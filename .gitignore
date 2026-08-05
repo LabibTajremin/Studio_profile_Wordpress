@@ -46,3 +46,13 @@ wp-config.php
 # Note: If you wish to whitelist themes,
 # uncomment the next line
 #/wp-content/themes
+
+# Maapkathi build tooling
+/vendor/
+/node_modules/
+/.wp-env
+/wp-env-cache
+.phpunit.result.cache
+/tests/playwright-report/
+/tests/test-results/
+.DS_Store

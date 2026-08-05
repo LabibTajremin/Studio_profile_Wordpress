@@ -1,0 +1,42 @@
+.mk-admin .mk-card {
+	background: #fff;
+	border: 1px solid #dcdcde;
+	border-radius: 8px;
+	padding: 1.5rem;
+	max-width: 480px;
+}
+.mk-admin .mk-warning {
+	color: #b32d2e;
+	font-weight: 600;
+}
+.mk-admin .mk-swatch-grid {
+	display: grid;
+	grid-template-columns: repeat(8, 32px);
+	gap: 8px;
+}
+.mk-admin .mk-swatch {
+	position: relative;
+	width: 32px;
+	height: 32px;
+	border-radius: 6px;
+	display: block;
+	cursor: pointer;
+	border: 2px solid transparent;
+}
+.mk-admin .mk-swatch input {
+	position: absolute;
+	inset: 0;
+	opacity: 0;
+	cursor: pointer;
+}
+.mk-admin .mk-swatch:has(input:checked) {
+	border-color: #1d2327;
+	box-shadow: 0 0 0 2px #fff, 0 0 0 4px #1d2327;
+}
+@media (max-width: 782px) {
+	.mk-admin .form-table th,
+	.mk-admin .form-table td {
+		display: block;
+		width: 100%;
+	}
+}

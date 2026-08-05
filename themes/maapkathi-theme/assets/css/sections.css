@@ -1,0 +1,73 @@
+/* Hero */
+.mk-hero { position: relative; min-height: 80vh; overflow: hidden; }
+.mk-hero__slide {
+	position: absolute;
+	inset: 0;
+	opacity: 0;
+	visibility: hidden;
+	transition: opacity var(--motion-duration) var(--motion-ease);
+}
+.mk-hero__slide.is-active { opacity: 1; visibility: visible; position: relative; }
+.mk-hero__slide--placeholder {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	min-height: 80vh;
+	background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 60%, black));
+	color: var(--accent-foreground);
+	text-align: center;
+	padding: 2rem;
+}
+.mk-hero__media, .mk-hero__embed, .mk-hero__embed iframe {
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	border: 0;
+}
+.mk-hero__embed { background-size: cover; background-position: center; }
+[data-hero-animation="ken-burns-drift"] .mk-hero__slide.is-active .mk-hero__media:not(.mk-hero__media--gif) {
+	animation: mk-ken-burns calc(var(--motion-duration) * 20) var(--motion-ease) forwards;
+}
+@keyframes mk-ken-burns {
+	from { transform: scale(1); }
+	to { transform: scale(1.08) translate(-1%, -1%); }
+}
+.mk-hero__copy {
+	position: relative;
+	z-index: 2;
+	color: var(--accent-foreground);
+	max-width: 640px;
+	margin: auto;
+	text-align: center;
+	padding: 2rem;
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
+	height: 100%;
+	justify-content: center;
+}
+.mk-hero__eyebrow { text-transform: uppercase; letter-spacing: 0.1em; font-size: 0.85rem; }
+.mk-hero__headline { font-family: var(--font-hero); font-size: clamp(2rem, 6vw, 4rem); color: var(--accent-foreground); }
+
+/* Clients */
+.mk-clients__wall { display: flex; flex-wrap: wrap; gap: 2rem; align-items: center; justify-content: center; }
+.mk-clients__wall img { height: 40px; width: auto; opacity: 0.7; }
+
+/* FAQ accordion */
+.mk-accordion__item { border-bottom: 1px solid color-mix(in srgb, var(--foreground) 15%, transparent); padding-block: 1rem; }
+.mk-accordion__item summary { cursor: pointer; font-weight: 600; }
+
+/* CTA band */
+.mk-cta-band { background: var(--accent); color: var(--accent-foreground); text-align: center; border-radius: var(--radius); }
+.mk-cta-band h2 { color: var(--accent-foreground); }
+
+/* Admin shield note */
+.mk-admin-shield-note { text-align: center; font-size: 0.8rem; padding: 0.25rem; }
+
+@media (max-width: 375px) {
+	.mk-container { padding-inline: 1rem; }
+}

@@ -1,0 +1,48 @@
+/*
+ * Fallback custom-property defaults. The authoritative values are injected
+ * inline in <head> by ThemeVarsBuilder (plugin) per §10/§11 — this file only
+ * guarantees every var resolves to something sane before that block loads
+ * or if the plugin is ever deactivated.
+ */
+:root {
+	--accent: #6e1f2a;
+	--accent-dark: #8f2d3b;
+	--accent-foreground: #faf6f1;
+	--background: #faf8f5;
+	--foreground: #141110;
+	--pattern-css: background: none;
+	--pattern-opacity: 0.06;
+	--font-headings: "Fraunces", Georgia, "Times New Roman", serif;
+	--font-body: "Manrope", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+	--font-nav: var(--font-body);
+	--font-buttons: var(--font-body);
+	--font-hero: var(--font-headings);
+	--font-accents: var(--font-body);
+	--heading-color: inherit;
+	--body-color: inherit;
+	--radius: 6px;
+	--density: 1;
+	--grain-opacity: 0;
+	--glass-blur: 12px;
+	--motion-duration: 600ms;
+	--motion-ease: cubic-bezier(0.16, 1, 0.3, 1);
+	--motion-distance: 12px;
+	--motion-stagger: 70ms;
+	--parallax-intensity: 0.2;
+}
+
+:root[data-theme="dark"] {
+	--background: #17130f;
+	--foreground: #faf6f1;
+	--accent: var(--accent-dark);
+}
+
+@media (prefers-reduced-motion: reduce) {
+	:root {
+		--motion-duration: 0ms !important;
+		--motion-ease: linear !important;
+		--motion-distance: 0px !important;
+		--motion-stagger: 0ms !important;
+		--parallax-intensity: 0 !important;
+	}
+}

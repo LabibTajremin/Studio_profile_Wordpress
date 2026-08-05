@@ -1,0 +1,11 @@
+parameters:
+    level: 6
+    paths:
+        - plugins/maapkathi-core/src
+        - themes/maapkathi-theme
+    excludePaths:
+        - '*/vendor/*'
+    bootstrapFiles:
+        - vendor/szepeviktor/phpstan-wordpress/bootstrap.php
+includes:
+    - vendor/szepeviktor/phpstan-wordpress/extension.neon

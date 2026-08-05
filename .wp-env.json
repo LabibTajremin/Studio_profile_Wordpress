@@ -1,0 +1,25 @@
+{
+  "core": null,
+  "phpVersion": "8.1",
+  "plugins": [
+    "./plugins/maapkathi-core"
+  ],
+  "themes": [
+    "./themes/maapkathi-theme"
+  ],
+  "config": {
+    "WP_DEBUG": true,
+    "WP_DEBUG_LOG": true,
+    "SCRIPT_DEBUG": true,
+    "MK_STORAGE_DRIVER": 3,
+    "MK_VIDEO_DRIVER": 0,
+    "MK_CACHE_DRIVER": 1,
+    "MK_MAIL_DRIVER": 0
+  },
+  "env": {
+    "tests": {
+      "port": 8889
+    }
+  },
+  "mappings": {}
+}
