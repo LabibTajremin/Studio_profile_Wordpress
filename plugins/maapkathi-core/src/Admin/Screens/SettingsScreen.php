@@ -43,6 +43,12 @@ final class SettingsScreen {
 		$settings['whatsapp']                     = sanitize_text_field( wp_unslash( $_POST['whatsapp'] ?? '' ) );
 		$settings['address']                      = sanitize_textarea_field( wp_unslash( $_POST['address'] ?? '' ) );
 		$settings['logo_show_title']              = ! empty( $_POST['logo_show_title'] );
+
+		// Branding images are stored as attachment IDs (0/'' clears them),
+		// which Branding::attachment_url() resolves at render time.
+		foreach ( array( 'logo_light', 'logo_dark', 'favicon' ) as $image_key ) {
+			$settings[ $image_key ] = absint( $_POST[ $image_key ] ?? 0 );
+		}
 		$settings['blog_enabled']                 = ! empty( $_POST['blog_enabled'] );
 		$settings['vision_mission_enabled']       = ! empty( $_POST['vision_mission_enabled'] );
 		$settings['vision_text']                  = sanitize_textarea_field( wp_unslash( $_POST['vision_text'] ?? '' ) );

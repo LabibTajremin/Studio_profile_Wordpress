@@ -1,0 +1,94 @@
+# Maapkathi Studio — root .htaccess for Hostinger (LiteSpeed)
+#
+# Copy to the WordPress root as `.htaccess`. WordPress manages the block
+# between the BEGIN/END WordPress markers itself — leave that alone; add
+# your own rules outside it.
+
+# ---------------------------------------------------------------------
+# Protect sensitive files
+# ---------------------------------------------------------------------
+<FilesMatch "^(wp-config\.php|\.env|composer\.json|composer\.lock|package\.json|package-lock\.json|phpcs\.xml\.dist|phpstan\.neon\.dist|phpunit\.xml\.dist|README\.md|BUILD_INSTRUCTIONS\.md)$">
+	Require all denied
+</FilesMatch>
+
+# Hide dotfiles (.git, .DS_Store, …)
+<FilesMatch "^\.">
+	Require all denied
+</FilesMatch>
+
+# Block direct access to the debug log if one is ever produced
+<Files "debug.log">
+	Require all denied
+</Files>
+
+# No directory listings
+Options -Indexes
+
+# XML-RPC is disabled in the plugin too; this stops it at the web server
+# so the request never reaches PHP at all.
+<Files "xmlrpc.php">
+	Require all denied
+</Files>
+
+# ---------------------------------------------------------------------
+# Security headers (belt and braces — the plugin sends these too, but
+# having them here covers static files as well)
+# ---------------------------------------------------------------------
+<IfModule mod_headers.c>
+	Header always set X-Content-Type-Options "nosniff"
+	Header always set X-Frame-Options "SAMEORIGIN"
+	Header always set Referrer-Policy "strict-origin-when-cross-origin"
+	Header always set Permissions-Policy "geolocation=(), microphone=(), camera=()"
+	# Enable once HTTPS is confirmed working on the domain:
+	# Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
+</IfModule>
+
+# ---------------------------------------------------------------------
+# Static asset caching + compression
+#
+# Video is served directly by LiteSpeed as a static file — this is what
+# keeps HTTP Range (206) requests working and costs zero PHP workers.
+# ---------------------------------------------------------------------
+<IfModule mod_expires.c>
+	ExpiresActive On
+	ExpiresByType image/jpeg          "access plus 1 year"
+	ExpiresByType image/png           "access plus 1 year"
+	ExpiresByType image/webp          "access plus 1 year"
+	ExpiresByType image/gif           "access plus 1 year"
+	ExpiresByType image/svg+xml       "access plus 1 year"
+	ExpiresByType video/mp4           "access plus 1 year"
+	ExpiresByType video/webm          "access plus 1 year"
+	ExpiresByType text/css            "access plus 1 month"
+	ExpiresByType application/javascript "access plus 1 month"
+	ExpiresByType font/woff2          "access plus 1 year"
+</IfModule>
+
+<IfModule mod_deflate.c>
+	AddOutputFilterByType DEFLATE text/html text/css text/plain text/xml application/javascript application/json image/svg+xml
+</IfModule>
+
+# Range requests must stay enabled for video seeking (§6.1 rule 2).
+<IfModule mod_headers.c>
+	Header set Accept-Ranges bytes
+</IfModule>
+
+# ---------------------------------------------------------------------
+# Force HTTPS (enable after the SSL certificate is active in hPanel)
+# ---------------------------------------------------------------------
+# <IfModule mod_rewrite.c>
+# RewriteEngine On
+# RewriteCond %{HTTPS} !=on
+# RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+# </IfModule>
+
+# BEGIN WordPress
+<IfModule mod_rewrite.c>
+RewriteEngine On
+RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+RewriteBase /
+RewriteRule ^index\.php$ - [L]
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule . /index.php [L]
+</IfModule>
+# END WordPress

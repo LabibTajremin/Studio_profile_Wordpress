@@ -62,6 +62,18 @@ html[data-loader-style="bar"] .mk-loader {
 
 @media (prefers-reduced-motion: reduce) {
 	.mk-reveal, .mk-card, .mk-card__media img { transition: none !important; animation: none !important; }
+	.mk-reveal { opacity: 1 !important; transform: none !important; }
+
+	/* Autoplay is disabled for every video kind when the visitor prefers
+	   reduced motion (§6.2) — the poster still is shown instead, and the
+	   third-party embed is not rendered at all. */
+	.mk-hero__slide video,
+	.mk-hero__embed { display: none !important; }
+	.mk-hero__media--reduced { display: block !important; }
+
+	/* An animated GIF cannot be paused, so the stored first frame is
+	   swapped in by the motion engine; suppress the Ken Burns drift too. */
+	.mk-hero__media { animation: none !important; }
 }
 
 @media (max-width: 767px) {

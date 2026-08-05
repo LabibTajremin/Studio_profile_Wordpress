@@ -217,9 +217,9 @@ $is_custom_preset = 'custom' === $settings['motion_preset'];
 				<td>
 					<input type="range" min="0" max="300" step="10" name="mk_theme_settings[stagger_ms]" value="<?php echo esc_attr( (string) $settings['stagger_ms'] ); ?>" <?php disabled( ! $is_custom_preset ); ?> oninput="this.nextElementSibling.textContent=this.value" />
 					<output><?php echo esc_html( (string) $settings['stagger_ms'] ); ?></output>
-					<?php if ( ! $is_custom_preset ) : ?>
-						<p class="description"><?php esc_html_e( "Set the preset to Custom to tune this.", 'maapkathi' ); ?></p>
-					<?php endif; ?>
+					<p class="description mk-stagger-help" <?php echo $is_custom_preset ? 'hidden' : ''; ?>>
+						<?php esc_html_e( 'Set the preset to Custom to tune this — every other preset supplies its own stagger.', 'maapkathi' ); ?>
+					</p>
 				</td>
 			</tr>
 			<tr>

@@ -2,22 +2,35 @@
 	background: #fff;
 	border: 1px solid #dcdcde;
 	border-radius: 8px;
-	padding: 1.5rem;
-	max-width: 480px;
+	padding: 1.25rem 1.5rem;
+	margin-bottom: 1rem;
 }
-.mk-admin .mk-warning {
-	color: #b32d2e;
+.mk-admin .mk-warning { color: #b32d2e; font-weight: 600; }
+
+.mk-admin .mk-badge {
+	display: inline-block;
+	background: #d63638;
+	color: #fff;
+	border-radius: 10px;
+	font-size: 11px;
+	line-height: 1.6;
+	padding: 0 8px;
+	vertical-align: middle;
 	font-weight: 600;
 }
+.mk-admin .mk-badge--new { background: #2271b1; }
+
+/* Accent swatch grid */
 .mk-admin .mk-swatch-grid {
 	display: grid;
-	grid-template-columns: repeat(8, 32px);
+	grid-template-columns: repeat(auto-fill, 34px);
 	gap: 8px;
+	max-width: 420px;
 }
 .mk-admin .mk-swatch {
 	position: relative;
-	width: 32px;
-	height: 32px;
+	width: 34px;
+	height: 34px;
 	border-radius: 6px;
 	display: block;
 	cursor: pointer;
@@ -28,15 +41,69 @@
 	inset: 0;
 	opacity: 0;
 	cursor: pointer;
+	margin: 0;
 }
 .mk-admin .mk-swatch:has(input:checked) {
-	border-color: #1d2327;
 	box-shadow: 0 0 0 2px #fff, 0 0 0 4px #1d2327;
 }
+.mk-admin .mk-swatch:focus-within {
+	box-shadow: 0 0 0 2px #fff, 0 0 0 4px #2271b1;
+}
+
+/* Media picker */
+.mk-admin [data-mk-media] .mk-media__preview:not(:empty) {
+	margin-bottom: 0.5rem;
+	padding: 8px;
+	background: #f6f7f7;
+	border: 1px solid #dcdcde;
+	border-radius: 6px;
+	display: inline-block;
+	max-width: 260px;
+}
+.mk-admin [data-mk-media] .mk-media__preview img {
+	max-width: 100%;
+	height: auto;
+	display: block;
+}
+.mk-admin .mk-media__clear { color: #b32d2e; margin-left: 0.5rem; }
+
+/* Hero slide editor */
+.mk-admin .mk-hero-length-note {
+	background: #fcf9e8;
+	border-left: 4px solid #dba617;
+	padding: 0.75rem 1rem;
+	margin: 0.75rem 0;
+}
+.mk-admin .mk-video-duration-warning {
+	background: #fcf0f1;
+	border-left: 4px solid #d63638;
+	padding: 0.75rem 1rem;
+	margin: 0.5rem 0 0;
+}
+.mk-admin .mk-stagger-help { color: #646970; font-style: italic; }
+
+.mk-admin fieldset legend {
+	font-size: 1.05rem;
+	padding: 0 0.35rem;
+}
+
+/* Every tap target stays >= 44px on a phone (§9). */
 @media (max-width: 782px) {
 	.mk-admin .form-table th,
 	.mk-admin .form-table td {
 		display: block;
 		width: 100%;
+		padding-left: 0;
+		padding-right: 0;
 	}
+	.mk-admin .button,
+	.mk-admin input[type="text"],
+	.mk-admin input[type="url"],
+	.mk-admin input[type="email"],
+	.mk-admin input[type="number"],
+	.mk-admin select {
+		min-height: 44px;
+	}
+	.mk-admin .wp-list-table td,
+	.mk-admin .wp-list-table th { word-break: break-word; }
 }

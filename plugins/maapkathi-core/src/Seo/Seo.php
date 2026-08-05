@@ -52,28 +52,90 @@ final class Seo {
 		}
 	}
 
+	private function site_settings(): array {
+		$settings = get_option( 'mk_site_settings', array() );
+		return is_array( $settings ) ? $settings : array();
+	}
+
 	private function resolve_title( array $seo ): string {
 		if ( is_singular() ) {
 			return wp_strip_all_tags( get_the_title() );
 		}
-		return $seo['default_title'] ?? get_bloginfo( 'name' );
-	}
 
-	private function resolve_description( array $seo ): string {
-		if ( is_singular() && has_excerpt() ) {
-			return wp_strip_all_tags( get_the_excerpt() );
+		$site = $this->site_settings();
+
+		foreach ( array( $seo['default_title'] ?? '', $site['studio_name'] ?? '', get_bloginfo( 'name' ) ) as $candidate ) {
+			if ( '' !== trim( (string) $candidate ) ) {
+				return (string) $candidate;
+			}
 		}
-		return $seo['default_description'] ?? get_bloginfo( 'description' );
+
+		return '';
 	}
 
+	/**
+	 * Every page must end up with a non-empty description (§11 gate), so
+	 * this walks a real fallback chain rather than trusting one option to
+	 * be filled in.
+	 */
+	private function resolve_description( array $seo ): string {
+		$site = $this->site_settings();
+
+		$candidates = array();
+
+		if ( is_singular() ) {
+			if ( has_excerpt() ) {
+				$candidates[] = get_the_excerpt();
+			}
+			$post_id = get_the_ID();
+			if ( $post_id ) {
+				$candidates[] = get_post_meta( $post_id, 'mk_summary', true );
+				$candidates[] = wp_trim_words( wp_strip_all_tags( (string) get_post_field( 'post_content', $post_id ) ), 32 );
+			}
+		}
+
+		$candidates[] = $seo['default_description'] ?? '';
+		$candidates[] = $site['tagline'] ?? '';
+		$candidates[] = get_bloginfo( 'description' );
+
+		foreach ( $candidates as $candidate ) {
+			$candidate = trim( wp_strip_all_tags( (string) $candidate ) );
+			if ( '' !== $candidate ) {
+				return $candidate;
+			}
+		}
+
+		return '';
+	}
+
+	/**
+	 * OG image chain: the post's own cover → the configured default →
+	 * the site logo → a generated branded placeholder, so social shares
+	 * never fall back to a blank card.
+	 */
 	private function resolve_image( array $seo ): string {
 		if ( is_singular() && has_post_thumbnail() ) {
 			$src = get_the_post_thumbnail_url( null, 'large' );
 			if ( $src ) {
-				return $src;
+				return (string) $src;
 			}
 		}
-		return $seo['og_image'] ?? '';
+
+		if ( ! empty( $seo['og_image'] ) ) {
+			return (string) $seo['og_image'];
+		}
+
+		$logo = \Maapkathi\Core\Support\Branding::logo_light_url() ?: \Maapkathi\Core\Support\Branding::logo_dark_url();
+		if ( $logo ) {
+			return $logo;
+		}
+
+		$site = $this->site_settings();
+		return \Maapkathi\Core\Rest\PlaceholderController::url(
+			(string) ( $site['studio_name'] ?? get_bloginfo( 'name' ) ),
+			1200,
+			630
+		);
 	}
 
 	private function canonical_url(): string {
@@ -97,8 +159,12 @@ final class Seo {
 	}
 
 	private function render_faq_page(): void {
-		$site_settings = get_option( 'mk_site_settings', array() );
-		$faqs          = $site_settings['faqs'] ?? array();
+		// Read through the same accessor the template uses, so the
+		// structured data can never describe a different set of FAQs than
+		// the ones actually rendered on the page (which would be a
+		// structured-data violation, not just a mismatch).
+		$faqs = \Maapkathi\Core\Support\Content::faqs();
+
 		if ( empty( $faqs ) ) {
 			return;
 		}

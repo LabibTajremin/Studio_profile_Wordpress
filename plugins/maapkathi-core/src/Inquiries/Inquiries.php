@@ -42,7 +42,24 @@ final class Inquiries {
 		$errors = $this->validate( $name, $email, $message );
 
 		if ( ! empty( $errors ) ) {
-			set_transient( 'mk_inquiry_errors_' . $this->client_ip_hash(), $errors, MINUTE_IN_SECONDS );
+			set_transient( self::errors_key(), $errors, 5 * MINUTE_IN_SECONDS );
+			// Preserve what they typed so the form can be repopulated —
+			// making someone retype a long message because of one bad field
+			// is how contact forms lose real enquiries.
+			// Repopulate from the raw text, not the sanitised values:
+			// sanitize_email() turns a typo'd address into an empty string,
+			// which would silently wipe the field the visitor most needs to
+			// correct. Output is escaped at render time.
+			set_transient(
+				self::old_input_key(),
+				array(
+					'name'    => sanitize_text_field( wp_unslash( $_POST['name'] ?? '' ) ),
+					'email'   => sanitize_text_field( wp_unslash( $_POST['email'] ?? '' ) ),
+					'phone'   => $phone,
+					'message' => $message,
+				),
+				5 * MINUTE_IN_SECONDS
+			);
 			wp_safe_redirect( wp_get_referer() ?: home_url( '/contact/' ) );
 			exit;
 		}
@@ -100,8 +117,50 @@ final class Inquiries {
 	}
 
 	private function client_ip_hash(): string {
+		return self::ip_hash();
+	}
+
+	private static function ip_hash(): string {
 		$ip = isset( $_SERVER['REMOTE_ADDR'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) ) : 'unknown';
 		return md5( $ip );
+	}
+
+	private static function errors_key(): string {
+		return 'mk_inquiry_errors_' . self::ip_hash();
+	}
+
+	private static function old_input_key(): string {
+		return 'mk_inquiry_old_' . self::ip_hash();
+	}
+
+	/**
+	 * Validation errors from the previous submission, consumed once
+	 * (flash-message semantics) so a later refresh doesn't re-show them.
+	 *
+	 * @return string[]
+	 */
+	public static function take_errors(): array {
+		$errors = get_transient( self::errors_key() );
+		if ( ! $errors ) {
+			return array();
+		}
+		delete_transient( self::errors_key() );
+		return is_array( $errors ) ? $errors : array();
+	}
+
+	/**
+	 * The previously submitted values, so a rejected form can be
+	 * repopulated instead of cleared. Consumed once, like the errors.
+	 *
+	 * @return array<string,string>
+	 */
+	public static function take_old_input(): array {
+		$old = get_transient( self::old_input_key() );
+		if ( ! $old ) {
+			return array();
+		}
+		delete_transient( self::old_input_key() );
+		return is_array( $old ) ? $old : array();
 	}
 
 	private function maybe_notify( string $name, string $email, string $message ): void {

@@ -1,5 +1,13 @@
 # Build status — honest checklist
 
+> **Latest pass (client-view sweep + production hardening).** Added a
+> versioned migration runner, an Enquiries inbox, the placeholder and
+> health endpoints, favicon/logo handling, security hardening, locally
+> generated demo imagery, and Hostinger deployment files — and fixed a
+> further batch of real bugs listed under "Second round of live-verified
+> fixes" below. All routes and admin screens re-verified against the live
+> Docker stack with an empty error log.
+
 This plugin + theme have now been installed and exercised against a real,
 running WordPress 6.7 + MariaDB 10.6 stack (Docker: `mariadb:10.6`,
 `wordpress:6.7-php8.2-apache`, `wordpress:cli-php8.2`), not just read for
@@ -68,6 +76,90 @@ request. All four are fixed, and the fix was re-verified live afterward.
    `media_kind`. Editing a saved image slide threw ~10 "Undefined array
    key" warnings per page load. Fixed by merging every row over the full
    default shape before rendering. Re-verified: zero log entries after.
+
+## Second round of live-verified fixes
+
+Found by walking the site as a client would, against the live stack:
+
+6. **All 29 Site Text fields were completely dormant.** `SiteText::` was
+   never called by a single template — the entire screen saved values
+   nothing ever read, which is precisely the "a control that does nothing
+   is worse than no control" failure §11 exists to prevent. Wired every
+   field into the templates, added shipped defaults so a fresh install
+   renders real copy, and verified live that changing a heading in the
+   admin changes the public homepage.
+7. **The homepage was missing 8 of its 13 required sections.** §3.2
+   specifies hero, tagline note, client wall, portfolio categories,
+   featured projects, services, stats band, values, team, testimonials,
+   awards, FAQ, and CTA. Only 5 existed. Rebuilt the whole front page.
+8. **Client logos and FAQs read from the wrong data source.**
+   `front-page.php` pulled them from `mk_site_settings` while the admin
+   screens wrote them as `mk_client` / `mk_faq` posts — so the client wall
+   could never render and FAQs only worked by accident of the seeder.
+   Added a `Support\Content` accessor layer that every template and the
+   JSON-LD now share.
+9. **FAQPage JSON-LD described a different set of FAQs than the page
+   rendered** (same root cause as #8) — a genuine structured-data
+   violation. Both now read through the same accessor.
+10. **Empty meta descriptions site-wide.** The SEO fallback chain ended at
+    `get_bloginfo('description')`, which is blank on a fresh install, so
+    every page shipped `<meta name="description" content="">`. Now walks
+    excerpt → summary → trimmed content → SEO default → studio tagline,
+    and OG images fall back through cover → default → logo → generated
+    placeholder.
+11. **`nav.php` would have fatalled the site.** It declared
+    `mk_blog_enabled()` unguarded, and the new plugin helper declares the
+    same name — a redeclare fatal the moment both loaded. Both are now
+    guarded.
+12. **Contact-form validation errors were stored but never displayed.**
+    A visitor submitting a bad address was redirected to a form that
+    looked like nothing happened. Errors now render, and the form
+    repopulates from the raw input (sanitize_email() had been wiping the
+    very field that needed correcting).
+13. **No Enquiries inbox existed at all.** The form wrote to
+    `mk_inquiries` and nothing in wp-admin ever read it — submissions were
+    invisible to the site owner. Built the inbox with read/unread state,
+    filters, pagination, reply/delete, and an unread-count bubble on the
+    menu.
+14. **Rewrite rules were flushed before post types were registered** on
+    activation, so `/work/{slug}` 404'd until someone re-saved Permalinks.
+
+## New in this pass
+
+- **Versioned migration runner** (`Support\Migrations`): ordered,
+  idempotent steps with a concurrency lock, run on activation *and*
+  version-guarded on every load, so an in-place file update upgrades the
+  database with no deactivate/reactivate. Verified live by dropping all
+  three tables and simply loading a page — they were recreated and the
+  health endpoint went green. Uses `dbDelta()` rather than
+  `CREATE TABLE IF NOT EXISTS` / `ADD COLUMN IF NOT EXISTS`: dbDelta gives
+  the same create-if-missing semantics portably, whereas the MariaDB-only
+  `IF NOT EXISTS` column syntax is rejected outright by MySQL 8.
+- **Demo images and logos generated locally with GD** — project covers,
+  galleries, member photos, client logos, hero art, and a favicon, all
+  imported through the Media Library. No external placeholder service, so
+  a fresh install looks finished with zero outbound network access.
+  Seeder is idempotent and supports `--fresh`.
+- **Placeholder endpoint** (`/wp-json/maapkathi/v1/placeholder/{w}/{h}`) —
+  branded gradient SVGs generated on demand, replacing the source app's
+  `/api/placeholder` route.
+- **Health endpoint** (`/wp-json/maapkathi/v1/health`) — app + DB +
+  schema status, public, leaking no version or config detail.
+- **Security hardening** (§13): version string and asset `?ver=` stripped,
+  XML-RPC disabled, REST user enumeration and `?author=` scans blocked,
+  generic login errors, upload MIME allowlist (SVG excluded), and
+  `X-Content-Type-Options` / `X-Frame-Options` / `Referrer-Policy` /
+  `Permissions-Policy` / CSP `frame-src` limited to the video embed
+  allowlist. All confirmed present on live response headers.
+- **Favicon fallback chain** (favicon → light logo → dark logo → built-in
+  mark) and CSS-only light/dark logo swap, plus Media Library pickers for
+  logo and favicon on the Settings screen.
+- **Hero editor rebuilt**: media-kind toggles that show only the relevant
+  fields, the §6.3 length note, and a client-side duration warning.
+- **Deployment kit**: `deploy/wp-config-sample.php` and
+  `deploy/htaccess-sample.txt`, plus a rewritten `docs/DEPLOYMENT.md`
+  covering the real hPanel flow, the Range-request video test, backups,
+  and a troubleshooting table.
 
 ## Verified live, end to end, with a real browser-equivalent HTTP session
 

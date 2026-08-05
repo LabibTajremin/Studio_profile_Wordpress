@@ -97,8 +97,13 @@ h1, h2, h3, h4, h5, h6 {
 	gap: 1rem;
 }
 .mk-logo { display: flex; align-items: center; gap: 0.5em; text-decoration: none; color: inherit; }
-.mk-logo__light { display: block; }
-:root[data-theme="dark"] .mk-logo__light img.mk-logo-dark { display: none; }
+.mk-logo__img, .mk-logo__mark { height: 36px; width: auto; display: block; }
+.mk-logo__title { font-family: var(--font-headings); font-weight: 600; }
+/* Light/dark logo swap happens in CSS, not JS, so there is no flash of the
+   wrong logo while scripts load (§3.5). */
+.mk-logo__img--dark { display: none; }
+:root[data-theme="dark"] .mk-logo__img--light { display: none; }
+:root[data-theme="dark"] .mk-logo__img--dark { display: block; }
 .mk-nav--desktop ul { list-style: none; display: flex; gap: 1.5rem; margin: 0; padding: 0; font-family: var(--font-nav); }
 .mk-nav--desktop a { text-decoration: none; color: inherit; }
 

@@ -1,122 +1,277 @@
 <?php
-declare( strict_types = 1 );
+/**
+ * Homepage — all 13 sections from §3.2, in order:
+ * hero carousel, tagline note, client logo wall, portfolio categories,
+ * featured projects, services, stats band, values, team, testimonials,
+ * awards, FAQ accordion, closing CTA band.
+ *
+ * Every section is self-hiding when it has no content, so a partially
+ * filled site never renders an empty heading.
+ */
 
-use Maapkathi\Core\Video\VideoResolver;
+declare( strict_types = 1 );
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-$site_settings  = get_option( 'mk_site_settings', array() );
-$theme_settings = \Maapkathi\Core\Theme\ThemeSettings::get();
-$slides         = $site_settings['hero_slides'] ?? array();
-$slide_seconds  = (int) ( $site_settings['hero_slide_duration'] ?? MK_HERO_SLIDE_SECONDS );
-
 get_header();
+
+get_template_part( 'parts/hero' );
+
+$tagline_note = mk_text( 'home_tagline_note' );
+$clients      = mk_content( 'clients' );
+$categories   = mk_content( 'project_categories' );
+$projects     = mk_content( 'featured_projects', 6 );
+$services     = mk_content( 'top_level_services', 4 );
+$stats        = mk_content( 'stats' );
+$values       = mk_content( 'values' );
+$members      = mk_content( 'members', 4 );
+$testimonials = mk_content( 'testimonials' );
+$awards       = mk_content( 'awards' );
+$faqs         = mk_content( 'faqs' );
 ?>
-<section class="mk-hero" data-hero data-slide-seconds="<?php echo esc_attr( (string) $slide_seconds ); ?>" data-single="<?php echo esc_attr( count( $slides ) < 2 ? '1' : '0' ); ?>">
-	<?php if ( empty( $slides ) ) : ?>
-		<div class="mk-hero__slide mk-hero__slide--placeholder">
-			<h1><?php echo esc_html( $site_settings['studio_name'] ?? get_bloginfo( 'name' ) ); ?></h1>
-			<p><?php echo esc_html( $site_settings['tagline'] ?? get_bloginfo( 'description' ) ); ?></p>
-		</div>
-	<?php else : ?>
-		<?php
-		$resolver = new VideoResolver();
-		foreach ( $slides as $i => $slide ) :
-			$kind = $slide['media_kind'] ?? 'image';
-			?>
-			<div class="mk-hero__slide" data-index="<?php echo esc_attr( (string) $i ); ?>" data-hold="<?php echo esc_attr( ! empty( $slide['hold_until_video_ends'] ) ? '1' : '0' ); ?>">
-				<?php if ( 'image' === $kind && ! empty( $slide['image_url'] ) ) : ?>
-					<img src="<?php echo esc_url( $slide['image_url'] ); ?>" alt="<?php echo esc_attr( $slide['headline'] ?? '' ); ?>" class="mk-hero__media" loading="<?php echo 0 === $i ? 'eager' : 'lazy'; ?>" fetchpriority="<?php echo 0 === $i ? 'high' : 'auto'; ?>" />
-				<?php elseif ( 'gif' === $kind && ! empty( $slide['gif_url'] ) ) : ?>
-					<img src="<?php echo esc_url( $slide['gif_url'] ); ?>" data-reduced-src="<?php echo esc_url( $slide['gif_first_frame_url'] ?? $slide['gif_url'] ); ?>" alt="<?php echo esc_attr( $slide['headline'] ?? '' ); ?>" class="mk-hero__media mk-hero__media--gif" loading="eager" fetchpriority="high" />
-				<?php else :
-					$video = $resolver->resolve(
-						array(
-							'video_source'     => $slide['video_source'] ?? 'upload',
-							'video_upload_url' => $slide['video_upload_url'] ?? null,
-							'video_url'        => $slide['video_url'] ?? null,
-							'video_poster'     => $slide['video_poster'] ?? null,
-						),
-						true
-					);
-					if ( $video ) :
-						if ( 'file' === $video->kind ) :
-							?>
-							<video class="mk-hero__media" autoplay muted loop playsinline preload="metadata" poster="<?php echo esc_url( $video->poster ?? '' ); ?>">
-								<source src="<?php echo esc_url( $video->src ); ?>" />
-							</video>
-						<?php else : ?>
-							<div class="mk-hero__embed" style="background-image:url('<?php echo esc_url( $video->poster ?? '' ); ?>')">
-								<iframe src="<?php echo esc_url( $video->src ); ?>" title="<?php echo esc_attr( $slide['headline'] ?? 'Hero video' ); ?>" allow="autoplay; encrypted-media" referrerpolicy="strict-origin-when-cross-origin" sandbox="allow-scripts allow-same-origin allow-presentation" loading="eager"></iframe>
-							</div>
-						<?php endif; ?>
-					<?php endif; ?>
-				<?php endif; ?>
 
-				<div class="mk-hero__copy">
-					<?php if ( ! empty( $slide['eyebrow'] ) ) : ?><p class="mk-hero__eyebrow"><?php echo esc_html( $slide['eyebrow'] ); ?></p><?php endif; ?>
-					<h1 class="mk-hero__headline"><?php echo esc_html( $slide['headline'] ?? '' ); ?></h1>
-					<?php if ( ! empty( $slide['body'] ) ) : ?><p class="mk-hero__body"><?php echo esc_html( $slide['body'] ); ?></p><?php endif; ?>
-					<?php if ( ! empty( $slide['cta_label'] ) && ! empty( $slide['cta_href'] ) ) : ?>
-						<a class="mk-btn mk-btn--accent" href="<?php echo esc_url( $slide['cta_href'] ); ?>"><?php echo esc_html( $slide['cta_label'] ); ?></a>
-					<?php endif; ?>
-				</div>
-			</div>
-		<?php endforeach; ?>
-	<?php endif; ?>
-</section>
-
-<?php if ( ! empty( $site_settings['clients'] ) ) : ?>
-<section class="mk-section mk-clients">
-	<div class="mk-container mk-clients__wall">
-		<?php foreach ( $site_settings['clients'] as $client ) : ?>
-			<img src="<?php echo esc_url( $client['logo_url'] ?? '' ); ?>" alt="<?php echo esc_attr( $client['name'] ?? '' ); ?>" loading="lazy" />
-		<?php endforeach; ?>
+<?php if ( $tagline_note ) : ?>
+<section class="mk-section mk-tagline-note" data-scroll-reveal>
+	<div class="mk-container">
+		<p class="mk-tagline-note__text"><?php echo esc_html( $tagline_note ); ?></p>
 	</div>
 </section>
 <?php endif; ?>
 
-<section class="mk-section mk-projects" data-scroll-reveal>
+<?php if ( $clients ) : ?>
+<section class="mk-section mk-clients" data-scroll-reveal>
 	<div class="mk-container">
-		<h2><?php esc_html_e( 'Featured Work', 'maapkathi' ); ?></h2>
-		<div class="mk-grid mk-grid--projects">
-			<?php
-			$featured = new WP_Query(
-				array(
-					'post_type'      => 'mk_project',
-					'posts_per_page' => 6,
-					'meta_key'       => 'mk_is_featured',
-					'meta_value'     => '1',
-				)
-			);
-			while ( $featured->have_posts() ) :
-				$featured->the_post();
-				?>
-				<a class="mk-card mk-card--project" href="<?php the_permalink(); ?>">
-					<?php if ( has_post_thumbnail() ) : ?>
-						<div class="mk-card__media"><?php the_post_thumbnail( 'large' ); ?></div>
-					<?php endif; ?>
-					<h3 class="mk-card__title"><?php the_title(); ?></h3>
-				</a>
+		<h2 class="mk-section__heading"><?php mk_the_text( 'home_clients_heading' ); ?></h2>
+		<div class="mk-clients__wall">
+			<?php foreach ( $clients as $client ) : ?>
 				<?php
-			endwhile;
-			wp_reset_postdata();
-			?>
+				$website = mk_meta( $client->ID, 'mk_website' );
+				$logo    = get_the_post_thumbnail( $client, 'medium', array( 'loading' => 'lazy' ) );
+				?>
+				<?php if ( $website ) : ?>
+					<a class="mk-clients__item" href="<?php echo esc_url( $website ); ?>" rel="noopener noreferrer" target="_blank">
+						<?php echo $logo ? $logo : esc_html( get_the_title( $client ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+					</a>
+				<?php else : ?>
+					<span class="mk-clients__item">
+						<?php echo $logo ? $logo : esc_html( get_the_title( $client ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+					</span>
+				<?php endif; ?>
+			<?php endforeach; ?>
 		</div>
 	</div>
 </section>
+<?php endif; ?>
 
-<?php if ( ! empty( $site_settings['faqs'] ) ) : ?>
+<?php if ( $categories ) : ?>
+<section class="mk-section mk-categories" data-scroll-reveal>
+	<div class="mk-container">
+		<h2 class="mk-section__heading"><?php mk_the_text( 'home_categories_heading' ); ?></h2>
+		<div class="mk-grid mk-grid--categories">
+			<?php foreach ( $categories as $term ) : ?>
+				<a class="mk-card mk-card--category" href="<?php echo esc_url( get_term_link( $term ) ); ?>">
+					<h3 class="mk-card__title"><?php echo esc_html( $term->name ); ?></h3>
+					<span class="mk-card__count">
+						<?php
+						printf(
+							/* translators: %d: number of projects in this category. */
+							esc_html( _n( '%d project', '%d projects', (int) $term->count, 'maapkathi' ) ),
+							(int) $term->count
+						);
+						?>
+					</span>
+				</a>
+			<?php endforeach; ?>
+		</div>
+	</div>
+</section>
+<?php endif; ?>
+
+<?php if ( $projects ) : ?>
+<section class="mk-section mk-projects" data-scroll-reveal>
+	<div class="mk-container">
+		<h2 class="mk-section__heading"><?php mk_the_text( 'home_projects_heading' ); ?></h2>
+		<div class="mk-grid mk-grid--projects">
+			<?php foreach ( $projects as $project ) : ?>
+				<a class="mk-card mk-card--project" href="<?php echo esc_url( (string) get_permalink( $project ) ); ?>">
+					<div class="mk-card__media">
+						<?php if ( has_post_thumbnail( $project ) ) : ?>
+							<?php echo get_the_post_thumbnail( $project, 'large', array( 'loading' => 'lazy' ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+						<?php else : ?>
+							<img src="<?php echo esc_url( mk_placeholder_url( get_the_title( $project ), 1200, 1500 ) ); ?>" alt="" loading="lazy" />
+						<?php endif; ?>
+					</div>
+					<h3 class="mk-card__title"><?php echo esc_html( get_the_title( $project ) ); ?></h3>
+					<?php $summary = mk_meta( $project->ID, 'mk_summary' ); ?>
+					<?php if ( $summary ) : ?>
+						<p class="mk-card__excerpt"><?php echo esc_html( wp_trim_words( $summary, 18 ) ); ?></p>
+					<?php endif; ?>
+				</a>
+			<?php endforeach; ?>
+		</div>
+		<p class="mk-section__more">
+			<a class="mk-btn mk-btn--ghost" href="<?php echo esc_url( (string) get_post_type_archive_link( 'mk_project' ) ); ?>">
+				<?php esc_html_e( 'View all work', 'maapkathi' ); ?>
+			</a>
+		</p>
+	</div>
+</section>
+<?php endif; ?>
+
+<?php if ( $services ) : ?>
+<section class="mk-section mk-services" data-scroll-reveal>
+	<div class="mk-container">
+		<h2 class="mk-section__heading"><?php mk_the_text( 'home_services_heading' ); ?></h2>
+		<div class="mk-grid mk-grid--services">
+			<?php foreach ( $services as $service ) : ?>
+				<a class="mk-card mk-card--service" href="<?php echo esc_url( (string) get_permalink( $service ) ); ?>">
+					<?php $icon = mk_meta( $service->ID, 'mk_icon' ); ?>
+					<?php if ( $icon ) : ?>
+						<span class="mk-card__icon dashicons <?php echo esc_attr( $icon ); ?>" aria-hidden="true"></span>
+					<?php endif; ?>
+					<h3 class="mk-card__title"><?php echo esc_html( get_the_title( $service ) ); ?></h3>
+					<p class="mk-card__excerpt"><?php echo esc_html( wp_trim_words( wp_strip_all_tags( $service->post_content ), 18 ) ); ?></p>
+				</a>
+			<?php endforeach; ?>
+		</div>
+	</div>
+</section>
+<?php endif; ?>
+
+<?php if ( $stats ) : ?>
+<section class="mk-section mk-stats-band" data-scroll-reveal>
+	<div class="mk-container">
+		<h2 class="mk-section__heading mk-section__heading--on-accent"><?php mk_the_text( 'home_stats_heading' ); ?></h2>
+		<div class="mk-grid mk-grid--stats">
+			<?php foreach ( $stats as $stat ) : ?>
+				<div class="mk-stat">
+					<span class="mk-stat__value">
+						<?php echo esc_html( mk_meta( $stat->ID, 'mk_value_number' ) ); ?><?php echo esc_html( mk_meta( $stat->ID, 'mk_suffix' ) ); ?>
+					</span>
+					<span class="mk-stat__label"><?php echo esc_html( get_the_title( $stat ) ); ?></span>
+				</div>
+			<?php endforeach; ?>
+		</div>
+	</div>
+</section>
+<?php endif; ?>
+
+<?php if ( $values ) : ?>
+<section class="mk-section mk-values" data-scroll-reveal>
+	<div class="mk-container">
+		<h2 class="mk-section__heading"><?php mk_the_text( 'home_values_heading' ); ?></h2>
+		<div class="mk-grid mk-grid--values">
+			<?php foreach ( $values as $value ) : ?>
+				<div class="mk-card mk-card--value">
+					<?php $icon = mk_meta( $value->ID, 'mk_icon' ); ?>
+					<?php if ( $icon ) : ?>
+						<span class="mk-card__icon dashicons <?php echo esc_attr( $icon ); ?>" aria-hidden="true"></span>
+					<?php endif; ?>
+					<h3 class="mk-card__title"><?php echo esc_html( get_the_title( $value ) ); ?></h3>
+					<p><?php echo esc_html( wp_strip_all_tags( $value->post_content ) ); ?></p>
+				</div>
+			<?php endforeach; ?>
+		</div>
+	</div>
+</section>
+<?php endif; ?>
+
+<?php if ( $members ) : ?>
+<section class="mk-section mk-team-preview" data-scroll-reveal>
+	<div class="mk-container">
+		<h2 class="mk-section__heading"><?php mk_the_text( 'home_team_heading' ); ?></h2>
+		<div class="mk-grid mk-grid--team">
+			<?php foreach ( $members as $member ) : ?>
+				<div class="mk-card mk-card--member">
+					<div class="mk-card__media">
+						<?php if ( has_post_thumbnail( $member ) ) : ?>
+							<?php echo get_the_post_thumbnail( $member, 'medium', array( 'loading' => 'lazy' ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+						<?php else : ?>
+							<img src="<?php echo esc_url( mk_placeholder_url( get_the_title( $member ), 600, 800 ) ); ?>" alt="" loading="lazy" />
+						<?php endif; ?>
+					</div>
+					<h3 class="mk-card__title"><?php echo esc_html( get_the_title( $member ) ); ?></h3>
+					<p class="mk-card__role"><?php echo esc_html( mk_meta( $member->ID, 'mk_role_title' ) ); ?></p>
+				</div>
+			<?php endforeach; ?>
+		</div>
+		<p class="mk-section__more">
+			<a class="mk-btn mk-btn--ghost" href="<?php echo esc_url( home_url( '/team/' ) ); ?>"><?php esc_html_e( 'Meet the team', 'maapkathi' ); ?></a>
+		</p>
+	</div>
+</section>
+<?php endif; ?>
+
+<?php if ( $testimonials ) : ?>
+<section class="mk-section mk-testimonials" data-scroll-reveal>
+	<div class="mk-container">
+		<h2 class="mk-section__heading"><?php mk_the_text( 'home_testimonials_heading' ); ?></h2>
+		<div class="mk-grid mk-grid--testimonials">
+			<?php foreach ( $testimonials as $testimonial ) : ?>
+				<?php
+				$rating = (int) mk_meta( $testimonial->ID, 'mk_rating', '0' );
+				$author = mk_meta( $testimonial->ID, 'mk_author_name', get_the_title( $testimonial ) );
+				$role   = mk_meta( $testimonial->ID, 'mk_author_role' );
+				$firm   = mk_meta( $testimonial->ID, 'mk_company' );
+				?>
+				<figure class="mk-card mk-card--testimonial">
+					<?php if ( $rating > 0 ) : ?>
+						<div class="mk-rating" role="img" aria-label="<?php echo esc_attr( sprintf( /* translators: %d: star rating out of five. */ __( '%d out of 5 stars', 'maapkathi' ), $rating ) ); ?>">
+							<?php echo esc_html( str_repeat( '★', min( 5, $rating ) ) . str_repeat( '☆', max( 0, 5 - $rating ) ) ); ?>
+						</div>
+					<?php endif; ?>
+					<blockquote><?php echo esc_html( mk_meta( $testimonial->ID, 'mk_quote' ) ); ?></blockquote>
+					<figcaption>
+						<strong><?php echo esc_html( $author ); ?></strong>
+						<?php if ( $role || $firm ) : ?>
+							<span><?php echo esc_html( trim( $role . ( $role && $firm ? ', ' : '' ) . $firm ) ); ?></span>
+						<?php endif; ?>
+					</figcaption>
+				</figure>
+			<?php endforeach; ?>
+		</div>
+	</div>
+</section>
+<?php endif; ?>
+
+<?php if ( $awards ) : ?>
+<section class="mk-section mk-awards" data-scroll-reveal>
+	<div class="mk-container">
+		<h2 class="mk-section__heading"><?php mk_the_text( 'home_awards_heading' ); ?></h2>
+		<ul class="mk-awards__list">
+			<?php foreach ( $awards as $award ) : ?>
+				<?php
+				$issuer = mk_meta( $award->ID, 'mk_issuer' );
+				$year   = mk_meta( $award->ID, 'mk_year' );
+				$link   = mk_meta( $award->ID, 'mk_link' );
+				?>
+				<li class="mk-awards__item">
+					<span class="mk-awards__title">
+						<?php if ( $link ) : ?>
+							<a href="<?php echo esc_url( $link ); ?>" rel="noopener noreferrer" target="_blank"><?php echo esc_html( get_the_title( $award ) ); ?></a>
+						<?php else : ?>
+							<?php echo esc_html( get_the_title( $award ) ); ?>
+						<?php endif; ?>
+					</span>
+					<span class="mk-awards__meta"><?php echo esc_html( trim( $issuer . ( $issuer && $year ? ' · ' : '' ) . $year ) ); ?></span>
+				</li>
+			<?php endforeach; ?>
+		</ul>
+	</div>
+</section>
+<?php endif; ?>
+
+<?php if ( $faqs ) : ?>
 <section class="mk-section mk-faq" data-scroll-reveal>
 	<div class="mk-container">
-		<h2><?php esc_html_e( 'Frequently Asked Questions', 'maapkathi' ); ?></h2>
+		<h2 class="mk-section__heading"><?php mk_the_text( 'home_faq_heading' ); ?></h2>
 		<div class="mk-accordion">
-			<?php foreach ( $site_settings['faqs'] as $faq ) : ?>
+			<?php foreach ( $faqs as $faq ) : ?>
 				<details class="mk-accordion__item">
-					<summary><?php echo esc_html( $faq['question'] ?? '' ); ?></summary>
-					<div><?php echo wp_kses_post( $faq['answer'] ?? '' ); ?></div>
+					<summary><?php echo esc_html( $faq['question'] ); ?></summary>
+					<div class="mk-accordion__body"><?php echo esc_html( $faq['answer'] ); ?></div>
 				</details>
 			<?php endforeach; ?>
 		</div>
@@ -126,8 +281,10 @@ get_header();
 
 <section class="mk-section mk-cta-band">
 	<div class="mk-container">
-		<h2><?php esc_html_e( "Let's build something", 'maapkathi' ); ?></h2>
-		<a class="mk-btn mk-btn--accent" href="<?php echo esc_url( home_url( '/contact/' ) ); ?>"><?php esc_html_e( 'Get in touch', 'maapkathi' ); ?></a>
+		<h2 class="mk-section__heading mk-section__heading--on-accent"><?php mk_the_text( 'home_cta_heading' ); ?></h2>
+		<a class="mk-btn mk-btn--on-accent" href="<?php echo esc_url( home_url( '/contact/' ) ); ?>">
+			<?php mk_the_text( 'home_cta_button_label' ); ?>
+		</a>
 	</div>
 </section>
 <?php

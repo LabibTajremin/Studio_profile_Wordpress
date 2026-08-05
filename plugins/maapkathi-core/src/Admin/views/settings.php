@@ -26,6 +26,37 @@ $socials = $settings['socials'] ?? array();
 			<tr><th><?php esc_html_e( 'Show title next to logo', 'maapkathi' ); ?></th><td><label><input type="checkbox" name="logo_show_title" value="1" <?php checked( $settings['logo_show_title'] ?? true ); ?> /> <?php esc_html_e( 'On', 'maapkathi' ); ?></label></td></tr>
 		</table>
 
+		<h2><?php esc_html_e( 'Branding', 'maapkathi' ); ?></h2>
+		<table class="form-table">
+			<?php
+			$mk_images = array(
+				'logo_light' => array( __( 'Logo (light mode)', 'maapkathi' ), __( 'Shown on light backgrounds. Recommended: SVG-crisp PNG, around 400×130.', 'maapkathi' ) ),
+				'logo_dark'  => array( __( 'Logo (dark mode)', 'maapkathi' ), __( 'Shown on dark backgrounds. Falls back to the light logo when unset.', 'maapkathi' ) ),
+				'favicon'    => array( __( 'Favicon', 'maapkathi' ), __( 'Browser tab icon, square. Falls back to the light logo, then the dark logo, then the built-in mark.', 'maapkathi' ) ),
+			);
+			foreach ( $mk_images as $mk_key => list( $mk_label, $mk_help ) ) :
+				$mk_id  = absint( $settings[ $mk_key ] ?? 0 );
+				$mk_src = $mk_id ? wp_get_attachment_image_url( $mk_id, 'medium' ) : '';
+				?>
+				<tr>
+					<th><?php echo esc_html( $mk_label ); ?></th>
+					<td>
+						<div data-mk-media>
+							<input type="hidden" name="<?php echo esc_attr( $mk_key ); ?>" value="<?php echo esc_attr( (string) $mk_id ); ?>" />
+							<div class="mk-media__preview">
+								<?php if ( $mk_src ) : ?>
+									<img src="<?php echo esc_url( $mk_src ); ?>" alt="" />
+								<?php endif; ?>
+							</div>
+							<button type="button" class="button mk-media__choose"><?php esc_html_e( 'Choose image', 'maapkathi' ); ?></button>
+							<button type="button" class="button-link mk-media__clear" <?php echo $mk_id ? '' : 'hidden'; ?>><?php esc_html_e( 'Clear', 'maapkathi' ); ?></button>
+							<p class="description"><?php echo esc_html( $mk_help ); ?></p>
+						</div>
+					</td>
+				</tr>
+			<?php endforeach; ?>
+		</table>
+
 		<h2><?php esc_html_e( 'Contact', 'maapkathi' ); ?></h2>
 		<table class="form-table">
 			<tr><th><?php esc_html_e( 'Email', 'maapkathi' ); ?></th><td><input type="email" name="contact_email" value="<?php echo esc_attr( $settings['contact_email'] ?? '' ); ?>" class="regular-text" /></td></tr>

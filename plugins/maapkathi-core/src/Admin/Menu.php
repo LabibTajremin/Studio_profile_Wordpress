@@ -11,6 +11,7 @@ use Maapkathi\Core\Admin\Screens\ApprovalsScreen;
 use Maapkathi\Core\Admin\Screens\UsersScreen;
 use Maapkathi\Core\Admin\Screens\SiteTextScreen;
 use Maapkathi\Core\Admin\Screens\SettingsScreen;
+use Maapkathi\Core\Admin\Screens\InquiriesScreen;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -56,6 +57,19 @@ final class Menu {
 		// #11 Hero.
 		add_submenu_page( 'maapkathi', __( 'Hero', 'maapkathi' ), __( 'Hero', 'maapkathi' ), $cap, 'maapkathi-hero', array( $this, 'render_hero' ) );
 
+		// Enquiries inbox — carries an unread count bubble, the same
+		// affordance WordPress uses for pending comments, so a new
+		// enquiry is impossible to miss.
+		$unread      = InquiriesScreen::unread_count();
+		$inbox_label = __( 'Enquiries', 'maapkathi' );
+		if ( $unread > 0 ) {
+			$inbox_label .= sprintf(
+				' <span class="awaiting-mod"><span class="pending-count">%d</span></span>',
+				$unread
+			);
+		}
+		add_submenu_page( 'maapkathi', __( 'Enquiries', 'maapkathi' ), $inbox_label, $cap, 'maapkathi-inquiries', array( $this, 'render_inquiries' ) );
+
 		// #12 Approvals.
 		add_submenu_page( 'maapkathi', __( 'Approvals', 'maapkathi' ), __( 'Approvals', 'maapkathi' ), Roles::CAP_APPROVE_REVISIONS, 'maapkathi-approvals', array( $this, 'render_approvals' ) );
 
@@ -81,8 +95,21 @@ final class Menu {
 		if ( ! str_contains( $hook, 'maapkathi' ) ) {
 			return;
 		}
+
+		// The Settings and Hero screens pick images from the Media
+		// Library, which needs core's media modal scripts loaded.
+		wp_enqueue_media();
+
 		wp_enqueue_style( 'maapkathi-admin', MK_PLUGIN_URL . 'assets/admin/admin.css', array(), MK_DB_VERSION );
-		wp_enqueue_script( 'maapkathi-admin', MK_PLUGIN_URL . 'assets/admin/admin.js', array(), MK_DB_VERSION, true );
+		wp_enqueue_script( 'maapkathi-admin', MK_PLUGIN_URL . 'assets/admin/admin.js', array( 'jquery' ), MK_DB_VERSION, true );
+		wp_localize_script(
+			'maapkathi-admin',
+			'mkAdmin',
+			array(
+				'chooseImage' => __( 'Choose image', 'maapkathi' ),
+				'useImage'    => __( 'Use this image', 'maapkathi' ),
+			)
+		);
 	}
 
 	public function render_dashboard(): void {
@@ -123,6 +150,10 @@ final class Menu {
 
 	public function render_hero(): void {
 		( new HeroScreen() )->render();
+	}
+
+	public function render_inquiries(): void {
+		( new InquiriesScreen() )->render();
 	}
 
 	public function render_approvals(): void {
