@@ -13,6 +13,9 @@ use Maapkathi\Core\Admin\Menu;
 use Maapkathi\Core\Inquiries\Inquiries;
 use Maapkathi\Core\Rest\UploadController;
 use Maapkathi\Core\Approval\ApprovalService;
+use Maapkathi\Core\Fields\MetaBoxes;
+use Maapkathi\Core\Seo\Seo;
+use Maapkathi\Core\Cli\SeedCommand;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -50,9 +53,15 @@ final class Plugin {
 		( new Inquiries() )->register_hooks();
 		( new ApprovalService() )->register_hooks();
 		( new UploadController() )->register_hooks();
+		( new MetaBoxes() )->register_hooks();
+		( new Seo() )->register_hooks();
 
 		if ( is_admin() ) {
 			( new Menu() )->register_hooks();
+		}
+
+		if ( defined( 'WP_CLI' ) && WP_CLI && class_exists( '\WP_CLI' ) ) {
+			\WP_CLI::add_command( 'maapkathi seed', SeedCommand::class );
 		}
 	}
 }

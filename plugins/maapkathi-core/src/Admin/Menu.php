@@ -6,6 +6,11 @@ namespace Maapkathi\Core\Admin;
 use Maapkathi\Core\Roles\Roles;
 use Maapkathi\Core\Theme\ThemeSettings;
 use Maapkathi\Core\Storage\Adapters\LocalStorageAdapter;
+use Maapkathi\Core\Admin\Screens\HeroScreen;
+use Maapkathi\Core\Admin\Screens\ApprovalsScreen;
+use Maapkathi\Core\Admin\Screens\UsersScreen;
+use Maapkathi\Core\Admin\Screens\SiteTextScreen;
+use Maapkathi\Core\Admin\Screens\SettingsScreen;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -13,8 +18,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 /**
  * Custom top-level "Maapkathi" admin menu (§9) with the 17 screens from
- * §3.3. Each screen checks capability on both render and any write action —
- * never relies on the menu item being hidden.
+ * §3.3. Projects/Services/Team/Testimonials/Clients/Awards/FAQs/Values/
+ * Stats/Process-Steps are native WordPress post-type screens nested here
+ * via PostTypes::show_in_menu('maapkathi') — sortable/filterable list
+ * tables and full create/edit/delete come from WordPress core, with the
+ * extra typed fields added by Fields\MetaBoxes. Every screen here still
+ * checks capability on both render and any write action.
  */
 final class Menu {
 
@@ -36,25 +45,36 @@ final class Menu {
 			3
 		);
 
-		$screens = array(
-			'maapkathi'                => array( __( 'Dashboard', 'maapkathi' ), $cap, array( $this, 'render_dashboard' ) ),
-			'maapkathi-projects'       => array( __( 'Projects', 'maapkathi' ), $cap, array( $this, 'render_placeholder' ) ),
-			'maapkathi-services'       => array( __( 'Services', 'maapkathi' ), $cap, array( $this, 'render_placeholder' ) ),
-			'maapkathi-content'        => array( __( 'Content', 'maapkathi' ), $cap, array( $this, 'render_placeholder' ) ),
-			'maapkathi-blog'           => array( __( 'Blog', 'maapkathi' ), $cap, array( $this, 'render_placeholder' ) ),
-			'maapkathi-team'           => array( __( 'Team', 'maapkathi' ), $cap, array( $this, 'render_placeholder' ) ),
-			'maapkathi-hero'           => array( __( 'Hero', 'maapkathi' ), $cap, array( $this, 'render_placeholder' ) ),
-			'maapkathi-approvals'      => array( __( 'Approvals', 'maapkathi' ), Roles::CAP_APPROVE_REVISIONS, array( $this, 'render_placeholder' ) ),
-			'maapkathi-users'          => array( __( 'Users', 'maapkathi' ), Roles::CAP_MANAGE_USERS, array( $this, 'render_placeholder' ) ),
-			'maapkathi-appearance'     => array( __( 'Appearance', 'maapkathi' ), Roles::CAP_MANAGE_APPEARANCE, array( $this, 'render_appearance' ) ),
-			'maapkathi-site-text'      => array( __( 'Site Text', 'maapkathi' ), Roles::CAP_MANAGE_SETTINGS, array( $this, 'render_placeholder' ) ),
-			'maapkathi-settings'       => array( __( 'Settings', 'maapkathi' ), Roles::CAP_MANAGE_SETTINGS, array( $this, 'render_placeholder' ) ),
-			'maapkathi-account'        => array( __( 'Account', 'maapkathi' ), $cap, array( $this, 'render_placeholder' ) ),
-		);
+		// #1 Dashboard (the top-level page itself).
+		add_submenu_page( 'maapkathi', __( 'Dashboard', 'maapkathi' ), __( 'Dashboard', 'maapkathi' ), $cap, 'maapkathi', array( $this, 'render_dashboard' ) );
 
-		foreach ( $screens as $slug => [ $label, $screen_cap, $callback ] ) {
-			add_submenu_page( 'maapkathi', $label, $label, $screen_cap, $slug, $callback );
-		}
+		// #8 Blog (list) — core 'post' type menu can't take show_in_menu, so
+		// alias it in here explicitly; #9 Blog editor is WP's native
+		// post-new.php/post.php, reached from that list as usual.
+		add_submenu_page( 'maapkathi', __( 'Blog', 'maapkathi' ), __( 'Blog', 'maapkathi' ), $cap, 'edit.php' );
+
+		// #11 Hero.
+		add_submenu_page( 'maapkathi', __( 'Hero', 'maapkathi' ), __( 'Hero', 'maapkathi' ), $cap, 'maapkathi-hero', array( $this, 'render_hero' ) );
+
+		// #12 Approvals.
+		add_submenu_page( 'maapkathi', __( 'Approvals', 'maapkathi' ), __( 'Approvals', 'maapkathi' ), Roles::CAP_APPROVE_REVISIONS, 'maapkathi-approvals', array( $this, 'render_approvals' ) );
+
+		// #13 Users.
+		add_submenu_page( 'maapkathi', __( 'Users', 'maapkathi' ), __( 'Users', 'maapkathi' ), Roles::CAP_MANAGE_USERS, 'maapkathi-users', array( $this, 'render_users' ) );
+
+		// #14 Appearance.
+		add_submenu_page( 'maapkathi', __( 'Appearance', 'maapkathi' ), __( 'Appearance', 'maapkathi' ), Roles::CAP_MANAGE_APPEARANCE, 'maapkathi-appearance', array( $this, 'render_appearance' ) );
+
+		// #15 Site Text.
+		add_submenu_page( 'maapkathi', __( 'Site Text', 'maapkathi' ), __( 'Site Text', 'maapkathi' ), Roles::CAP_MANAGE_SETTINGS, 'maapkathi-site-text', array( $this, 'render_site_text' ) );
+
+		// #16 Settings.
+		add_submenu_page( 'maapkathi', __( 'Settings', 'maapkathi' ), __( 'Settings', 'maapkathi' ), Roles::CAP_MANAGE_SETTINGS, 'maapkathi-settings', array( $this, 'render_settings' ) );
+
+		// #17 Account — WordPress already owns this at profile.php; alias it
+		// in so it's reachable from the Maapkathi menu without duplicating
+		// WP's own password/profile security logic.
+		add_submenu_page( 'maapkathi', __( 'Account', 'maapkathi' ), __( 'Account', 'maapkathi' ), 'read', 'profile.php' );
 	}
 
 	public function enqueue_assets( string $hook ): void {
@@ -74,8 +94,12 @@ final class Menu {
 		$disk_gb  = round( $usage['bytes'] / ( 1024 ** 3 ), 2 );
 		$percent  = round( ( $usage['bytes'] / ( 20 * 1024 ** 3 ) ) * 100, 1 );
 
+		global $wpdb;
+		$pending_count = (int) $wpdb->get_var( "SELECT COUNT(*) FROM " . \Maapkathi\Core\Support\Database::revisions_table() . " WHERE status = 'pending'" ); // phpcs:ignore WordPress.DB.PreparedSQLPlaceholders.PreparedSQLPlaceholders
+
 		echo '<div class="wrap mk-admin"><h1>' . esc_html__( 'Maapkathi Dashboard', 'maapkathi' ) . '</h1>';
 		echo '<p><a href="' . esc_url( home_url( '/' ) ) . '" target="_blank" rel="noopener">' . esc_html__( 'View public site ↗', 'maapkathi' ) . '</a></p>';
+
 		echo '<div class="mk-card"><h2>' . esc_html__( 'Storage', 'maapkathi' ) . '</h2>';
 		printf(
 			'<p>%s / 20 GB (%s%%) &middot; %s %s</p>',
@@ -87,15 +111,34 @@ final class Menu {
 		if ( $percent > 80 ) {
 			echo '<p class="mk-warning">' . esc_html__( 'Disk usage is above 80%. Consider clearing unused media.', 'maapkathi' ) . '</p>';
 		}
+		echo '</div>';
+
+		echo '<div class="mk-card"><h2>' . esc_html__( 'Pending approvals', 'maapkathi' ) . '</h2>';
+		printf( '<p>%d</p>', esc_html( (string) $pending_count ) );
+		if ( $pending_count > 0 ) {
+			echo '<p><a class="button" href="' . esc_url( admin_url( 'admin.php?page=maapkathi-approvals' ) ) . '">' . esc_html__( 'Review', 'maapkathi' ) . '</a></p>';
+		}
 		echo '</div></div>';
 	}
 
-	public function render_placeholder(): void {
-		if ( ! current_user_can( Roles::CAP_EDIT_CONTENT ) ) {
-			wp_die( esc_html__( 'You do not have permission to view this page.', 'maapkathi' ) );
-		}
-		echo '<div class="wrap mk-admin"><h1>' . esc_html( get_admin_page_title() ) . '</h1>';
-		echo '<p>' . esc_html__( 'This screen is scaffolded and pending full implementation.', 'maapkathi' ) . '</p></div>';
+	public function render_hero(): void {
+		( new HeroScreen() )->render();
+	}
+
+	public function render_approvals(): void {
+		( new ApprovalsScreen() )->render();
+	}
+
+	public function render_users(): void {
+		( new UsersScreen() )->render();
+	}
+
+	public function render_site_text(): void {
+		( new SiteTextScreen() )->render();
+	}
+
+	public function render_settings(): void {
+		( new SettingsScreen() )->render();
 	}
 
 	public function render_appearance(): void {

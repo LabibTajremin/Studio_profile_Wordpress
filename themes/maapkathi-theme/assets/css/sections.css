@@ -68,6 +68,43 @@
 /* Admin shield note */
 .mk-admin-shield-note { text-align: center; font-size: 0.8rem; padding: 0.25rem; }
 
+/* Project/service detail */
+.mk-project-hero__media img { width: 100%; height: 60vh; object-fit: cover; display: block; }
+.mk-project-detail { display: grid; grid-template-columns: 2fr 1fr; gap: 3rem; }
+.mk-project-detail__spec dl { display: grid; grid-template-columns: auto 1fr; gap: 0.5rem 1rem; }
+.mk-project-detail__spec dt { font-weight: 600; color: var(--accent); }
+.mk-lede { font-size: 1.25rem; }
+.mk-prose { line-height: 1.7; }
+.mk-gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1rem; margin-top: 2rem; }
+.mk-gallery img { width: 100%; height: auto; border-radius: var(--radius); display: block; }
+@media (max-width: 767px) { .mk-project-detail { grid-template-columns: 1fr; } }
+
+/* Stats / team / services grids */
+.mk-grid--stats { grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); text-align: center; }
+.mk-stat__value { display: block; font-family: var(--font-headings); font-size: 2.5rem; color: var(--accent); }
+.mk-grid--team, .mk-grid--services { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
+.mk-card__role { color: var(--accent); font-weight: 600; }
+.mk-post-cover img { width: 100%; height: auto; border-radius: var(--radius); }
+.mk-service-group { margin-bottom: 3rem; }
+
+/* Lightbox */
+.mk-lightbox { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 999; display: none; align-items: center; justify-content: center; }
+.mk-lightbox.is-open { display: flex; }
+.mk-lightbox__image { max-width: 90vw; max-height: 85vh; object-fit: contain; }
+.mk-lightbox__close, .mk-lightbox__prev, .mk-lightbox__next {
+	position: absolute;
+	background: transparent;
+	color: #fff;
+	border: 0;
+	font-size: 2rem;
+	cursor: pointer;
+	min-width: 44px;
+	min-height: 44px;
+}
+.mk-lightbox__close { top: 1rem; right: 1rem; }
+.mk-lightbox__prev { left: 1rem; top: 50%; transform: translateY(-50%); }
+.mk-lightbox__next { right: 1rem; top: 50%; transform: translateY(-50%); }
+
 @media (max-width: 375px) {
 	.mk-container { padding-inline: 1rem; }
 }

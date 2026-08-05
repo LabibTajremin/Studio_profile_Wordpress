@@ -9,8 +9,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 /**
  * Registers every custom post type from §3.1. Fields on each CPT are defined
- * separately in Fields\FieldGroups (Carbon Fields, version-controlled PHP —
- * no click-configuration).
+ * separately in Fields\MetaBoxes — native register_post_meta() + meta boxes,
+ * version-controlled PHP, no ACF/Carbon Fields dependency (that would be a
+ * Composer package this build cannot assume is fetchable at deploy time on
+ * shared hosting) and no click-configuration.
  */
 final class PostTypes {
 
@@ -127,7 +129,7 @@ final class PostTypes {
 			'public'              => $public,
 			'publicly_queryable'  => $public,
 			'show_ui'             => true,
-			'show_in_menu'        => false, // Surfaced under the custom "Maapkathi" menu instead (§9).
+			'show_in_menu'        => 'maapkathi', // Nests as a submenu under the custom "Maapkathi" top-level menu (§9).
 			'show_in_rest'        => true,
 			'menu_icon'           => $definition['icon'],
 			'supports'            => $definition['supports'],

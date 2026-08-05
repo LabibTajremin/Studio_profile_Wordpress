@@ -1,0 +1,199 @@
+<?php
+declare( strict_types = 1 );
+
+namespace Maapkathi\Core\Seo;
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
+/**
+ * Hand-written meta + JSON-LD (§12) — deliberately independent of whether
+ * RankMath is installed, so SEO basics work even on a fresh install before
+ * a site owner adds RankMath from the plugin browser. WordPress core's own
+ * sitemap (wp-sitemap.xml, since WP 5.5) already indexes every public post
+ * type registered with show_in_rest — mk_project, mk_service, and post
+ * (when the blog is enabled) — with no code required.
+ */
+final class Seo {
+
+	public function register_hooks(): void {
+		add_action( 'wp_head', array( $this, 'render_meta' ), 2 );
+		add_action( 'wp_head', array( $this, 'render_json_ld' ), 5 );
+		add_filter( 'robots_txt', array( $this, 'robots_txt' ), 10, 2 );
+		add_filter( 'wp_sitemaps_post_types', array( $this, 'filter_sitemap_post_types' ) );
+	}
+
+	public function render_meta(): void {
+		$seo = get_option( 'mk_seo_settings', array() );
+
+		$title       = $this->resolve_title( $seo );
+		$description = $this->resolve_description( $seo );
+		$image       = $this->resolve_image( $seo );
+		$canonical   = $this->canonical_url();
+
+		printf( '<meta name="description" content="%s" />' . "\n", esc_attr( $description ) );
+		printf( '<link rel="canonical" href="%s" />' . "\n", esc_url( $canonical ) );
+
+		printf( '<meta property="og:title" content="%s" />' . "\n", esc_attr( $title ) );
+		printf( '<meta property="og:description" content="%s" />' . "\n", esc_attr( $description ) );
+		printf( '<meta property="og:url" content="%s" />' . "\n", esc_url( $canonical ) );
+		printf( '<meta property="og:type" content="%s" />' . "\n", is_singular( 'mk_project' ) ? 'article' : 'website' );
+
+		if ( $image ) {
+			printf( '<meta property="og:image" content="%s" />' . "\n", esc_url( $image ) );
+			printf( '<meta name="twitter:card" content="summary_large_image" />' . "\n" );
+		} else {
+			printf( '<meta name="twitter:card" content="summary" />' . "\n" );
+		}
+
+		if ( ! empty( $seo['ga_id'] ) ) {
+			printf( '<!-- GA: %s (loaded by RankMath/Site Kit if installed) -->' . "\n", esc_html( $seo['ga_id'] ) );
+		}
+	}
+
+	private function resolve_title( array $seo ): string {
+		if ( is_singular() ) {
+			return wp_strip_all_tags( get_the_title() );
+		}
+		return $seo['default_title'] ?? get_bloginfo( 'name' );
+	}
+
+	private function resolve_description( array $seo ): string {
+		if ( is_singular() && has_excerpt() ) {
+			return wp_strip_all_tags( get_the_excerpt() );
+		}
+		return $seo['default_description'] ?? get_bloginfo( 'description' );
+	}
+
+	private function resolve_image( array $seo ): string {
+		if ( is_singular() && has_post_thumbnail() ) {
+			$src = get_the_post_thumbnail_url( null, 'large' );
+			if ( $src ) {
+				return $src;
+			}
+		}
+		return $seo['og_image'] ?? '';
+	}
+
+	private function canonical_url(): string {
+		global $wp;
+		return home_url( add_query_arg( array(), $wp->request ?? '' ) );
+	}
+
+	public function render_json_ld(): void {
+		if ( is_front_page() ) {
+			$this->render_faq_page();
+		}
+
+		if ( is_singular( 'mk_project' ) ) {
+			$this->render_creative_work();
+			$this->render_breadcrumbs();
+		}
+
+		if ( is_singular( 'mk_service' ) ) {
+			$this->render_breadcrumbs();
+		}
+	}
+
+	private function render_faq_page(): void {
+		$site_settings = get_option( 'mk_site_settings', array() );
+		$faqs          = $site_settings['faqs'] ?? array();
+		if ( empty( $faqs ) ) {
+			return;
+		}
+
+		$entities = array();
+		foreach ( $faqs as $faq ) {
+			if ( empty( $faq['question'] ) ) {
+				continue;
+			}
+			$entities[] = array(
+				'@type'          => 'Question',
+				'name'           => $faq['question'],
+				'acceptedAnswer' => array(
+					'@type' => 'Answer',
+					'text'  => wp_strip_all_tags( $faq['answer'] ?? '' ),
+				),
+			);
+		}
+
+		if ( empty( $entities ) ) {
+			return;
+		}
+
+		$this->print_ld_json(
+			array(
+				'@context'   => 'https://schema.org',
+				'@type'      => 'FAQPage',
+				'mainEntity' => $entities,
+			)
+		);
+	}
+
+	private function render_creative_work(): void {
+		$post_id = get_the_ID();
+		if ( ! $post_id ) {
+			return;
+		}
+
+		$this->print_ld_json(
+			array(
+				'@context'       => 'https://schema.org',
+				'@type'          => 'CreativeWork',
+				'name'           => get_the_title( $post_id ),
+				'description'    => wp_strip_all_tags( get_post_meta( $post_id, 'mk_summary', true ) ?: get_the_excerpt( $post_id ) ),
+				'image'          => get_the_post_thumbnail_url( $post_id, 'large' ) ?: null,
+				'locationCreated' => get_post_meta( $post_id, 'mk_location', true ) ?: null,
+				'dateCreated'    => get_post_meta( $post_id, 'mk_completed_at', true ) ?: null,
+			)
+		);
+	}
+
+	private function render_breadcrumbs(): void {
+		$items = array(
+			array( '@type' => 'ListItem', 'position' => 1, 'name' => __( 'Home', 'maapkathi' ), 'item' => home_url( '/' ) ),
+		);
+
+		if ( is_singular( 'mk_project' ) ) {
+			$items[] = array( '@type' => 'ListItem', 'position' => 2, 'name' => __( 'Work', 'maapkathi' ), 'item' => home_url( '/work/' ) );
+			$items[] = array( '@type' => 'ListItem', 'position' => 3, 'name' => get_the_title(), 'item' => get_permalink() );
+		} else {
+			$items[] = array( '@type' => 'ListItem', 'position' => 2, 'name' => __( 'Services', 'maapkathi' ), 'item' => home_url( '/services/' ) );
+			$items[] = array( '@type' => 'ListItem', 'position' => 3, 'name' => get_the_title(), 'item' => get_permalink() );
+		}
+
+		$this->print_ld_json(
+			array(
+				'@context'        => 'https://schema.org',
+				'@type'           => 'BreadcrumbList',
+				'itemListElement' => $items,
+			)
+		);
+	}
+
+	private function print_ld_json( array $data ): void {
+		$data = array_filter( $data, static fn( $v ) => null !== $v );
+		echo '<script type="application/ld+json">' . wp_json_encode( $data ) . '</script>' . "\n"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+	}
+
+	public function robots_txt( string $output, bool $public ): string {
+		if ( $public ) {
+			$output .= "Disallow: /wp-admin/\n";
+			$output .= 'Sitemap: ' . home_url( '/wp-sitemap.xml' ) . "\n";
+		}
+		return $output;
+	}
+
+	/**
+	 * @param string[] $post_types
+	 * @return string[]
+	 */
+	public function filter_sitemap_post_types( $post_types ) {
+		$site_settings = get_option( 'mk_site_settings', array() );
+		if ( empty( $site_settings['blog_enabled'] ) && isset( $post_types['post'] ) ) {
+			unset( $post_types['post'] );
+		}
+		return $post_types;
+	}
+}
