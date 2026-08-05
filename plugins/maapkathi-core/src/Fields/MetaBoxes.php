@@ -97,7 +97,11 @@ final class MetaBoxes {
 					$post_type,
 					$field['key'],
 					array(
-						'type'         => in_array( $field['type'], array( 'number' ), true ) ? 'number' : 'string',
+						'type'         => match ( $field['type'] ) {
+							'number'   => 'number',
+							'checkbox' => 'boolean',
+							default    => 'string',
+						},
 						'single'       => true,
 						'show_in_rest' => true,
 						'auth_callback' => static function () {

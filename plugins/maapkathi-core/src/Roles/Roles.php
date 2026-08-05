@@ -26,12 +26,24 @@ final class Roles {
 
 	public function register_hooks(): void {
 		add_action( 'wp_login', array( $this, 'block_inactive_users' ), 10, 2 );
-		add_filter( 'authenticate', array( $this, 'enforce_login_rate_limit' ), 30, 1 );
+		add_filter( 'authenticate', array( $this, 'block_if_rate_limited' ), 30, 1 );
+		add_action( 'wp_login_failed', array( $this, 'record_failed_login' ), 10, 1 );
 	}
 
 	public static function register_roles(): void {
+		// Every CPT's per-post permissions are enforced through our own
+		// mk_* capabilities via map_meta_cap (§PostTypes::args_for). But
+		// WordPress's own admin bootstrap (wp-admin/includes/menu.php ->
+		// user_can_access_admin_page(), verified live against a real
+		// WordPress install) independently gates whether an "Add New" /
+		// list screen is reachable at all on the LITERAL 'edit_posts'
+		// capability, regardless of any custom capability_type mapping.
+		// Without it here, both roles get a hard 403 on every custom post
+		// type's admin screens — confirmed by direct testing, not a
+		// theoretical concern.
 		$admin_caps = array(
 			'read'                        => true,
+			'edit_posts'                  => true,
 			self::CAP_MANAGE_SETTINGS     => true,
 			self::CAP_MANAGE_APPEARANCE   => true,
 			self::CAP_MANAGE_USERS        => true,
@@ -43,6 +55,7 @@ final class Roles {
 
 		$editor_caps = array(
 			'read'                    => true,
+			'edit_posts'              => true,
 			self::CAP_EDIT_CONTENT    => true,
 			'upload_files'            => true,
 		);
@@ -100,25 +113,35 @@ final class Roles {
 	/**
 	 * Login rate limiting: max 5 attempts per IP per 15 minutes, then
 	 * exponential backoff via a transient counter.
+	 *
+	 * Deliberately split across two hooks rather than counting failures
+	 * inside the 'authenticate' filter itself: WordPress core can invoke
+	 * that filter chain more than once within a single login request (its
+	 * own default callbacks re-enter it), which — verified live — silently
+	 * double-counted even a successful login as a failed attempt and could
+	 * lock a legitimate user out. 'wp_login_failed' is WordPress's own
+	 * canonical hook for "a login attempt genuinely failed," fired exactly
+	 * once per failed wp_signon() call, which is what this needs.
 	 */
-	public function enforce_login_rate_limit( $user ) {
-		if ( empty( $_SERVER['REMOTE_ADDR'] ) ) {
-			return $user;
-		}
-
-		$ip  = sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) );
-		$key = 'mk_login_attempts_' . md5( $ip );
-
-		$attempts = (int) get_transient( $key );
-
-		if ( $attempts >= 5 ) {
+	public function block_if_rate_limited( $user ) {
+		if ( $this->attempts_for_current_ip() >= 5 ) {
 			return new \WP_Error( 'mk_rate_limited', __( 'Too many login attempts. Please try again later.', 'maapkathi' ) );
 		}
 
-		if ( is_wp_error( $user ) ) {
-			set_transient( $key, $attempts + 1, 15 * MINUTE_IN_SECONDS * ( 1 + $attempts ) );
-		}
-
 		return $user;
+	}
+
+	public function record_failed_login( string $username ): void {
+		$attempts = $this->attempts_for_current_ip();
+		set_transient( $this->rate_limit_key(), $attempts + 1, 15 * MINUTE_IN_SECONDS * ( 1 + $attempts ) );
+	}
+
+	private function attempts_for_current_ip(): int {
+		return (int) get_transient( $this->rate_limit_key() );
+	}
+
+	private function rate_limit_key(): string {
+		$ip = ! empty( $_SERVER['REMOTE_ADDR'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) ) : 'unknown';
+		return 'mk_login_attempts_' . md5( $ip );
 	}
 }

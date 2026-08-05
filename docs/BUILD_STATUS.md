@@ -1,103 +1,139 @@
 # Build status — honest checklist
 
-This build was produced in a sandboxed session with no Docker/`wp-env`,
-no live WordPress install, and no MariaDB instance — and `composer install`
-could not reach `github.com`'s archive API through this environment's
-network proxy, so the dev dependencies (PHPUnit, PHPCS, PHPStan, WPCS)
-are declared but were never actually installed or run here. Everything
-below is scoped honestly against that constraint. **Nothing in this repo
-has been verified against a live WordPress+MariaDB site or a real
-browser** — that verification is the next required step before any phase
-gate in `BUILD_INSTRUCTIONS.md` can be marked passed.
+This plugin + theme have now been installed and exercised against a real,
+running WordPress 6.7 + MariaDB 10.6 stack (Docker: `mariadb:10.6`,
+`wordpress:6.7-php8.2-apache`, `wordpress:cli-php8.2`), not just read for
+syntax. This section is the honest record of what that live testing found,
+fixed, and confirmed — plus what's still outside what could be checked here
+(no real browser/Playwright, no HTTPS, no production traffic).
 
-## Deliberate deviation: native WP fields instead of ACF Pro/Carbon Fields
+`composer install` still cannot reach `github.com`'s archive API through
+this sandbox's proxy, so PHPUnit/PHPCS/PHPStan themselves were never run —
+but the code they'd check has now been run for real instead, which is a
+stronger signal for the highest-risk parts of the system.
 
-`BUILD_INSTRUCTIONS.md` assumes ACF Pro (paid, unavailable here) or
-Carbon Fields (free, but a Composer package — and this sandbox cannot
-`composer install` anything from GitHub). Introducing that dependency
-would mean the plugin silently breaks the moment `vendor/` isn't
-regenerable, which is exactly the failure mode a Hostinger shared-hosting
-deploy (no SSH Composer access on the cheapest plans) is most likely to
-hit. Instead, every CPT's extra fields are defined in
-`Fields\MetaBoxes::schema()` — plain PHP, version-controlled, rendered via
-native `add_meta_box()` + `register_post_meta()`, zero third-party
-runtime dependency. This is arguably a stronger fit for "no
-click-configure ACF" than the spec's own assumption.
+## Bugs found and fixed by live testing (would have shipped broken otherwise)
 
-A related, deliberate deviation: post types that were `public => false`
-placeholders (testimonials, clients, awards, FAQs, values, stats, process
-steps, team) now use `show_in_menu => 'maapkathi'`, so each gets a full
-native WordPress list/edit screen nested under the custom "Maapkathi" menu
-automatically — sortable, filterable, with working create/edit/delete —
-instead of the single custom-built "Content" unified manager described in
-§3.3 #7. Feature-complete, just organized as several native screens
-instead of one hand-built one.
+These would not have been caught by code review, `php -l`, or unit tests —
+each only appeared once a real WordPress core actually processed a
+request. All four are fixed, and the fix was re-verified live afterward.
 
-## What is real and working (verified by direct execution in this session)
+1. **Site-wide admin lockout.** `PostTypes::args_for()` mapped the
+   `edit_post`/`read_post`/`delete_post` meta-cap keys to the plugin's own
+   generic capability strings (`mk_edit_content`, `mk_publish_content`,
+   `read`). WordPress's `_post_type_meta_capabilities()` globally registers
+   whatever string is used there as an alias requiring a specific post ID
+   — so every bare `current_user_can( 'mk_edit_content' )` call anywhere in
+   the plugin (Dashboard, every admin screen, meta box auth) started
+   silently resolving through `map_meta_cap()`'s "you must check this
+   against a specific post" fallback and returning `do_not_allow`. Result:
+   **the entire admin area 403'd for every role**, including
+   administrators. Root-caused via `map_meta_cap()` tracing against live
+   WordPress core source, not guessed. Fixed by leaving those three keys
+   unset (WordPress auto-derives collision-free per-post-type strings) and
+   mapping only the plural primitive caps.
+2. **`/services` routing conflict.** `mk_service` had both `has_archive =>
+   true` (default) and a hand-built `page-services.php` Page at the same
+   slug. WordPress's CPT archive rewrite rule silently won, so the custom
+   category/sub-service page never rendered — confirmed via the response's
+   `body` class (`post-type-archive-mk_service` instead of
+   `page-template-default`). Fixed by setting `has_archive => false` for
+   `mk_service` specifically (individual services still resolve at
+   `/services/{slug}`).
+3. **REST `meta` invisible + wrong type.** No CPT declared `'custom-fields'`
+   support, so WordPress never added a `meta` property to the REST schema
+   at all (confirmed via `OPTIONS /wp-json/wp/v2/mk_project` before/after)
+   — meaning the block editor's REST-based save could never touch any of
+   `Fields\MetaBoxes`'s registered fields. Separately, checkbox fields were
+   registered as REST type `string`, so any real boolean update was
+   rejected with `rest_invalid_type`. Fixed by adding `'custom-fields'` to
+   every CPT's supports array and mapping the `checkbox` field type to
+   REST type `boolean`. Re-verified with a real `POST
+   /wp-json/wp/v2/mk_project/{id}` updating `mk_summary`, `mk_is_featured`
+   (bool), and `mk_area_sqft` (number) — all three persisted correctly.
+4. **Login rate limiter double-counted successful logins.** The failed-
+   attempt counter was incremented inside the `authenticate` filter, which
+   WordPress core can re-enter more than once per single login request —
+   confirmed live: **one successful login incremented the "failed
+   attempts" counter**, meaning a handful of normal logins during testing
+   or real use could lock a legitimate user out for up to 90 minutes.
+   Fixed by moving the increment to WordPress's dedicated
+   `wp_login_failed` action (fired exactly once per genuine failure) and
+   keeping only the pre-check (no side effects) on `authenticate`.
+   Re-verified: 3 clean logins in a row now leave the counter untouched; a
+   deliberately wrong password increments it by exactly 1.
+5. **Hero admin screen PHP warnings.** `Admin/views/hero.php` assumed
+   every saved slide carried all media-kind fields, but
+   `HeroScreen::save()` only writes the keys relevant to that slide's own
+   `media_kind`. Editing a saved image slide threw ~10 "Undefined array
+   key" warnings per page load. Fixed by merging every row over the full
+   default shape before rendering. Re-verified: zero log entries after.
 
-- All PHP files pass `php -l` (zero syntax errors), re-checked after every
-  batch of changes in this session.
-- The pure business-logic classes were smoke-tested directly (32/32
-  assertions passed): `ContentVisibilityPolicy::decide()` (full §8 matrix),
-  `Theme\Motion::resolve_vars()`, `Theme\ThemeSettings` (31-key registry +
-  sanitisation), `Video\VideoResolver` (YouTube/Vimeo/direct-file, autoplay
-  params, host-smuggling/scheme rejection from §13).
-- **Content model** (§3.1): all CPTs + taxonomy, all nested under the
-  custom "Maapkathi" admin menu; the 3 custom tables via `dbDelta()`,
-  MariaDB-safe (§3.6); `Fields\MetaBoxes` for every CPT's extra typed
-  fields.
-- **Storage + video** (§6): `LocalStorageAdapter` (direct static URLs,
-  `.htaccess` PHP block, disk/inode usage), chunked upload + magic-byte
-  validation + orphan GC (`Rest\UploadController`), `VideoResolver` (§6.2).
-- **Roles + approval workflow** (§7, §8): capabilities, login rate
-  limiting, admin bootstrap, full `ContentVisibilityPolicy` decision
-  matrix, `ApprovalService` (mk_revisions queue + audit log).
-- **Theme engine** (§10, §11): all 24 accents / 22 patterns / 8 fonts / 31
-  settings ported verbatim, inline CSS-var injection with cache
-  invalidation on save, no-flash pre-paint mode script.
-- **Admin — all 17 §3.3 screens now functional**, not placeholders:
-  Dashboard (disk/inode usage + pending-approval count), Projects/
-  Services/Team/Testimonials/Clients/Awards/FAQs/Values/Stats/
-  Process-Steps (native WP CRUD screens via `show_in_menu`), Blog (native
-  `edit.php`), Hero (custom repeater-style form for up to 8 slides, all
-  four media kinds, length-warning copy, hold-until-video-ends, global
-  slide duration), Approvals (pending-revisions queue with approve/reject
-  + note, writes to the audit log), Users (invite, role change, activate/
-  deactivate), Appearance (all 30 controls across 31 settings), Site Text
-  (all 29 copy fields grouped by page/section), Settings (studio/contact/
-  socials/behaviour/SEO defaults), Account (aliases WP's native
-  `profile.php` rather than re-implementing password/profile security).
-- **Public templates — all 10 §3.2 routes**: `front-page.php` (hero
-  through `VideoResolver`, clients, featured projects, FAQ accordion,
-  CTA band), `archive-mk_project.php`, `single-mk_project.php` (spec
-  sidebar + gallery lightbox), `page-services.php`,
-  `single-mk_service.php`, `page-about.php` (stats/values/vision-mission),
-  `page-team.php`, `home.php` + `single.php` (blog, 404 when disabled per
-  §3.5), `page-contact.php`, plus a `404.php`.
-- **SEO** (§12): hand-written `Organization` JSON-LD (footer),
-  `FAQPage` (homepage), `CreativeWork` (project pages),
-  `BreadcrumbList` (project/service detail pages); dynamic meta/OG/
-  Twitter/canonical via `Seo\Seo`; `robots.txt` disallows `/wp-admin`;
-  WordPress core's own `wp-sitemap.xml` (built in since WP 5.5) indexes
-  every public post type automatically, filtered to drop blog posts when
-  the blog is disabled.
-- **Demo seeder** (§13/Phase 13): `wp maapkathi seed` — idempotent (guards
-  on an option marker), creates site/theme settings, 3 categories + 6
-  projects, 4 services, 4 team members, 3 testimonials, 6 clients, 3
-  awards, 4 stats, 4 values, homepage FAQs, and 4 hero slides — one per
-  media kind, exercising every hero path. Placeholder images come from
-  `placehold.co` rather than bundled binaries (no way to fetch/bundle CC0
-  demo assets in this sandbox); the video-upload slide is left with an
-  empty URL for the same reason and needs a real MP4 uploaded once a live
-  install exists.
-- CI workflow, `composer.json`, `phpcs.xml.dist`, `phpstan.neon.dist`,
-  `phpunit.xml.dist`, `playwright.config.ts`, `.wp-env.json` all in place
-  — untested only because no runtime was available in this sandbox.
+## Verified live, end to end, with a real browser-equivalent HTTP session
+
+- **Every admin screen returns 200** for an administrator, with zero
+  entries in `wp-content/debug.log`: Dashboard, Hero, Approvals, Users,
+  Appearance, Site Text, Settings, and both the list and "Add New" screens
+  for all 10 custom post types.
+- **Editor-role boundary is correct**: `mk_editor` gets 200 on Dashboard
+  and every CPT's list/new screen, and a genuine 403 on
+  Appearance/Approvals/Users/Settings — matching §7 exactly, not just
+  "menu item hidden."
+- **All 10 public routes** (`/`, `/work/`, `/work/{slug}`, `/services/`,
+  `/services/{slug}`, `/services/{parent}/{child}/`, `/about/`, `/team/`,
+  `/blog/`, `/contact/`) return 200 with well-formed, fully-closed HTML and
+  zero PHP log entries.
+- **The theme engine is live-confirmed working end to end**, not just
+  unit-tested: saved 19 of the 30 Appearance/Motion controls through the
+  real admin form (accent, pattern, radius, density, hero style, motion
+  preset, all 6 motion selects, cursor/loader style, parallax/speed/
+  stagger sliders, motion-on-mobile) and confirmed the **public homepage's
+  rendered `<html>` reflected every change immediately** (`--accent:
+  #0f5a5e`, `--radius: 9999px`, `data-hero-style="contained"`,
+  `data-cursor-style="ring"`, `data-loader-style="bar"`) with no hard
+  refresh — proving the transient cache-bust-on-save (§11.3) genuinely
+  works.
+- **Hero screen save** round-tripped through the real form (slide
+  duration, media kind, headline, image URL) and persisted correctly into
+  `mk_site_settings`.
+- **Settings screen save** round-tripped (studio name, contact info, blog
+  toggle, verification toggle) and persisted correctly.
+- **Contact form**: a real unauthenticated POST through
+  `admin-post.php` with nonce + honeypot fields correctly inserted a row
+  into `wp_mk_inquiries` and redirected to `?mk_inquiry=sent`.
+- **`wp maapkathi seed`** ran cleanly on a fresh install with zero errors,
+  populating every content type.
+- **Plugin activate → deactivate → reactivate** is clean (no fatals), and
+  `dbDelta()` created all three custom tables correctly on first
+  activation.
+
+## Deliberate deviations from the spec (with reasons)
+
+- **Native `register_post_meta()` + `add_meta_box()` instead of ACF
+  Pro/Carbon Fields.** Carbon Fields is a Composer package this sandbox
+  cannot install (same GitHub-archive-API block that stops
+  PHPUnit/PHPCS), and a hard runtime dependency on it is a real
+  deployment risk on shared hosting without guaranteed SSH Composer
+  access. `Fields\MetaBoxes::schema()` is plain, version-controlled PHP —
+  arguably a stronger fit for "no click-configure ACF" than the spec's
+  own assumption.
+- **`show_in_menu => 'maapkathi'` per CPT** instead of one hand-built
+  "Content" unified manager (§3.3 #7). Testimonials, clients, awards,
+  FAQs, values, stats, process steps, and team each get a full native WP
+  list/edit screen nested under the custom menu — sortable, filterable,
+  fully working CRUD, verified live above — just organized as several
+  native screens instead of one custom-built one.
+- **`edit_posts` (WordPress's literal, non-namespaced capability) granted
+  to both custom roles**, discovered necessary by the live-testing bug #1
+  above: `wp-admin/includes/menu.php`'s `user_can_access_admin_page()`
+  independently gates whether a custom post type's admin screens are
+  reachable at all on this literal string, regardless of any
+  `capability_type` remapping. Documented inline in `Roles.php`.
 
 ## What is still thin
 
 - The Settings screen doesn't yet manage logo/favicon/video uploads (needs
-  a Media Library picker, noted inline in the screen itself).
+  a Media Library picker — noted inline in the screen itself).
 - `Seo\Seo` covers the four JSON-LD types and meta/OG/canonical, but
   doesn't replicate a full RankMath configuration — installing RankMath
   itself (from the WP.org plugin browser, not Composer) remains a
@@ -106,30 +142,43 @@ instead of one hand-built one.
   implemented — `StorageFactory` always returns `LocalStorageAdapter`,
   correct per DEC-2, but switching drivers isn't wired.
 - No image derivatives/LQIP-blurhash placeholder generation yet.
+- The hero video-**upload** path (as opposed to video-link) has not been
+  exercised with a real MP4 file — no binary test asset was available in
+  this sandbox. The chunked-upload REST endpoint's logic was reviewed but
+  not driven through a real multi-chunk upload.
 
 ## What could not be done in this environment at all
 
-- **No PHPUnit run.** `composer install` cannot reach GitHub's archive API
-  through this session's proxy — confirmed on two separate attempts. The
-  test files in `tests/Unit/` are real, executable PHPUnit tests (verified
-  by hand-running their assertions via a standalone smoke script — 32/32
-  passed) but have never run under the actual PHPUnit binary.
-- **No integration tests against real MariaDB**, no `wp-env` boot, no
-  Playwright run, no browser screenshots, no axe-core a11y check, no RTL/
-  actual-font rendering check.
+- **No PHPUnit/PHPCS/PHPStan run** — `composer install` cannot reach
+  GitHub's archive API through this session's proxy, confirmed on
+  multiple attempts. The pure-logic tests in `tests/Unit/` were instead
+  hand-verified via a standalone smoke script (32/32 passed) and,
+  separately, exercised far more thoroughly through this session's live
+  WordPress testing above.
+- **No real browser / Playwright / axe-core / mobile-viewport
+  screenshots.** All verification above is HTTP-level (status codes,
+  response bodies, rendered HTML/CSS-variable output, database state) —
+  genuinely strong evidence the backend is correct, but it cannot catch
+  pure-CSS layout bugs, JS runtime errors, or visual regressions the way
+  an actual browser run would.
+- **No HTTPS / TLS**, no real domain, no production traffic, no
+  Hostinger-specific quirks (LiteSpeed vs. Apache, actual shared-hosting
+  resource limits).
 - **No side-by-side comparison against `https://maapkathi.vercel.app`.**
-- **No ACF Pro / Carbon Fields** — see the deviation note above.
+- **No real video file exercised** through the upload/chunking/faststart
+  path (§6.1) — no MP4 test asset was available.
 
 ## Recommended next steps
 
-1. Run `composer install`/`npm install` somewhere with normal GitHub
-   access, then `npx wp-env start` and `composer test`.
-2. Install this plugin + theme on a real WordPress + MariaDB 10.6 install
-   (or `wp-env`) and walk every one of the 17 admin screens and 10 public
-   pages by hand — this is genuinely unverified code.
-3. Run `wp maapkathi seed`, upload one real MP4 to the hero-video-upload
-   slide, and confirm autoplay/Range/206 behaviour per §6.1's curl test.
-4. Take Playwright screenshots at 375px on all 10 public pages and fix
-   overflow as it's found; run axe-core.
-5. Add a Media Library picker to the Settings screen for logo/favicon.
-6. Write the integration + E2E test suites described in `docs/TESTING.md`.
+1. Get a real browser in front of this (Playwright, or just click through
+   it) — this is the one category of bug this session's HTTP-level
+   testing structurally cannot catch.
+2. Upload a real MP4 through the Hero screen and confirm HTTP 206 Range
+   support on the resulting static URL (§6.1's curl test).
+3. Run `composer install`/`npm install` somewhere with normal GitHub
+   access, then `composer test` and `npx playwright test`.
+4. Add a Media Library picker to the Settings screen for logo/favicon.
+5. Install RankMath and confirm it coexists cleanly with `Seo\Seo`.
+6. Deploy to a Hostinger staging instance and repeat this session's
+   sweep (every admin screen, every public page, editor-role boundary,
+   theme-engine save round-trip) against the real target environment.

@@ -18,7 +18,15 @@ $empty_row = array(
 	'video_source' => 'upload', 'video_upload_url' => '', 'video_url' => '', 'video_poster' => '',
 	'hold_until_video_ends' => false, 'is_active' => true,
 );
-$rows = array_pad( $slides, 8, $empty_row );
+// A saved slide only carries the keys relevant to its own media_kind
+// (HeroScreen::save() writes image_url for an 'image' slide but never
+// gif_url/video_* for it, and vice versa) — merge every row over the full
+// default shape so every field below always has a defined key to read,
+// regardless of which kind was last saved for that slide.
+$rows = array_map(
+	static fn( array $row ) => array_merge( $empty_row, $row ),
+	array_pad( $slides, 8, $empty_row )
+);
 
 settings_errors( 'mk_hero' );
 ?>

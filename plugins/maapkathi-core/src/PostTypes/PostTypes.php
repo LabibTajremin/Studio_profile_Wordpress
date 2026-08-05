@@ -35,6 +35,10 @@ final class PostTypes {
 				'icon'         => 'dashicons-hammer',
 				'supports'     => array( 'title', 'editor', 'thumbnail', 'page-attributes', 'revisions' ),
 				'hierarchical' => true,
+				// No CPT archive: /services is a hand-built WP Page
+				// (page-services.php) per §3.2, not a generic archive.
+				// Individual services still resolve at /services/{slug}.
+				'has_archive'  => false,
 			),
 			'mk_member'       => array(
 				'label'    => __( 'Team Members', 'maapkathi' ),
@@ -132,20 +136,43 @@ final class PostTypes {
 			'show_in_menu'        => 'maapkathi', // Nests as a submenu under the custom "Maapkathi" top-level menu (§9).
 			'show_in_rest'        => true,
 			'menu_icon'           => $definition['icon'],
-			'supports'            => $definition['supports'],
+			// 'custom-fields' is required for WordPress to expose a `meta`
+			// property in the REST schema at all — without it, every field
+			// Fields\MetaBoxes registers via register_post_meta() is
+			// invisible to the block editor's REST-based save, even though
+			// register_post_meta() itself succeeds silently. Verified live:
+			// WP_REST_Posts_Controller::get_item_schema() gates the whole
+			// 'meta' property on post_type_supports( $type, 'custom-fields' ).
+			'supports'            => array_unique( array_merge( $definition['supports'], array( 'custom-fields' ) ) ),
 			'hierarchical'        => $definition['hierarchical'] ?? false,
-			'has_archive'         => $public,
+			'has_archive'         => $definition['has_archive'] ?? $public,
 			'rewrite'             => $public ? array( 'slug' => $definition['slug'] ) : false,
 			'capability_type'     => array( 'mk_post', 'mk_posts' ),
 			'map_meta_cap'        => true,
+			// Deliberately do NOT override 'edit_post' / 'read_post' /
+			// 'delete_post' (the singular meta-cap keys). WordPress's
+			// _post_type_meta_capabilities() globally registers whatever
+			// string is used as their VALUE as an alias requiring a specific
+			// post ID (via the $post_type_meta_caps global, consulted on
+			// every map_meta_cap() call, for every post type). Reusing our
+			// own bare capability strings there — as an earlier version of
+			// this file did — silently breaks every bare
+			// current_user_can(Roles::CAP_EDIT_CONTENT) check across the
+			// entire plugin/admin, including basic login access. Leaving
+			// these three unset lets WordPress auto-derive harmless,
+			// collision-free per-post-type strings (edit_mk_post, etc.)
+			// that are never checked directly by our own code.
 			'capabilities'        => array(
-				'edit_post'          => \Maapkathi\Core\Roles\Roles::CAP_EDIT_CONTENT,
-				'edit_posts'         => \Maapkathi\Core\Roles\Roles::CAP_EDIT_CONTENT,
-				'edit_others_posts'  => \Maapkathi\Core\Roles\Roles::CAP_PUBLISH_CONTENT,
-				'publish_posts'      => \Maapkathi\Core\Roles\Roles::CAP_PUBLISH_CONTENT,
-				'read_post'          => 'read',
-				'read_private_posts' => \Maapkathi\Core\Roles\Roles::CAP_EDIT_CONTENT,
-				'delete_post'        => \Maapkathi\Core\Roles\Roles::CAP_PUBLISH_CONTENT,
+				'edit_posts'             => \Maapkathi\Core\Roles\Roles::CAP_EDIT_CONTENT,
+				'delete_posts'           => \Maapkathi\Core\Roles\Roles::CAP_EDIT_CONTENT,
+				'read_private_posts'     => \Maapkathi\Core\Roles\Roles::CAP_EDIT_CONTENT,
+				'edit_others_posts'      => \Maapkathi\Core\Roles\Roles::CAP_PUBLISH_CONTENT,
+				'edit_private_posts'     => \Maapkathi\Core\Roles\Roles::CAP_PUBLISH_CONTENT,
+				'edit_published_posts'   => \Maapkathi\Core\Roles\Roles::CAP_PUBLISH_CONTENT,
+				'publish_posts'          => \Maapkathi\Core\Roles\Roles::CAP_PUBLISH_CONTENT,
+				'delete_private_posts'   => \Maapkathi\Core\Roles\Roles::CAP_PUBLISH_CONTENT,
+				'delete_published_posts' => \Maapkathi\Core\Roles\Roles::CAP_PUBLISH_CONTENT,
+				'delete_others_posts'    => \Maapkathi\Core\Roles\Roles::CAP_PUBLISH_CONTENT,
 			),
 		);
 	}
