@@ -28,6 +28,9 @@ final class Roles {
 		add_action( 'wp_login', array( $this, 'block_inactive_users' ), 10, 2 );
 		add_filter( 'authenticate', array( $this, 'block_if_rate_limited' ), 30, 1 );
 		add_action( 'wp_login_failed', array( $this, 'record_failed_login' ), 10, 1 );
+		add_action( 'admin_notices', array( $this, 'password_change_notice' ) );
+		add_action( 'after_password_reset', array( $this, 'clear_password_notice' ), 10, 1 );
+		add_action( 'profile_update', array( $this, 'maybe_clear_password_notice' ), 10, 2 );
 	}
 
 	public static function register_roles(): void {
@@ -76,29 +79,114 @@ final class Roles {
 		}
 	}
 
+	/**
+	 * Creates the first Maapkathi admin from wp-config.php constants, so a
+	 * site can be deployed with known credentials without anyone clicking
+	 * through an installer.
+	 *
+	 * Runs on activation only, and never touches an existing account:
+	 * if either the username or the email is already taken it bails, which
+	 * makes reactivating the plugin safe and stops a stale constant from
+	 * silently resetting a live admin's password.
+	 */
 	public static function bootstrap_admin_user(): void {
 		if ( ! defined( 'MK_ADMIN_EMAIL' ) || ! defined( 'MK_ADMIN_PASSWORD' ) ) {
 			return;
 		}
 
-		if ( email_exists( MK_ADMIN_EMAIL ) ) {
+		$email    = (string) MK_ADMIN_EMAIL;
+		$password = (string) MK_ADMIN_PASSWORD;
+
+		if ( ! is_email( $email ) || '' === $password ) {
+			return;
+		}
+
+		// Username: explicit constant wins; otherwise fall back to the part
+		// of the email before the @, which is what most people expect.
+		$login = defined( 'MK_ADMIN_USERNAME' ) && '' !== (string) MK_ADMIN_USERNAME
+			? (string) MK_ADMIN_USERNAME
+			: ( str_contains( $email, '@' ) ? (string) strstr( $email, '@', true ) : 'maapkathi-admin' );
+
+		$login = sanitize_user( $login, true );
+		if ( '' === $login ) {
+			$login = 'maapkathi-admin';
+		}
+
+		if ( email_exists( $email ) || username_exists( $login ) ) {
 			return;
 		}
 
 		$name    = defined( 'MK_ADMIN_NAME' ) ? (string) MK_ADMIN_NAME : 'Maapkathi Admin';
 		$user_id = wp_insert_user(
 			array(
-				'user_login'   => sanitize_user( str_contains( (string) MK_ADMIN_EMAIL, '@' ) ? strstr( (string) MK_ADMIN_EMAIL, '@', true ) : 'maapkathi-admin' ),
-				'user_email'   => (string) MK_ADMIN_EMAIL,
-				'user_pass'    => (string) MK_ADMIN_PASSWORD,
+				'user_login'   => $login,
+				'user_email'   => $email,
+				'user_pass'    => $password,
 				'display_name' => $name,
+				'nickname'     => $name,
 				'role'         => self::ADMIN_ROLE,
 			)
 		);
 
-		if ( is_int( $user_id ) ) {
+		if ( is_wp_error( $user_id ) ) {
+			return;
+		}
+
+		update_user_meta( $user_id, 'mk_is_active', 1 );
+
+		// Only nag for a password change when the shipped sentinel is still
+		// in place — someone who set a real password in wp-config.php has
+		// already made a deliberate choice and shouldn't be hassled.
+		$sentinels = array( 'change-this-immediately', 'change-me-immediately', 'ChangeMe123!' );
+		if ( in_array( $password, $sentinels, true ) ) {
 			update_user_meta( $user_id, 'mk_must_change_password', 1 );
-			update_user_meta( $user_id, 'mk_is_active', 1 );
+		}
+	}
+
+	/**
+	 * Persistent reminder while a bootstrap account is still on the
+	 * shipped sentinel password (§7).
+	 */
+	public function password_change_notice(): void {
+		if ( ! is_admin() || ! is_user_logged_in() ) {
+			return;
+		}
+
+		$user_id = get_current_user_id();
+		if ( ! get_user_meta( $user_id, 'mk_must_change_password', true ) ) {
+			return;
+		}
+
+		printf(
+			'<div class="notice notice-error"><p><strong>%s</strong> %s <a href="%s">%s</a></p></div>',
+			esc_html__( 'Security:', 'maapkathi' ),
+			esc_html__( 'This account is still using the default setup password.', 'maapkathi' ),
+			esc_url( admin_url( 'profile.php' ) ),
+			esc_html__( 'Change it now', 'maapkathi' )
+		);
+	}
+
+	/** Clears the nag once the password has actually been changed. */
+	public function clear_password_notice( $user_id ): void {
+		$id = $user_id instanceof \WP_User ? $user_id->ID : (int) $user_id;
+		delete_user_meta( $id, 'mk_must_change_password' );
+	}
+
+	/**
+	 * profile_update fires on any profile save, so only clear the nag when
+	 * the password hash actually changed.
+	 *
+	 * @param int      $user_id       Updated user.
+	 * @param \WP_User $old_user_data User before the update.
+	 */
+	public function maybe_clear_password_notice( int $user_id, $old_user_data ): void {
+		if ( ! $old_user_data instanceof \WP_User ) {
+			return;
+		}
+
+		$user = get_userdata( $user_id );
+		if ( $user && $user->user_pass !== $old_user_data->user_pass ) {
+			delete_user_meta( $user_id, 'mk_must_change_password' );
 		}
 	}
 

@@ -53,13 +53,24 @@ define( 'MK_HERO_SLIDE_SECONDS', 6 );
 define( 'MK_MAX_HERO_HOLD_SECONDS', 20 );
 
 /*
- * First-run admin bootstrap. Set these BEFORE the first page load, then
- * delete the three lines once you have logged in and changed the password
- * (the account is flagged must-change-password automatically).
+ * ---------------------------------------------------------------------
+ * First-run admin account
+ * ---------------------------------------------------------------------
+ * Set these BEFORE activating the plugin. The account is created once,
+ * on activation, with the mk_admin role (full access to every Maapkathi
+ * screen).
+ *
+ * Safe by design: if the username or email already exists, nothing is
+ * touched — so reactivating the plugin can never reset a live password.
+ *
+ * Once you have logged in successfully, comment these four lines out and
+ * save the file, so the credentials are not sitting in a file on the
+ * server any longer than necessary.
  */
-// define( 'MK_ADMIN_EMAIL', 'you@yourdomain.com' );
-// define( 'MK_ADMIN_PASSWORD', 'change-this-immediately' );
-// define( 'MK_ADMIN_NAME', 'Studio Admin' );
+define( 'MK_ADMIN_USERNAME', 'studioadmin' );          // login name
+define( 'MK_ADMIN_PASSWORD', 'CHANGE-THIS-NOW-x9F2!' ); // 16+ chars, mixed case, digit, symbol
+define( 'MK_ADMIN_EMAIL', 'you@yourdomain.com' );      // must be a real inbox for password resets
+define( 'MK_ADMIN_NAME', 'Studio Admin' );             // display name shown in the admin
 
 // ---------------------------------------------------------------------
 // Production hardening
