@@ -56,3 +56,7 @@ wp-config.php
 /tests/playwright-report/
 /tests/test-results/
 .DS_Store
+
+# Filled-in deployment secrets — never commit these.
+deploy/deploy.env
+deploy/wp-config.php
