@@ -218,6 +218,20 @@ $config = <<<'PHPCONFIG'
  */
 
 // ---------------------------------------------------------------------
+// Paths
+//
+// Defined first because constants further down build paths from them.
+// WordPress only sets these when they are not already defined, so
+// establishing them here is safe and is the documented pattern.
+// ---------------------------------------------------------------------
+if ( ! defined( 'ABSPATH' ) ) {
+	define( 'ABSPATH', __DIR__ . '/' );
+}
+if ( ! defined( 'WP_CONTENT_DIR' ) ) {
+	define( 'WP_CONTENT_DIR', ABSPATH . 'wp-content' );
+}
+
+// ---------------------------------------------------------------------
 // Database
 // ---------------------------------------------------------------------
 define( 'DB_NAME', {$q_db_name} );

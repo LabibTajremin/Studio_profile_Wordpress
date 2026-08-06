@@ -43,6 +43,15 @@ define( 'MK_VIDEO_DRIVER', 0 );     // 0 same-as-storage (SHIPPED)
 define( 'MK_CACHE_DRIVER', 1 );     // 1 transients · 2 Redis
 define( 'MK_MAIL_DRIVER', 0 );      // 0 inbox only · 1 SMTP · 2 external API
 
+// ABSPATH / WP_CONTENT_DIR are not set until wp-settings.php runs, so they
+// are established here before anything builds a path from them. WordPress
+// only defines them when they are not already set, so this is safe.
+if ( ! defined( 'ABSPATH' ) ) {
+	define( 'ABSPATH', __DIR__ . '/' );
+}
+if ( ! defined( 'WP_CONTENT_DIR' ) ) {
+	define( 'WP_CONTENT_DIR', ABSPATH . 'wp-content' );
+}
 define( 'MK_LOCAL_STORAGE_DIR', WP_CONTENT_DIR . '/uploads/maapkathi' );
 
 define( 'MK_MAX_VIDEO_BYTES', 200 * 1024 * 1024 );
