@@ -209,23 +209,36 @@ final class UploadController {
 			return;
 		}
 
-		foreach ( glob( trailingslashit( $dir ) . '*', GLOB_ONLYDIR ) ?: array() as $session_dir ) {
+		$session_dirs = glob( trailingslashit( $dir ) . '*', GLOB_ONLYDIR );
+		foreach ( $session_dirs ? $session_dirs : array() as $session_dir ) {
 			if ( filemtime( $session_dir ) < time() - DAY_IN_SECONDS ) {
 				$this->cleanup_dir( $session_dir );
 			}
 		}
 	}
 
+	/**
+	 * The local directory used to store in-progress upload chunk sessions.
+	 *
+	 * @return string Absolute directory path.
+	 */
 	private function chunks_dir(): string {
 		return trailingslashit( Config::instance()->local_storage_dir() ) . '.chunks';
 	}
 
+	/**
+	 * Delete every file in a chunk session directory, then remove the directory itself.
+	 *
+	 * @param string $dir Absolute path to the chunk session directory to remove.
+	 */
 	private function cleanup_dir( string $dir ): void {
-		foreach ( glob( trailingslashit( $dir ) . '*' ) ?: array() as $file ) {
+		$files = glob( trailingslashit( $dir ) . '*' );
+		foreach ( $files ? $files : array() as $file ) {
 			if ( is_file( $file ) ) {
 				wp_delete_file( $file );
 			}
 		}
-		@rmdir( $dir ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+		// phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged, WordPress.WP.AlternativeFunctions.file_system_operations_rmdir -- best-effort cleanup of a now-empty local temp directory; failure is non-fatal and WP_Filesystem is not used elsewhere in this codebase.
+		@rmdir( $dir );
 	}
 }
