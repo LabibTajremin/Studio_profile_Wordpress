@@ -134,7 +134,13 @@ final class PlaceholderController {
 		);
 	}
 
-	/** Lightens (positive) or darkens (negative) a hex colour. */
+	/**
+	 * Lightens (positive) or darkens (negative) a hex colour.
+	 *
+	 * @param string $hex    Hex colour string, with or without a leading '#'.
+	 * @param float  $amount Shade amount from -1 (fully dark) to 1 (fully light).
+	 * @return string The shaded hex colour string, prefixed with '#'.
+	 */
 	private static function shade( string $hex, float $amount ): string {
 		$hex = ltrim( $hex, '#' );
 		if ( 3 === strlen( $hex ) ) {
