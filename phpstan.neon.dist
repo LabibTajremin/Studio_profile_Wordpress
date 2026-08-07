@@ -18,11 +18,15 @@ parameters:
     ignoreErrors:
         -
             message: '#^Result of \|\| is always true\.$#'
-            path: plugins/maapkathi-core/src/Roles/Roles.php
+            path: plugins/maapkathi-core/src/Config/Config.php
         -
             message: '#^Unreachable statement - code above always terminates\.$#'
-            paths:
-                - plugins/maapkathi-core/src/Roles/Roles.php
-                - plugins/maapkathi-core/src/Inquiries/Inquiries.php
+            path: plugins/maapkathi-core/src/Inquiries/Inquiries.php
+        -
+            # add_submenu_page() genuinely accepts a null $parent_slug since
+            # WP 5.3 to register a hidden page reachable only by URL — the
+            # bundled stub's signature just wasn't updated for it.
+            message: '#^Parameter \#1 \$parent_slug of function add_submenu_page expects string, null given\.$#'
+            path: plugins/maapkathi-core/src/Setup/SetupWizard.php
 includes:
     - vendor/szepeviktor/phpstan-wordpress/extension.neon

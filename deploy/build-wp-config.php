@@ -271,7 +271,20 @@ define( 'MK_HERO_SLIDE_SECONDS', {$hero_seconds} );
 define( 'MK_MAX_HERO_HOLD_SECONDS', {$hero_hold} );
 
 // ---------------------------------------------------------------------
-// First admin account (created once, on plugin activation)
+// Outbound email — sender identity + SMTP (SMTP only used when
+// MK_MAIL_DRIVER=1 above)
+// ---------------------------------------------------------------------
+define( 'MK_MAIL_FROM_EMAIL', {$q_mail_from_email} );
+define( 'MK_MAIL_FROM_NAME', {$q_mail_from_name} );
+define( 'MK_SMTP_HOST', {$q_smtp_host} );
+define( 'MK_SMTP_PORT', {$smtp_port} );
+define( 'MK_SMTP_USERNAME', {$q_smtp_username} );
+define( 'MK_SMTP_PASSWORD', {$q_smtp_password} );
+define( 'MK_SMTP_ENCRYPTION', {$q_smtp_encryption} );
+
+// ---------------------------------------------------------------------
+// First admin account (legacy / optional — the on-site setup wizard
+// handles this normally; see deploy.env.example)
 // ---------------------------------------------------------------------
 {$admin_block}
 // ---------------------------------------------------------------------
@@ -345,6 +358,13 @@ $config = strtr(
 		'{$chunk_bytes}'   => (string) mk_int( $env, 'MK_CHUNK_BYTES', 2097152 ),
 		'{$hero_seconds}'  => (string) mk_int( $env, 'MK_HERO_SLIDE_SECONDS', 6 ),
 		'{$hero_hold}'     => (string) mk_int( $env, 'MK_MAX_HERO_HOLD_SECONDS', 20 ),
+		'{$q_mail_from_email}' => mk_php_quote( trim( $env['MK_MAIL_FROM_EMAIL'] ?? '' ) ),
+		'{$q_mail_from_name}'  => mk_php_quote( trim( $env['MK_MAIL_FROM_NAME'] ?? '' ) ),
+		'{$q_smtp_host}'       => mk_php_quote( trim( $env['MK_SMTP_HOST'] ?? '' ) ),
+		'{$smtp_port}'         => (string) mk_int( $env, 'MK_SMTP_PORT', 587 ),
+		'{$q_smtp_username}'   => mk_php_quote( trim( $env['MK_SMTP_USERNAME'] ?? '' ) ),
+		'{$q_smtp_password}'   => mk_php_quote( $env['MK_SMTP_PASSWORD'] ?? '' ),
+		'{$q_smtp_encryption}' => mk_php_quote( trim( $env['MK_SMTP_ENCRYPTION'] ?? '' ) ?: 'tls' ),
 		'{$force_ssl}'     => mk_bool( $env, 'FORCE_SSL_ADMIN', true ) ? 'true' : 'false',
 		'{$wp_debug}'      => $debug ? 'true' : 'false',
 		'{$salt_lines}'    => $salt_lines,

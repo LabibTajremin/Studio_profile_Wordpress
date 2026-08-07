@@ -87,6 +87,24 @@ final class Config {
 	}
 
 	/**
+	 * The configured outbound sender address (MK_MAIL_FROM_EMAIL), or an empty string when unset.
+	 *
+	 * @return string
+	 */
+	public function mail_from_email(): string {
+		return $this->constant_string( 'MK_MAIL_FROM_EMAIL', '' );
+	}
+
+	/**
+	 * The SMTP host (MK_SMTP_HOST), or an empty string when unset.
+	 *
+	 * @return string
+	 */
+	public function smtp_host(): string {
+		return $this->constant_string( 'MK_SMTP_HOST', '' );
+	}
+
+	/**
 	 * The local storage directory, from MK_LOCAL_STORAGE_DIR or the default uploads path.
 	 *
 	 * @return string Absolute directory path.
@@ -164,6 +182,7 @@ final class Config {
 		$this->check_in_set( 'MK_MAIL_DRIVER', $this->mail_driver(), self::MAIL_DRIVERS );
 
 		$this->check_driver_credentials();
+		$this->check_mail_credentials();
 
 		if ( $this->hero_slide_seconds() < 3 || $this->hero_slide_seconds() > 20 ) {
 			$this->errors[] = 'MK_HERO_SLIDE_SECONDS must be between 3 and 20.';
@@ -250,6 +269,25 @@ final class Config {
 	}
 
 	/**
+	 * Append an error when MK_MAIL_DRIVER=1 (SMTP) is active but the SMTP
+	 * host/username/password credentials it needs are not defined.
+	 */
+	private function check_mail_credentials(): void {
+		if ( 1 !== $this->mail_driver() ) {
+			return;
+		}
+
+		foreach ( array( 'MK_SMTP_HOST', 'MK_SMTP_USERNAME', 'MK_SMTP_PASSWORD' ) as $constant_name ) {
+			if ( ! defined( $constant_name ) || '' === (string) constant( $constant_name ) ) {
+				$this->errors[] = sprintf(
+					'MK_MAIL_DRIVER=1 (SMTP) requires %s to be defined in wp-config.php.',
+					$constant_name
+				);
+			}
+		}
+	}
+
+	/**
 	 * Read a constant as an int, falling back to a default when it is not defined.
 	 *
 	 * @param string $name     Constant name to look up.
@@ -258,5 +296,16 @@ final class Config {
 	 */
 	private function constant_int( string $name, int $fallback ): int {
 		return defined( $name ) ? (int) constant( $name ) : $fallback;
+	}
+
+	/**
+	 * Read a constant as a string, falling back to a default when it is not defined.
+	 *
+	 * @param string $name     Constant name to look up.
+	 * @param string $fallback Value to use when the constant is not defined.
+	 * @return string The constant's value cast to string, or the fallback.
+	 */
+	private function constant_string( string $name, string $fallback ): string {
+		return defined( $name ) ? (string) constant( $name ) : $fallback;
 	}
 }

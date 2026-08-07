@@ -32,10 +32,13 @@ define( 'MK_CHUNK_BYTES', (int) getenv( 'PHPSTAN_STUB_INT' ) );
 define( 'MK_HERO_SLIDE_SECONDS', (int) getenv( 'PHPSTAN_STUB_INT' ) );
 define( 'MK_MAX_HERO_HOLD_SECONDS', (int) getenv( 'PHPSTAN_STUB_INT' ) );
 
-define( 'MK_ADMIN_USERNAME', (string) getenv( 'PHPSTAN_STUB_STRING' ) );
-define( 'MK_ADMIN_PASSWORD', (string) getenv( 'PHPSTAN_STUB_STRING' ) );
-define( 'MK_ADMIN_EMAIL', (string) getenv( 'PHPSTAN_STUB_STRING' ) );
-define( 'MK_ADMIN_NAME', (string) getenv( 'PHPSTAN_STUB_STRING' ) );
+define( 'MK_MAIL_FROM_EMAIL', (string) getenv( 'PHPSTAN_STUB_STRING' ) );
+define( 'MK_MAIL_FROM_NAME', (string) getenv( 'PHPSTAN_STUB_STRING' ) );
+define( 'MK_SMTP_HOST', (string) getenv( 'PHPSTAN_STUB_STRING' ) );
+define( 'MK_SMTP_PORT', (int) getenv( 'PHPSTAN_STUB_INT' ) );
+define( 'MK_SMTP_USERNAME', (string) getenv( 'PHPSTAN_STUB_STRING' ) );
+define( 'MK_SMTP_PASSWORD', (string) getenv( 'PHPSTAN_STUB_STRING' ) );
+define( 'MK_SMTP_ENCRYPTION', (string) getenv( 'PHPSTAN_STUB_STRING' ) );
 
 define( 'MK_SUPABASE_URL', (string) getenv( 'PHPSTAN_STUB_STRING' ) );
 define( 'MK_SUPABASE_SERVICE_KEY', (string) getenv( 'PHPSTAN_STUB_STRING' ) );

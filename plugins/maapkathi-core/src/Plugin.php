@@ -25,6 +25,9 @@ use Maapkathi\Core\Approval\ApprovalService;
 use Maapkathi\Core\Fields\MetaBoxes;
 use Maapkathi\Core\Seo\Seo;
 use Maapkathi\Core\Cli\SeedCommand;
+use Maapkathi\Core\Setup\SetupWizard;
+use Maapkathi\Core\Users\EmailVerification;
+use Maapkathi\Core\Mail\Mailer;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -45,7 +48,10 @@ final class Plugin {
 	public static function activate(): void {
 		Roles::register_roles();
 		Database::install();
-		Roles::bootstrap_admin_user();
+
+		// No wp-config.php-constant admin bootstrap here — the first
+		// administrator WordPress's own installer created is walked
+		// through SetupWizard the first time they open wp-admin instead.
 
 		// Register post types before flushing, or the CPT rewrite rules
 		// (/work, /services/{slug}) are absent from the freshly-written
@@ -93,9 +99,12 @@ final class Plugin {
 		( new MetaBoxes() )->register_hooks();
 		( new Seo() )->register_hooks();
 		( new Security() )->register_hooks();
+		( new Mailer() )->register_hooks();
+		( new EmailVerification() )->register_hooks();
 
 		if ( is_admin() ) {
 			( new Menu() )->register_hooks();
+			( new SetupWizard() )->register_hooks();
 		}
 
 		if ( defined( 'WP_CLI' ) && WP_CLI && class_exists( '\WP_CLI' ) ) {
