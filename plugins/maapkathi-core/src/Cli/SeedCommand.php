@@ -296,7 +296,7 @@ final class SeedCommand {
 				$term = wp_insert_term( $name, 'mk_project_category', array( 'slug' => $slug ) );
 			}
 			if ( ! is_wp_error( $term ) ) {
-				$term_ids[] = (int) ( is_array( $term ) ? $term['term_id'] : $term );
+				$term_ids[] = (int) $term['term_id'];
 			}
 		}
 

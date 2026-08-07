@@ -81,7 +81,7 @@ final class PlaceholderController {
 	 *
 	 * @param \WP_REST_Request $request REST request carrying width, height, and an optional label.
 	 */
-	public function render( \WP_REST_Request $request ) {
+	public function render( \WP_REST_Request $request ): never {
 		$width  = max( 1, min( self::MAX_DIMENSION, absint( $request['width'] ) ) );
 		$height = max( 1, min( self::MAX_DIMENSION, absint( $request['height'] ) ) );
 		$label  = (string) $request->get_param( 'label' );

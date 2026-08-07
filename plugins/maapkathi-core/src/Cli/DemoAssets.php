@@ -291,10 +291,12 @@ final class DemoAssets {
 				'post_content'   => '',
 				'post_status'    => 'inherit',
 			),
-			$upload['file']
+			$upload['file'],
+			0,
+			true
 		);
 
-		if ( is_wp_error( $attachment_id ) || ! $attachment_id ) {
+		if ( is_wp_error( $attachment_id ) ) {
 			return 0;
 		}
 

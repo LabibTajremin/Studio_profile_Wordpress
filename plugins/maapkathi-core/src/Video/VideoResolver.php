@@ -31,7 +31,7 @@ final class VideoResolver {
 	 * @return ?ResolvedVideo
 	 */
 	public function resolve( array $field, bool $is_background = false ): ?ResolvedVideo {
-		$source = $field['video_source'] ?? 'upload';
+		$source = $field['video_source'];
 		$poster = $field['video_poster'] ?? null;
 
 		if ( 'upload' === $source ) {

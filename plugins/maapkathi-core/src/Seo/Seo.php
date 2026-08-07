@@ -237,7 +237,7 @@ final class Seo {
 				'name'           => $faq['question'],
 				'acceptedAnswer' => array(
 					'@type' => 'Answer',
-					'text'  => wp_strip_all_tags( $faq['answer'] ?? '' ),
+					'text'  => wp_strip_all_tags( $faq['answer'] ),
 				),
 			);
 		}
