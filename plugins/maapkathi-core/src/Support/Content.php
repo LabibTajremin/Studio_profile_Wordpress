@@ -1,4 +1,10 @@
 <?php
+/**
+ * Read-side accessors for public content types, used by the theme.
+ *
+ * @package maapkathi-core
+ */
+
 declare( strict_types = 1 );
 
 namespace Maapkathi\Core\Support;
@@ -18,6 +24,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 final class Content {
 
 	/**
+	 * Runs a shared, consistently-ordered `WP_Query` for one post type.
+	 *
+	 * @param string               $post_type Post type slug to query.
+	 * @param int                  $limit     Max posts to return, or -1 for all.
+	 * @param array<string,mixed>  $extra     Extra `get_posts()` args, merged over the defaults.
 	 * @return \WP_Post[]
 	 */
 	public static function items( string $post_type, int $limit = -1, array $extra = array() ): array {

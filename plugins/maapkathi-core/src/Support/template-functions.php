@@ -91,39 +91,71 @@ if ( ! function_exists( 'mk_content' ) ) {
 }
 
 if ( ! function_exists( 'mk_meta' ) ) {
-	/** Post meta with a default, saving the theme repetitive guards. */
-	function mk_meta( int $post_id, string $key, string $default = '' ): string {
+	/**
+	 * Post meta with a default, saving the theme repetitive guards.
+	 *
+	 * @param int    $post_id       Post ID to read meta from.
+	 * @param string $key           Meta key.
+	 * @param string $default_value Value to return when the meta is empty.
+	 * @return string
+	 */
+	function mk_meta( int $post_id, string $key, string $default_value = '' ): string {
 		$value = get_post_meta( $post_id, $key, true );
-		return ( '' === $value || null === $value ) ? $default : (string) $value;
+		return ( '' === $value || null === $value ) ? $default_value : (string) $value;
 	}
 }
 
 if ( ! function_exists( 'mk_blog_enabled' ) ) {
+	/**
+	 * Whether the site's blog feature is enabled in site settings.
+	 *
+	 * @return bool
+	 */
 	function mk_blog_enabled(): bool {
 		return ! empty( mk_setting( 'blog_enabled' ) );
 	}
 }
 
 if ( ! function_exists( 'mk_logo_light_url' ) ) {
+	/**
+	 * URL of the configured light-mode logo, or an empty string if unset.
+	 *
+	 * @return string
+	 */
 	function mk_logo_light_url(): string {
 		return Branding::logo_light_url();
 	}
 }
 
 if ( ! function_exists( 'mk_logo_dark_url' ) ) {
+	/**
+	 * URL of the configured dark-mode logo, or an empty string if unset.
+	 *
+	 * @return string
+	 */
 	function mk_logo_dark_url(): string {
 		return Branding::logo_dark_url();
 	}
 }
 
 if ( ! function_exists( 'mk_default_mark_url' ) ) {
+	/**
+	 * URL of the built-in wordmark, used when no logo has been uploaded.
+	 *
+	 * @return string
+	 */
 	function mk_default_mark_url(): string {
 		return Branding::default_mark_url();
 	}
 }
 
 if ( ! function_exists( 'mk_tel_href' ) ) {
-	/** Normalises a phone number into a tel: href value. */
+	/**
+	 * Normalises a phone number into a tel: href value.
+	 *
+	 * @param string $phone Phone number in any format.
+	 * @return string
+	 */
 	function mk_tel_href( string $phone ): string {
 		return 'tel:' . preg_replace( '/[^0-9+]/', '', $phone );
 	}
@@ -134,6 +166,11 @@ if ( ! function_exists( 'mk_placeholder_url' ) ) {
 	 * On-the-fly gradient SVG placeholder (§3.5). Entirely local — no
 	 * third-party image host, so a fresh install has no broken images and
 	 * no external requests.
+	 *
+	 * @param string $label  Text label to render on the placeholder.
+	 * @param int    $width  Placeholder width in pixels.
+	 * @param int    $height Placeholder height in pixels.
+	 * @return string
 	 */
 	function mk_placeholder_url( string $label = '', int $width = 1600, int $height = 1000 ): string {
 		return \Maapkathi\Core\Rest\PlaceholderController::url( $label, $width, $height );
