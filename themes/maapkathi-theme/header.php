@@ -1,4 +1,8 @@
 <?php
+/**
+ * Opens the HTML document: <head>, site header, and the #main region.
+ */
+
 declare( strict_types = 1 );
 
 if ( ! defined( 'ABSPATH' ) ) {

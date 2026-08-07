@@ -1,4 +1,8 @@
 <?php
+/**
+ * 404 template — no post/page matched the request.
+ */
+
 declare( strict_types = 1 );
 
 if ( ! defined( 'ABSPATH' ) ) {

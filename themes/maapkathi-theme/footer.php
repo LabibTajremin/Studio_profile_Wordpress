@@ -1,4 +1,8 @@
 <?php
+/**
+ * Closes the #main content region and renders the site footer.
+ */
+
 declare( strict_types = 1 );
 
 if ( ! defined( 'ABSPATH' ) ) {
