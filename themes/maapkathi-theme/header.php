@@ -1,6 +1,8 @@
 <?php
 /**
  * Opens the HTML document: <head>, site header, and the #main region.
+ *
+ * @package maapkathi-theme
  */
 
 declare( strict_types = 1 );

@@ -1,6 +1,8 @@
 <?php
 /**
  * Fallback blog index template, used when no more specific template applies.
+ *
+ * @package maapkathi-theme
  */
 
 declare( strict_types = 1 );

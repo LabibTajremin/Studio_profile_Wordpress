@@ -25,18 +25,38 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 final class LocalStorageAdapter implements StorageAdapter {
 
+	/**
+	 * Numeric identifier for this driver.
+	 *
+	 * @return int
+	 */
 	public function driver_code(): int {
 		return 3;
 	}
 
+	/**
+	 * Copies a local temp file into the storage directory under the given
+	 * key, creating the destination directory and the protective
+	 * .htaccess as needed.
+	 *
+	 * @param string $key        Storage key to write the object under.
+	 * @param string $tmp_path   Absolute path of the local temp file to store.
+	 * @param string $mime       MIME type of the file.
+	 * @param string $visibility Unused — local storage has no per-object visibility.
+	 * @return StoredObject
+	 */
 	public function put( string $key, string $tmp_path, string $mime, string $visibility ): StoredObject {
 		$this->ensure_htaccess();
 
 		$destination = $this->path_for_key( $key );
 		wp_mkdir_p( dirname( $destination ) );
 
-		if ( ! @copy( $tmp_path, $destination ) ) {
-			throw new \RuntimeException( 'Unable to write file to local storage: ' . $key );
+		// Suppressed deliberately: copy() emits its own PHP warning on
+		// failure in addition to a false return value, and the false
+		// return is already turned into a proper exception below, so the
+		// warning would just be redundant noise in the log.
+		if ( ! @copy( $tmp_path, $destination ) ) { // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged -- failure is already converted into a RuntimeException below; the suppressed warning would be redundant.
+			throw new \RuntimeException( 'Unable to write file to local storage: ' . esc_html( $key ) );
 		}
 
 		return new StoredObject(
@@ -47,6 +67,12 @@ final class LocalStorageAdapter implements StorageAdapter {
 		);
 	}
 
+	/**
+	 * Deletes the object stored under the given key, if it exists.
+	 *
+	 * @param string $key Storage key of the object to delete.
+	 * @return void
+	 */
 	public function delete( string $key ): void {
 		$path = $this->path_for_key( $key );
 		if ( file_exists( $path ) ) {
@@ -54,13 +80,24 @@ final class LocalStorageAdapter implements StorageAdapter {
 		}
 	}
 
+	/**
+	 * Builds the direct, statically-served URL for an object.
+	 *
+	 * @param string $key Storage key of the object.
+	 * @return string
+	 */
 	public function url( string $key ): string {
-		$base_dir = trailingslashit( $this->base_dir() );
 		$base_url = $this->base_url();
 
 		return trailingslashit( $base_url ) . ltrim( $key, '/' );
 	}
 
+	/**
+	 * Checks whether an object exists under the given key.
+	 *
+	 * @param string $key Storage key to check.
+	 * @return bool
+	 */
 	public function exists( string $key ): bool {
 		return file_exists( $this->path_for_key( $key ) );
 	}
@@ -101,14 +138,31 @@ final class LocalStorageAdapter implements StorageAdapter {
 		);
 	}
 
+	/**
+	 * Resolves a storage key to its absolute filesystem path.
+	 *
+	 * @param string $key Storage key.
+	 * @return string
+	 */
 	private function path_for_key( string $key ): string {
 		return trailingslashit( $this->base_dir() ) . ltrim( $key, '/' );
 	}
 
+	/**
+	 * Absolute path of the configured local storage directory.
+	 *
+	 * @return string
+	 */
 	private function base_dir(): string {
 		return Config::instance()->local_storage_dir();
 	}
 
+	/**
+	 * Public base URL corresponding to the local storage directory,
+	 * derived from the WordPress uploads base URL.
+	 *
+	 * @return string
+	 */
 	private function base_url(): string {
 		$upload_dir = wp_get_upload_dir();
 		$relative   = str_replace( wp_normalize_path( $upload_dir['basedir'] ), '', wp_normalize_path( $this->base_dir() ) );

@@ -1,6 +1,8 @@
 <?php
 /**
  * Closes the #main content region and renders the site footer.
+ *
+ * @package maapkathi-theme
  */
 
 declare( strict_types = 1 );
