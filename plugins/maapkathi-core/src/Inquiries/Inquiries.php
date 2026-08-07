@@ -22,17 +22,24 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 final class Inquiries {
 
+	/**
+	 * Wire the logged-in and logged-out admin-post handlers for the contact form.
+	 */
 	public function register_hooks(): void {
 		add_action( 'admin_post_mk_submit_inquiry', array( $this, 'handle_submit' ) );
 		add_action( 'admin_post_nopriv_mk_submit_inquiry', array( $this, 'handle_submit' ) );
 	}
 
+	/**
+	 * Validate, rate-limit, and store a contact form submission, then redirect back.
+	 */
 	public function handle_submit(): void {
 		check_admin_referer( 'mk_inquiry', 'mk_inquiry_nonce' );
 
 		// Honeypot: a hidden field a bot fills in but a human never sees.
 		if ( ! empty( $_POST['mk_website'] ) ) {
-			wp_safe_redirect( add_query_arg( 'mk_inquiry', 'sent', wp_get_referer() ?: home_url( '/contact/' ) ) );
+			$referer = wp_get_referer();
+			wp_safe_redirect( add_query_arg( 'mk_inquiry', 'sent', $referer ? $referer : home_url( '/contact/' ) ) );
 			exit;
 		}
 
@@ -66,7 +73,8 @@ final class Inquiries {
 				),
 				5 * MINUTE_IN_SECONDS
 			);
-			wp_safe_redirect( wp_get_referer() ?: home_url( '/contact/' ) );
+			$referer = wp_get_referer();
+			wp_safe_redirect( $referer ? $referer : home_url( '/contact/' ) );
 			exit;
 		}
 
@@ -87,12 +95,18 @@ final class Inquiries {
 
 		$this->maybe_notify( $name, $email, $message );
 
-		wp_safe_redirect( add_query_arg( 'mk_inquiry', 'sent', wp_get_referer() ?: home_url( '/contact/' ) ) );
+		$referer = wp_get_referer();
+		wp_safe_redirect( add_query_arg( 'mk_inquiry', 'sent', $referer ? $referer : home_url( '/contact/' ) ) );
 		exit;
 	}
 
 	/**
-	 * @return string[]
+	 * Validate a contact form submission's required fields.
+	 *
+	 * @param string $name    Submitted name.
+	 * @param string $email   Submitted email address.
+	 * @param string $message Submitted message body.
+	 * @return string[] Human-readable validation error messages; empty when valid.
 	 */
 	public function validate( string $name, string $email, string $message ): array {
 		$errors = array();
@@ -110,6 +124,11 @@ final class Inquiries {
 		return $errors;
 	}
 
+	/**
+	 * Whether the current client's IP has exceeded the submission rate limit.
+	 *
+	 * @return bool True when the client has already made 5+ attempts in the current window.
+	 */
 	private function is_rate_limited(): bool {
 		$key      = 'mk_inquiry_rate_' . $this->client_ip_hash();
 		$attempts = (int) get_transient( $key );

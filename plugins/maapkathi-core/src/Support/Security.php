@@ -178,6 +178,11 @@ final class Security {
 		}
 	}
 
+	/**
+	 * Prints a noindex/nofollow robots meta tag on wp-admin pages.
+	 *
+	 * @return void
+	 */
 	public function noindex_admin(): void {
 		echo '<meta name="robots" content="noindex, nofollow" />' . "\n";
 	}
@@ -187,10 +192,10 @@ final class Security {
 	 * Everything else — including SVG, which is an XSS vector when
 	 * uploadable by non-trusted roles — is rejected.
 	 *
-	 * @param array<string,string> $mimes
+	 * @param array<string,string> $mimes Existing allowed MIME map (unused, replaced wholesale).
 	 * @return array<string,string>
 	 */
-	public function restrict_upload_mimes( array $mimes ): array {
+	public function restrict_upload_mimes( array $mimes ): array { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.Found -- required by the upload_mimes filter signature; this filter deliberately replaces the map wholesale.
 		return array(
 			'jpg|jpeg|jpe' => 'image/jpeg',
 			'png'          => 'image/png',

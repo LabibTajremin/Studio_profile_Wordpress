@@ -38,10 +38,10 @@ $is_custom_preset = 'custom' === $settings['motion_preset'];
 			<tr>
 				<th><?php esc_html_e( '1. Mode', 'maapkathi' ); ?></th>
 				<td>
-					<?php foreach ( array( 'light', 'dark', 'system' ) as $mode ) : ?>
+					<?php foreach ( array( 'light', 'dark', 'system' ) as $mk_mode ) : ?>
 						<label style="margin-right:1em">
-							<input type="radio" name="mk_theme_settings[mode]" value="<?php echo esc_attr( $mode ); ?>" <?php checked( $settings['mode'], $mode ); ?> />
-							<?php echo esc_html( ucfirst( $mode ) ); ?>
+							<input type="radio" name="mk_theme_settings[mode]" value="<?php echo esc_attr( $mk_mode ); ?>" <?php checked( $settings['mode'], $mk_mode ); ?> />
+							<?php echo esc_html( ucfirst( $mk_mode ) ); ?>
 						</label>
 					<?php endforeach; ?>
 				</td>
@@ -116,8 +116,8 @@ $is_custom_preset = 'custom' === $settings['motion_preset'];
 			<tr>
 				<th><?php esc_html_e( '10. Radius', 'maapkathi' ); ?></th>
 				<td>
-					<?php foreach ( Fonts::RADIUS_SCALE as $id => $px ) : ?>
-						<label style="margin-right:1em"><input type="radio" name="mk_theme_settings[radius]" value="<?php echo esc_attr( $id ); ?>" <?php checked( $settings['radius'], $id ); ?> /> <?php echo esc_html( ucfirst( $id ) ); ?> (<?php echo esc_html( $px ); ?>)</label>
+					<?php foreach ( Fonts::RADIUS_SCALE as $mk_radius_id => $px ) : ?>
+						<label style="margin-right:1em"><input type="radio" name="mk_theme_settings[radius]" value="<?php echo esc_attr( $mk_radius_id ); ?>" <?php checked( $settings['radius'], $mk_radius_id ); ?> /> <?php echo esc_html( ucfirst( $mk_radius_id ) ); ?> (<?php echo esc_html( $px ); ?>)</label>
 					<?php endforeach; ?>
 				</td>
 			</tr>

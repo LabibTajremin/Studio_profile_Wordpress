@@ -76,7 +76,7 @@ add_action(
 
 		$fonts_url = mk_theme_google_fonts_url();
 		if ( $fonts_url ) {
-			wp_enqueue_style( 'maapkathi-google-fonts', $fonts_url, array(), null );
+			wp_enqueue_style( 'maapkathi-google-fonts', $fonts_url, array(), $ver( '/style.css' ) );
 		}
 	}
 );
