@@ -284,6 +284,9 @@ final class MetaBoxes {
 		}
 	}
 
+	/**
+	 * Register the "Maapkathi Fields" meta box on every CPT edit screen that has a schema.
+	 */
 	public function add_meta_boxes(): void {
 		foreach ( self::schema() as $post_type => $fields ) {
 			add_meta_box(
@@ -300,7 +303,10 @@ final class MetaBoxes {
 	}
 
 	/**
-	 * @param array<int,array{key:string,label:string,type:string,help?:string}> $fields
+	 * Render the meta box table for a post's fields.
+	 *
+	 * @param \WP_Post                                                          $post   Post being edited.
+	 * @param array<int,array{key:string,label:string,type:string,help?:string}> $fields Field definitions to render.
 	 */
 	private function render( \WP_Post $post, array $fields ): void {
 		wp_nonce_field( 'mk_save_fields_' . $post->ID, 'mk_fields_nonce' );
@@ -318,34 +324,43 @@ final class MetaBoxes {
 	}
 
 	/**
-	 * @param array{key:string,label:string,type:string} $field
+	 * Render a single field's input control, matched to its declared type.
+	 *
+	 * @param array{key:string,label:string,type:string} $field Field definition to render an input for.
+	 * @param mixed                                       $value Current stored value for the field.
 	 */
 	private function render_input( array $field, $value ): void {
-		$id = esc_attr( $field['key'] );
+		$id = $field['key'];
 		switch ( $field['type'] ) {
 			case 'textarea':
-				printf( '<textarea id="%1$s" name="%1$s" rows="4" class="large-text">%2$s</textarea>', $id, esc_textarea( (string) $value ) );
+				printf( '<textarea id="%1$s" name="%1$s" rows="4" class="large-text">%2$s</textarea>', esc_attr( $id ), esc_textarea( (string) $value ) );
 				break;
 			case 'checkbox':
-				printf( '<input type="checkbox" id="%1$s" name="%1$s" value="1" %2$s />', $id, checked( (bool) $value, true, false ) );
+				printf( '<input type="checkbox" id="%1$s" name="%1$s" value="1" %2$s />', esc_attr( $id ), checked( (bool) $value, true, false ) );
 				break;
 			case 'number':
-				printf( '<input type="number" id="%1$s" name="%1$s" value="%2$s" class="small-text" />', $id, esc_attr( (string) $value ) );
+				printf( '<input type="number" id="%1$s" name="%1$s" value="%2$s" class="small-text" />', esc_attr( $id ), esc_attr( (string) $value ) );
 				break;
 			case 'date':
-				printf( '<input type="date" id="%1$s" name="%1$s" value="%2$s" />', $id, esc_attr( (string) $value ) );
+				printf( '<input type="date" id="%1$s" name="%1$s" value="%2$s" />', esc_attr( $id ), esc_attr( (string) $value ) );
 				break;
 			case 'url':
-				printf( '<input type="url" id="%1$s" name="%1$s" value="%2$s" class="regular-text" />', $id, esc_attr( (string) $value ) );
+				printf( '<input type="url" id="%1$s" name="%1$s" value="%2$s" class="regular-text" />', esc_attr( $id ), esc_attr( (string) $value ) );
 				break;
 			case 'gallery':
-				printf( '<input type="text" id="%1$s" name="%1$s" value="%2$s" class="large-text" placeholder="12,34,56" />', $id, esc_attr( (string) $value ) );
+				printf( '<input type="text" id="%1$s" name="%1$s" value="%2$s" class="large-text" placeholder="12,34,56" />', esc_attr( $id ), esc_attr( (string) $value ) );
 				break;
 			default:
-				printf( '<input type="text" id="%1$s" name="%1$s" value="%2$s" class="regular-text" />', $id, esc_attr( (string) $value ) );
+				printf( '<input type="text" id="%1$s" name="%1$s" value="%2$s" class="regular-text" />', esc_attr( $id ), esc_attr( (string) $value ) );
 		}
 	}
 
+	/**
+	 * Sanitize and save submitted field values for a post, after verifying the nonce and capability.
+	 *
+	 * @param int      $post_id ID of the post being saved.
+	 * @param \WP_Post $post    Post being saved.
+	 */
 	public function save( int $post_id, \WP_Post $post ): void {
 		$fields = self::schema()[ $post->post_type ] ?? null;
 		if ( null === $fields ) {

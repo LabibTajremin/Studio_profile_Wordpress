@@ -245,19 +245,19 @@ $faqs         = mk_content( 'faqs' );
 		<ul class="mk-awards__list">
 			<?php foreach ( $awards as $award ) : ?>
 				<?php
-				$issuer = mk_meta( $award->ID, 'mk_issuer' );
-				$year   = mk_meta( $award->ID, 'mk_year' );
-				$link   = mk_meta( $award->ID, 'mk_link' );
+				$issuer     = mk_meta( $award->ID, 'mk_issuer' );
+				$award_year = mk_meta( $award->ID, 'mk_year' );
+				$award_link = mk_meta( $award->ID, 'mk_link' );
 				?>
 				<li class="mk-awards__item">
 					<span class="mk-awards__title">
-						<?php if ( $link ) : ?>
-							<a href="<?php echo esc_url( $link ); ?>" rel="noopener noreferrer" target="_blank"><?php echo esc_html( get_the_title( $award ) ); ?></a>
+						<?php if ( $award_link ) : ?>
+							<a href="<?php echo esc_url( $award_link ); ?>" rel="noopener noreferrer" target="_blank"><?php echo esc_html( get_the_title( $award ) ); ?></a>
 						<?php else : ?>
 							<?php echo esc_html( get_the_title( $award ) ); ?>
 						<?php endif; ?>
 					</span>
-					<span class="mk-awards__meta"><?php echo esc_html( trim( $issuer . ( $issuer && $year ? ' · ' : '' ) . $year ) ); ?></span>
+					<span class="mk-awards__meta"><?php echo esc_html( trim( $issuer . ( $issuer && $award_year ? ' · ' : '' ) . $award_year ) ); ?></span>
 				</li>
 			<?php endforeach; ?>
 		</ul>

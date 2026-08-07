@@ -1,4 +1,11 @@
 <?php
+/**
+ * Site hardening: header stripping, XML-RPC/enumeration lockdown, security
+ * headers and upload MIME allowlisting.
+ *
+ * @package maapkathi-core
+ */
+
 declare( strict_types = 1 );
 
 namespace Maapkathi\Core\Support;
@@ -18,6 +25,12 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 final class Security {
 
+	/**
+	 * Registers every hardening hook: header stripping, XML-RPC lockdown,
+	 * enumeration blocking, security headers and upload restrictions.
+	 *
+	 * @return void
+	 */
 	public function register_hooks(): void {
 		// Remove the WordPress version string from <head> and from feeds —
 		// it tells an attacker exactly which exploits to try.

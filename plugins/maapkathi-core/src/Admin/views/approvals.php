@@ -1,4 +1,10 @@
 <?php
+/**
+ * Approvals queue screen markup.
+ *
+ * @package Maapkathi\Core
+ */
+
 declare( strict_types = 1 );
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -6,6 +12,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
+ * View variables provided by ApprovalsScreen::render().
+ *
  * @var array<int,object> $pending
  * @var string $notice
  */
@@ -22,11 +30,21 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<?php else : ?>
 		<?php foreach ( $pending as $revision ) : ?>
 			<div class="mk-card" style="margin-bottom:1rem">
+				<?php $mk_entity_title = get_the_title( (int) $revision->entity_id ); ?>
 				<p>
 					<strong><?php echo esc_html( $revision->entity ); ?> #<?php echo esc_html( (string) $revision->entity_id ); ?></strong>
-					&mdash; <?php echo esc_html( get_the_title( (int) $revision->entity_id ) ?: '' ); ?>
+					&mdash; <?php echo esc_html( $mk_entity_title ? $mk_entity_title : '' ); ?>
 					<br />
-					<small><?php printf( esc_html__( 'Submitted by user #%1$d on %2$s', 'maapkathi' ), (int) $revision->submitted_by, esc_html( $revision->created_at ) ); ?></small>
+					<small>
+						<?php
+						printf(
+							/* translators: 1: submitting user ID, 2: submission date/time. */
+							esc_html__( 'Submitted by user #%1$d on %2$s', 'maapkathi' ),
+							(int) $revision->submitted_by,
+							esc_html( $revision->created_at )
+						);
+						?>
+					</small>
 				</p>
 				<pre style="white-space:pre-wrap;background:#f6f7f7;padding:0.75rem;border-radius:4px;max-height:200px;overflow:auto"><?php echo esc_html( wp_json_encode( json_decode( (string) $revision->payload, true ), JSON_PRETTY_PRINT ) ); ?></pre>
 

@@ -1,4 +1,10 @@
 <?php
+/**
+ * Hero carousel screen markup.
+ *
+ * @package Maapkathi\Core
+ */
+
 declare( strict_types = 1 );
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -6,6 +12,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
+ * View variables provided by HeroScreen::render().
+ *
  * @var array<int,array<string,mixed>> $slides
  * @var int    $duration
  * @var string $notice
@@ -74,7 +82,15 @@ settings_errors( 'mk_hero' );
 		<?php foreach ( $mk_rows as $mk_i => $mk_slide ) : ?>
 			<?php $mk_name = 'slides[' . $mk_i . ']'; ?>
 			<fieldset class="mk-card" data-hero-slide>
-				<legend><strong><?php printf( esc_html__( 'Slide %d', 'maapkathi' ), (int) $mk_i + 1 ); ?></strong></legend>
+				<legend><strong>
+					<?php
+					printf(
+						/* translators: %d: slide number. */
+						esc_html__( 'Slide %d', 'maapkathi' ),
+						(int) $mk_i + 1
+					);
+					?>
+				</strong></legend>
 
 				<p>
 					<strong><?php esc_html_e( 'Media kind', 'maapkathi' ); ?></strong><br />

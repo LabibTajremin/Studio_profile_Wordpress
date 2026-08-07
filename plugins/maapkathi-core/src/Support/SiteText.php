@@ -161,6 +161,11 @@ final class SiteText {
 		);
 	}
 
+	/**
+	 * Flat list of every field key defined in the schema.
+	 *
+	 * @return string[]
+	 */
 	public static function keys(): array {
 		$keys = array();
 		foreach ( self::schema() as $fields ) {
@@ -212,6 +217,9 @@ final class SiteText {
 	}
 
 	/**
+	 * Stored Site Text values merged over the shipped defaults, so cleared
+	 * fields still render their default copy.
+	 *
 	 * @return array<string,string>
 	 */
 	public static function get(): array {
@@ -228,7 +236,12 @@ final class SiteText {
 		return array_merge( self::defaults(), $stored );
 	}
 
-	/** Single copy string, with the shipped default as fallback. */
+	/**
+	 * Single copy string, with the shipped default as fallback.
+	 *
+	 * @param string $key Field key from the schema.
+	 * @return string
+	 */
 	public static function text( string $key ): string {
 		$all = self::get();
 		return (string) ( $all[ $key ] ?? '' );
