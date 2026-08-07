@@ -1,4 +1,10 @@
 <?php
+/**
+ * Versioned, idempotent database schema migrations.
+ *
+ * @package maapkathi-core
+ */
+
 declare( strict_types = 1 );
 
 namespace Maapkathi\Core\Support;

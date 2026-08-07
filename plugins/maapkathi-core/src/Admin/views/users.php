@@ -1,4 +1,10 @@
 <?php
+/**
+ * Users screen markup.
+ *
+ * @package Maapkathi\Core
+ */
+
 declare( strict_types = 1 );
 
 use Maapkathi\Core\Roles\Roles;
@@ -8,13 +14,18 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
+ * View variables provided by UsersScreen::render().
+ *
  * @var \WP_User[] $users
  * @var string $notice
  */
 ?>
 <div class="wrap mk-admin">
 	<h1><?php esc_html_e( 'Users', 'maapkathi' ); ?></h1>
-	<?php if ( $notice ) : ?><div class="notice notice-success"><p><?php echo esc_html( $notice ); ?></p></div><?php endif; ?>
+	<?php
+	if ( $notice ) :
+		?>
+		<div class="notice notice-success"><p><?php echo esc_html( $notice ); ?></p></div><?php endif; ?>
 
 	<h2><?php esc_html_e( 'Invite a user', 'maapkathi' ); ?></h2>
 	<form method="post" class="mk-card" style="max-width:480px">

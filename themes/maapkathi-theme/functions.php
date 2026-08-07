@@ -1,4 +1,10 @@
 <?php
+/**
+ * Theme bootstrap: setup, asset enqueues, and template-rendering hooks.
+ *
+ * @package maapkathi-theme
+ */
+
 declare( strict_types = 1 );
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -76,7 +82,7 @@ add_action(
 
 		$fonts_url = mk_theme_google_fonts_url();
 		if ( $fonts_url ) {
-			wp_enqueue_style( 'maapkathi-google-fonts', $fonts_url, array(), null );
+			wp_enqueue_style( 'maapkathi-google-fonts', $fonts_url, array(), $ver( '/style.css' ) );
 		}
 	}
 );
@@ -184,7 +190,7 @@ add_action(
 );
 
 /**
- * data-* attributes on <html> for every setting that drives behaviour
+ * Adds data-* attributes on <html> for every setting that drives behaviour
  * rather than a single CSS variable (§11.3).
  */
 add_filter(
@@ -240,7 +246,13 @@ add_action(
 		}
 
 		if ( $query->is_post_type_archive( 'mk_project' ) || $query->is_tax( 'mk_project_category' ) ) {
-			$query->set( 'orderby', array( 'menu_order' => 'ASC', 'date' => 'DESC' ) );
+			$query->set(
+				'orderby',
+				array(
+					'menu_order' => 'ASC',
+					'date'       => 'DESC',
+				)
+			);
 		}
 	}
 );

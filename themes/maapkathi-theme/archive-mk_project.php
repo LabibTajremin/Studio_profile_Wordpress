@@ -1,4 +1,10 @@
 <?php
+/**
+ * Archive template for the mk_project custom post type.
+ *
+ * @package maapkathi-theme
+ */
+
 declare( strict_types = 1 );
 
 if ( ! defined( 'ABSPATH' ) ) {

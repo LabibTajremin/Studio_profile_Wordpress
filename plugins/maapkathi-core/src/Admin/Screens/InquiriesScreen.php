@@ -1,4 +1,10 @@
 <?php
+/**
+ * Enquiries inbox screen controller.
+ *
+ * @package Maapkathi\Core
+ */
+
 declare( strict_types = 1 );
 
 namespace Maapkathi\Core\Admin\Screens;
@@ -20,6 +26,12 @@ final class InquiriesScreen {
 
 	private const PER_PAGE = 20;
 
+	/**
+	 * Checks capability, handles a mark-read/mark-unread/delete action, and
+	 * renders the filtered, paginated inbox.
+	 *
+	 * @return void
+	 */
 	public function render(): void {
 		if ( ! current_user_can( Roles::CAP_EDIT_CONTENT ) ) {
 			wp_die( esc_html__( 'You do not have permission to view this page.', 'maapkathi' ) );
@@ -48,9 +60,9 @@ final class InquiriesScreen {
 		}
 
 		// phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery
-		$total   = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table} {$where}" );
-		$unread  = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table} WHERE is_read = 0" );
-		$rows    = $wpdb->get_results(
+		$total  = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table} {$where}" );
+		$unread = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table} WHERE is_read = 0" );
+		$rows   = $wpdb->get_results(
 			$wpdb->prepare(
 				"SELECT * FROM {$table} {$where} ORDER BY created_at DESC LIMIT %d OFFSET %d",
 				self::PER_PAGE,
@@ -64,14 +76,24 @@ final class InquiriesScreen {
 		require MK_PLUGIN_DIR . 'src/Admin/views/inquiries.php';
 	}
 
+	/**
+	 * Marks an enquiry read/unread or deletes it, per the posted action.
+	 *
+	 * Called only from render(), which has already verified the
+	 * mk_inquiry_action nonce before invoking this method.
+	 *
+	 * @return string Notice message describing the result.
+	 */
 	private function handle_action(): string {
 		if ( ! current_user_can( Roles::CAP_EDIT_CONTENT ) ) {
 			return '';
 		}
 
 		global $wpdb;
-		$table  = Database::inquiries_table();
-		$id     = absint( $_POST['inquiry_id'] ?? 0 );
+		$table = Database::inquiries_table();
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- nonce already verified in render() before this method is called.
+		$id = absint( $_POST['inquiry_id'] ?? 0 );
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- nonce already verified in render() before this method is called.
 		$action = sanitize_key( $_POST['mk_action'] ?? '' );
 
 		if ( ! $id ) {
@@ -100,6 +122,11 @@ final class InquiriesScreen {
 		return '';
 	}
 
+	/**
+	 * Counts unread enquiries, used for the admin-menu badge.
+	 *
+	 * @return int
+	 */
 	public static function unread_count(): int {
 		global $wpdb;
 

@@ -1,4 +1,10 @@
 <?php
+/**
+ * Contact form submission handling.
+ *
+ * @package maapkathi-core
+ */
+
 declare( strict_types = 1 );
 
 namespace Maapkathi\Core\Inquiries;
@@ -16,17 +22,24 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 final class Inquiries {
 
+	/**
+	 * Wire the logged-in and logged-out admin-post handlers for the contact form.
+	 */
 	public function register_hooks(): void {
 		add_action( 'admin_post_mk_submit_inquiry', array( $this, 'handle_submit' ) );
 		add_action( 'admin_post_nopriv_mk_submit_inquiry', array( $this, 'handle_submit' ) );
 	}
 
+	/**
+	 * Validate, rate-limit, and store a contact form submission, then redirect back.
+	 */
 	public function handle_submit(): void {
 		check_admin_referer( 'mk_inquiry', 'mk_inquiry_nonce' );
 
 		// Honeypot: a hidden field a bot fills in but a human never sees.
 		if ( ! empty( $_POST['mk_website'] ) ) {
-			wp_safe_redirect( add_query_arg( 'mk_inquiry', 'sent', wp_get_referer() ?: home_url( '/contact/' ) ) );
+			$referer = wp_get_referer();
+			wp_safe_redirect( add_query_arg( 'mk_inquiry', 'sent', $referer ? $referer : home_url( '/contact/' ) ) );
 			exit;
 		}
 
@@ -60,7 +73,8 @@ final class Inquiries {
 				),
 				5 * MINUTE_IN_SECONDS
 			);
-			wp_safe_redirect( wp_get_referer() ?: home_url( '/contact/' ) );
+			$referer = wp_get_referer();
+			wp_safe_redirect( $referer ? $referer : home_url( '/contact/' ) );
 			exit;
 		}
 
@@ -81,12 +95,18 @@ final class Inquiries {
 
 		$this->maybe_notify( $name, $email, $message );
 
-		wp_safe_redirect( add_query_arg( 'mk_inquiry', 'sent', wp_get_referer() ?: home_url( '/contact/' ) ) );
+		$referer = wp_get_referer();
+		wp_safe_redirect( add_query_arg( 'mk_inquiry', 'sent', $referer ? $referer : home_url( '/contact/' ) ) );
 		exit;
 	}
 
 	/**
-	 * @return string[]
+	 * Validate a contact form submission's required fields.
+	 *
+	 * @param string $name    Submitted name.
+	 * @param string $email   Submitted email address.
+	 * @param string $message Submitted message body.
+	 * @return string[] Human-readable validation error messages; empty when valid.
 	 */
 	public function validate( string $name, string $email, string $message ): array {
 		$errors = array();
@@ -104,6 +124,11 @@ final class Inquiries {
 		return $errors;
 	}
 
+	/**
+	 * Whether the current client's IP has exceeded the submission rate limit.
+	 *
+	 * @return bool True when the client has already made 5+ attempts in the current window.
+	 */
 	private function is_rate_limited(): bool {
 		$key      = 'mk_inquiry_rate_' . $this->client_ip_hash();
 		$attempts = (int) get_transient( $key );
@@ -116,19 +141,39 @@ final class Inquiries {
 		return false;
 	}
 
+	/**
+	 * Instance-method wrapper around ip_hash() for the current request.
+	 *
+	 * @return string Hash of the current client's IP address.
+	 */
 	private function client_ip_hash(): string {
 		return self::ip_hash();
 	}
 
+	/**
+	 * Hash the current request's IP address for use as a transient key suffix.
+	 *
+	 * @return string MD5 hash of the client IP, or of 'unknown' when absent.
+	 */
 	private static function ip_hash(): string {
 		$ip = isset( $_SERVER['REMOTE_ADDR'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) ) : 'unknown';
 		return md5( $ip );
 	}
 
+	/**
+	 * The transient key used to store the current client's last validation errors.
+	 *
+	 * @return string Transient key.
+	 */
 	private static function errors_key(): string {
 		return 'mk_inquiry_errors_' . self::ip_hash();
 	}
 
+	/**
+	 * The transient key used to store the current client's last submitted (invalid) input.
+	 *
+	 * @return string Transient key.
+	 */
 	private static function old_input_key(): string {
 		return 'mk_inquiry_old_' . self::ip_hash();
 	}
@@ -163,6 +208,13 @@ final class Inquiries {
 		return is_array( $old ) ? $old : array();
 	}
 
+	/**
+	 * Email the site admin about a new inquiry, unless MK_MAIL_DRIVER is disabled.
+	 *
+	 * @param string $name    Submitter's name.
+	 * @param string $email   Submitter's email address.
+	 * @param string $message Submitted message body.
+	 */
 	private function maybe_notify( string $name, string $email, string $message ): void {
 		$driver = defined( 'MK_MAIL_DRIVER' ) ? (int) MK_MAIL_DRIVER : 0;
 		if ( 0 === $driver ) {
@@ -177,6 +229,12 @@ final class Inquiries {
 		);
 	}
 
+	/**
+	 * Mark an inquiry as read (or unread).
+	 *
+	 * @param int  $id   Inquiry row ID.
+	 * @param bool $read True to mark read, false to mark unread.
+	 */
 	public function mark_read( int $id, bool $read = true ): void {
 		global $wpdb;
 		$wpdb->update( Database::inquiries_table(), array( 'is_read' => $read ? 1 : 0 ), array( 'id' => $id ) );

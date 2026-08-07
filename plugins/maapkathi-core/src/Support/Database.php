@@ -1,4 +1,10 @@
 <?php
+/**
+ * Custom table-name helpers and thin wrappers over the migration runner.
+ *
+ * @package maapkathi-core
+ */
+
 declare( strict_types = 1 );
 
 namespace Maapkathi\Core\Support;
@@ -28,16 +34,31 @@ final class Database {
 		Migrations::run();
 	}
 
+	/**
+	 * Fully-prefixed name of the inquiries table.
+	 *
+	 * @return string
+	 */
 	public static function inquiries_table(): string {
 		global $wpdb;
 		return $wpdb->prefix . 'mk_inquiries';
 	}
 
+	/**
+	 * Fully-prefixed name of the audit log table.
+	 *
+	 * @return string
+	 */
 	public static function audit_log_table(): string {
 		global $wpdb;
 		return $wpdb->prefix . 'mk_audit_log';
 	}
 
+	/**
+	 * Fully-prefixed name of the revisions table.
+	 *
+	 * @return string
+	 */
 	public static function revisions_table(): string {
 		global $wpdb;
 		return $wpdb->prefix . 'mk_revisions';

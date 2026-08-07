@@ -1,4 +1,10 @@
 <?php
+/**
+ * Theme settings registry.
+ *
+ * @package maapkathi-core
+ */
+
 declare( strict_types = 1 );
 
 namespace Maapkathi\Core\Theme;
@@ -15,50 +21,57 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 final class ThemeSettings {
 
-	public const OPTION = 'mk_theme_settings';
+	public const OPTION    = 'mk_theme_settings';
 	public const CACHE_KEY = 'mk_theme_vars_cache';
 
 	/**
+	 * The default value for every registered setting.
+	 *
 	 * @return array<string,mixed> setting key => default value
 	 */
 	public static function defaults(): array {
 		return array(
 			// Appearance group (#1–14).
-			'mode'               => 'system',
-			'accent_id'          => Accents::default_id(),
-			'custom_accent_hex'  => null,
-			'pattern_id'         => 'none',
-			'pattern_opacity'    => 6,
-			'font_pair_id'       => 'fraunces-manrope',
-			'font_overrides'     => array(), // headings, body, nav, buttons, hero, accents => {fontId, colorHex}
-			'heading_color_hex'  => null,
-			'body_color_hex'     => null,
-			'radius'             => 'subtle',
-			'density'            => 'comfortable',
-			'grain'              => false,
-			'glass'              => true,
-			'hero_style'         => 'full-bleed',
+			'mode'                => 'system',
+			'accent_id'           => Accents::default_id(),
+			'custom_accent_hex'   => null,
+			'pattern_id'          => 'none',
+			'pattern_opacity'     => 6,
+			'font_pair_id'        => 'fraunces-manrope',
+			'font_overrides'      => array(), // headings, body, nav, buttons, hero, accents => {fontId, colorHex}.
+			'heading_color_hex'   => null,
+			'body_color_hex'      => null,
+			'radius'              => 'subtle',
+			'density'             => 'comfortable',
+			'grain'               => false,
+			'glass'               => true,
+			'hero_style'          => 'full-bleed',
 			// Motion group (#15–31).
-			'motion_preset'        => 'refined',
-			'motion_level'         => 'refined',
-			'scroll_reveal_style'  => 'fade-up-soft',
-			'hero_animation'       => 'ken-burns-drift',
-			'image_hover_style'    => 'zoom',
-			'card_hover_style'     => 'lift-shadow',
-			'text_reveal_style'    => 'mask-slide-up',
-			'page_transition'      => 'fade',
-			'cursor_style'         => 'none',
-			'loader_style'         => 'none',
-			'scroll_progress'      => false,
-			'smooth_scroll'        => false,
-			'parallax_intensity'   => 20,
-			'motion_speed'         => 100,
-			'stagger_ms'           => 70,
-			'animate_once'         => true,
-			'motion_on_mobile'     => 'reduced',
+			'motion_preset'       => 'refined',
+			'motion_level'        => 'refined',
+			'scroll_reveal_style' => 'fade-up-soft',
+			'hero_animation'      => 'ken-burns-drift',
+			'image_hover_style'   => 'zoom',
+			'card_hover_style'    => 'lift-shadow',
+			'text_reveal_style'   => 'mask-slide-up',
+			'page_transition'     => 'fade',
+			'cursor_style'        => 'none',
+			'loader_style'        => 'none',
+			'scroll_progress'     => false,
+			'smooth_scroll'       => false,
+			'parallax_intensity'  => 20,
+			'motion_speed'        => 100,
+			'stagger_ms'          => 70,
+			'animate_once'        => true,
+			'motion_on_mobile'    => 'reduced',
 		);
 	}
 
+	/**
+	 * All registered setting keys.
+	 *
+	 * @return string[]
+	 */
 	public static function keys(): array {
 		return array_keys( self::defaults() );
 	}
@@ -93,16 +106,29 @@ final class ThemeSettings {
 		);
 	}
 
+	/**
+	 * Registers the hooks that keep the theme-vars cache in sync with the
+	 * stored settings.
+	 *
+	 * @return void
+	 */
 	public function register_hooks(): void {
 		add_action( 'update_option_' . self::OPTION, array( $this, 'bust_cache' ) );
 		add_action( 'add_option_' . self::OPTION, array( $this, 'bust_cache' ) );
 	}
 
+	/**
+	 * Clears the cached theme-vars CSS so it is rebuilt on next request.
+	 *
+	 * @return void
+	 */
 	public function bust_cache(): void {
 		delete_transient( self::CACHE_KEY );
 	}
 
 	/**
+	 * The current, sanitized theme settings.
+	 *
 	 * @return array<string,mixed>
 	 */
 	public static function get(): array {
@@ -118,7 +144,7 @@ final class ThemeSettings {
 	 * registry. Unknown keys are dropped; unknown enum values and
 	 * out-of-range numbers fall back to the default (§11.2, §11.3).
 	 *
-	 * @param array<string,mixed> $input
+	 * @param array<string,mixed> $input Full or partial settings payload.
 	 * @return array<string,mixed>
 	 */
 	public static function sanitize( array $input ): array {
@@ -155,7 +181,9 @@ final class ThemeSettings {
 	}
 
 	/**
-	 * @param array<string,mixed> $overrides
+	 * Validates a font_overrides payload, dropping unknown areas/font ids.
+	 *
+	 * @param array<string,mixed> $overrides Raw per-area font override payload.
 	 * @return array<string,array{fontId:?string,colorHex:?string}>
 	 */
 	private static function sanitize_font_overrides( array $overrides ): array {
@@ -166,9 +194,9 @@ final class ThemeSettings {
 			if ( empty( $overrides[ $area ] ) || ! is_array( $overrides[ $area ] ) ) {
 				continue;
 			}
-			$row      = $overrides[ $area ];
-			$font_id  = $row['fontId'] ?? null;
-			$color    = $row['colorHex'] ?? null;
+			$row     = $overrides[ $area ];
+			$font_id = $row['fontId'] ?? null;
+			$color   = $row['colorHex'] ?? null;
 
 			$entry = array();
 			if ( $font_id && in_array( $font_id, Fonts::ids(), true ) ) {

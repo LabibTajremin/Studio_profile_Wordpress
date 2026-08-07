@@ -1,4 +1,10 @@
 <?php
+/**
+ * Settings screen (§3.3 #16) controller.
+ *
+ * @package Maapkathi\Core
+ */
+
 declare( strict_types = 1 );
 
 namespace Maapkathi\Core\Admin\Screens;
@@ -16,6 +22,11 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 final class SettingsScreen {
 
+	/**
+	 * Checks capability, saves the form on submit, and renders the screen.
+	 *
+	 * @return void
+	 */
 	public function render(): void {
 		if ( ! current_user_can( Roles::CAP_MANAGE_SETTINGS ) ) {
 			wp_die( esc_html__( 'You do not have permission to view this page.', 'maapkathi' ) );
@@ -33,16 +44,25 @@ final class SettingsScreen {
 		require MK_PLUGIN_DIR . 'src/Admin/views/settings.php';
 	}
 
+	/**
+	 * Sanitizes and persists the posted site-settings and SEO-settings fields.
+	 *
+	 * Called only from render(), which has already verified the
+	 * mk_save_settings nonce before invoking this method.
+	 *
+	 * @return void
+	 */
 	private function save(): void {
+		// phpcs:disable WordPress.Security.NonceVerification.Missing -- nonce already verified in render() before this method is called.
 		$settings = get_option( 'mk_site_settings', array() );
 
-		$settings['studio_name']                 = sanitize_text_field( wp_unslash( $_POST['studio_name'] ?? '' ) );
-		$settings['tagline']                      = sanitize_text_field( wp_unslash( $_POST['tagline'] ?? '' ) );
-		$settings['contact_email']                = sanitize_email( wp_unslash( $_POST['contact_email'] ?? '' ) );
-		$settings['contact_phone']                = sanitize_text_field( wp_unslash( $_POST['contact_phone'] ?? '' ) );
-		$settings['whatsapp']                     = sanitize_text_field( wp_unslash( $_POST['whatsapp'] ?? '' ) );
-		$settings['address']                      = sanitize_textarea_field( wp_unslash( $_POST['address'] ?? '' ) );
-		$settings['logo_show_title']              = ! empty( $_POST['logo_show_title'] );
+		$settings['studio_name']     = sanitize_text_field( wp_unslash( $_POST['studio_name'] ?? '' ) );
+		$settings['tagline']         = sanitize_text_field( wp_unslash( $_POST['tagline'] ?? '' ) );
+		$settings['contact_email']   = sanitize_email( wp_unslash( $_POST['contact_email'] ?? '' ) );
+		$settings['contact_phone']   = sanitize_text_field( wp_unslash( $_POST['contact_phone'] ?? '' ) );
+		$settings['whatsapp']        = sanitize_text_field( wp_unslash( $_POST['whatsapp'] ?? '' ) );
+		$settings['address']         = sanitize_textarea_field( wp_unslash( $_POST['address'] ?? '' ) );
+		$settings['logo_show_title'] = ! empty( $_POST['logo_show_title'] );
 
 		// Branding images are stored as attachment IDs (0/'' clears them),
 		// which Branding::attachment_url() resolves at render time.
@@ -54,7 +74,7 @@ final class SettingsScreen {
 		$settings['vision_text']                  = sanitize_textarea_field( wp_unslash( $_POST['vision_text'] ?? '' ) );
 		$settings['mission_text']                 = sanitize_textarea_field( wp_unslash( $_POST['mission_text'] ?? '' ) );
 		$settings['editor_verification_required'] = ! empty( $_POST['editor_verification_required'] );
-		$settings['show_admin_shield']             = ! empty( $_POST['show_admin_shield'] );
+		$settings['show_admin_shield']            = ! empty( $_POST['show_admin_shield'] );
 
 		$socials = array();
 		foreach ( array( 'facebook', 'instagram', 'linkedin', 'twitter', 'pinterest' ) as $platform ) {
@@ -85,5 +105,6 @@ final class SettingsScreen {
 			'meta_pixel_id'       => sanitize_text_field( wp_unslash( $_POST['seo_meta_pixel_id'] ?? '' ) ),
 		);
 		update_option( 'mk_seo_settings', $seo );
+		// phpcs:enable WordPress.Security.NonceVerification.Missing
 	}
 }

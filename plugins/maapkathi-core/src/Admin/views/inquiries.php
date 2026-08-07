@@ -1,4 +1,10 @@
 <?php
+/**
+ * Enquiries inbox screen markup.
+ *
+ * @package Maapkathi\Core
+ */
+
 declare( strict_types = 1 );
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -6,6 +12,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
+ * View variables provided by InquiriesScreen::render().
+ *
  * @var array<int,object> $rows
  * @var int    $total
  * @var int    $unread

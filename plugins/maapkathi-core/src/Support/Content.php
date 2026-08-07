@@ -1,4 +1,10 @@
 <?php
+/**
+ * Read-side accessors for public content types, used by the theme.
+ *
+ * @package maapkathi-core
+ */
+
 declare( strict_types = 1 );
 
 namespace Maapkathi\Core\Support;
@@ -18,6 +24,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 final class Content {
 
 	/**
+	 * Runs a shared, consistently-ordered `WP_Query` for one post type.
+	 *
+	 * @param string              $post_type Post type slug to query.
+	 * @param int                 $limit     Max posts to return, or -1 for all.
+	 * @param array<string,mixed> $extra     Extra `get_posts()` args, merged over the defaults.
 	 * @return \WP_Post[]
 	 */
 	public static function items( string $post_type, int $limit = -1, array $extra = array() ): array {
@@ -39,7 +50,13 @@ final class Content {
 		return get_posts( $args );
 	}
 
-	/** @return \WP_Post[] */
+	/**
+	 * Projects flagged as featured, falling back to the most recent
+	 * projects when nothing is flagged yet.
+	 *
+	 * @param int $limit Max projects to return.
+	 * @return \WP_Post[]
+	 */
 	public static function featured_projects( int $limit = 6 ): array {
 		$featured = self::items(
 			'mk_project',
@@ -64,47 +81,86 @@ final class Content {
 		return $featured;
 	}
 
-	/** @return \WP_Post[] */
+	/**
+	 * All published clients.
+	 *
+	 * @return \WP_Post[]
+	 */
 	public static function clients(): array {
 		return self::items( 'mk_client' );
 	}
 
-	/** @return \WP_Post[] */
+	/**
+	 * All published testimonials.
+	 *
+	 * @return \WP_Post[]
+	 */
 	public static function testimonials(): array {
 		return self::items( 'mk_testimonial' );
 	}
 
-	/** @return \WP_Post[] */
+	/**
+	 * All published awards.
+	 *
+	 * @return \WP_Post[]
+	 */
 	public static function awards(): array {
 		return self::items( 'mk_award' );
 	}
 
-	/** @return \WP_Post[] */
+	/**
+	 * All published stats.
+	 *
+	 * @return \WP_Post[]
+	 */
 	public static function stats(): array {
 		return self::items( 'mk_stat' );
 	}
 
-	/** @return \WP_Post[] */
+	/**
+	 * All published values.
+	 *
+	 * @return \WP_Post[]
+	 */
 	public static function values(): array {
 		return self::items( 'mk_value' );
 	}
 
-	/** @return \WP_Post[] */
+	/**
+	 * All published process steps.
+	 *
+	 * @return \WP_Post[]
+	 */
 	public static function process_steps(): array {
 		return self::items( 'mk_process_step' );
 	}
 
-	/** @return \WP_Post[] */
+	/**
+	 * All published team members.
+	 *
+	 * @param int $limit Max members to return, or -1 for all.
+	 * @return \WP_Post[]
+	 */
 	public static function members( int $limit = -1 ): array {
 		return self::items( 'mk_member', $limit );
 	}
 
-	/** @return \WP_Post[] */
+	/**
+	 * Top-level services (no parent service).
+	 *
+	 * @param int $limit Max services to return, or -1 for all.
+	 * @return \WP_Post[]
+	 */
 	public static function top_level_services( int $limit = -1 ): array {
 		return self::items( 'mk_service', $limit, array( 'post_parent' => 0 ) );
 	}
 
-	/** @return \WP_Post[] */
+	/**
+	 * Services whose parent is the given service.
+	 *
+	 * @param int $parent_id Parent service post ID.
+	 * @return \WP_Post[]
+	 */
 	public static function child_services( int $parent_id ): array {
 		return self::items( 'mk_service', -1, array( 'post_parent' => $parent_id ) );
 	}

@@ -1,4 +1,10 @@
 <?php
+/**
+ * Logo, favicon and accent-color resolution for site branding.
+ *
+ * @package maapkathi-core
+ */
+
 declare( strict_types = 1 );
 
 namespace Maapkathi\Core\Support;
@@ -16,19 +22,41 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 final class Branding {
 
+	/**
+	 * Reads the `mk_site_settings` option, guaranteed as an array even if
+	 * the option was never saved.
+	 *
+	 * @return array<string,mixed>
+	 */
 	public static function settings(): array {
 		$settings = get_option( 'mk_site_settings', array() );
 		return is_array( $settings ) ? $settings : array();
 	}
 
+	/**
+	 * URL of the configured light-mode logo, or an empty string if unset.
+	 *
+	 * @return string
+	 */
 	public static function logo_light_url(): string {
 		return self::attachment_url( 'logo_light' );
 	}
 
+	/**
+	 * URL of the configured dark-mode logo, or an empty string if unset.
+	 *
+	 * @return string
+	 */
 	public static function logo_dark_url(): string {
 		return self::attachment_url( 'logo_dark' );
 	}
 
+	/**
+	 * Resolves the favicon URL via the fallback chain: configured favicon
+	 * → light logo → dark logo → the built-in default mark.
+	 *
+	 * @return string
+	 */
 	public static function favicon_url(): string {
 		$chain = array(
 			self::attachment_url( 'favicon' ),
@@ -48,6 +76,8 @@ final class Branding {
 	/**
 	 * The built-in wordmark, rendered as an inline-SVG data URI so it needs
 	 * no uploaded file and no HTTP request, and it picks up the site accent.
+	 *
+	 * @return string
 	 */
 	public static function default_mark_url(): string {
 		$accent = self::accent_hex();
@@ -58,16 +88,30 @@ final class Branding {
 			esc_attr( self::on_accent_hex( $accent ) )
 		);
 
-		return 'data:image/svg+xml;base64,' . base64_encode( $svg );
+		return 'data:image/svg+xml;base64,' . base64_encode( $svg ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode -- encoding an inline SVG data: URI, not obfuscating code.
 	}
 
+	/**
+	 * Resolves the site's active accent color as a hex string, honouring a
+	 * custom override before falling back to the selected accent's light
+	 * shade.
+	 *
+	 * @return string
+	 */
 	public static function accent_hex(): string {
 		$theme  = \Maapkathi\Core\Theme\ThemeSettings::get();
 		$accent = \Maapkathi\Core\Theme\Accents::by_id( $theme['accent_id'] );
 
-		return $theme['custom_accent_hex'] ?: ( $accent['light'] ?? '#6e1f2a' );
+		return $theme['custom_accent_hex'] ? $theme['custom_accent_hex'] : ( $accent['light'] ?? '#6e1f2a' );
 	}
 
+	/**
+	 * Resolves the readable foreground color to use on top of the given
+	 * accent color.
+	 *
+	 * @param string $accent Accent color as a hex string.
+	 * @return string
+	 */
 	private static function on_accent_hex( string $accent ): string {
 		return \Maapkathi\Core\Theme\Accents::on_accent( $accent );
 	}
@@ -75,6 +119,9 @@ final class Branding {
 	/**
 	 * Resolves a settings key that stores either an attachment ID or a raw
 	 * URL, so the Settings screen can accept both.
+	 *
+	 * @param string $key Site settings key to resolve.
+	 * @return string
 	 */
 	private static function attachment_url( string $key ): string {
 		$settings = self::settings();

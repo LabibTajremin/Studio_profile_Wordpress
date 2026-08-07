@@ -1,4 +1,10 @@
 <?php
+/**
+ * Approvals queue screen controller.
+ *
+ * @package Maapkathi\Core
+ */
+
 declare( strict_types = 1 );
 
 namespace Maapkathi\Core\Admin\Screens;
@@ -17,6 +23,12 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 final class ApprovalsScreen {
 
+	/**
+	 * Checks capability, approves/rejects a revision on submit, and renders
+	 * the pending-revisions queue.
+	 *
+	 * @return void
+	 */
 	public function render(): void {
 		if ( ! current_user_can( Roles::CAP_APPROVE_REVISIONS ) ) {
 			wp_die( esc_html__( 'You do not have permission to view this page.', 'maapkathi' ) );
@@ -40,9 +52,13 @@ final class ApprovalsScreen {
 		}
 
 		global $wpdb;
-		$table = Database::revisions_table();
-		// phpcs:ignore WordPress.DB.PreparedSQLPlaceholders.PreparedSQLPlaceholders -- table name has no user input
-		$pending = $wpdb->get_results( "SELECT id, entity, entity_id, payload, submitted_by, created_at FROM {$table} WHERE status = 'pending' ORDER BY created_at DESC" );
+		$table   = Database::revisions_table();
+		$pending = $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT id, entity, entity_id, payload, submitted_by, created_at FROM %i WHERE status = 'pending' ORDER BY created_at DESC",
+				$table
+			)
+		);
 
 		require MK_PLUGIN_DIR . 'src/Admin/views/approvals.php';
 	}

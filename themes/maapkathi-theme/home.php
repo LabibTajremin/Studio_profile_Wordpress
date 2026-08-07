@@ -1,4 +1,10 @@
 <?php
+/**
+ * Blog index template — 404s when blogging is disabled in site settings.
+ *
+ * @package maapkathi-theme
+ */
+
 declare( strict_types = 1 );
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -19,7 +25,10 @@ get_header();
 <div class="mk-container mk-section">
 	<h1><?php esc_html_e( 'Blog', 'maapkathi' ); ?></h1>
 	<div class="mk-grid mk-grid--posts" data-scroll-reveal>
-		<?php while ( have_posts() ) : the_post(); ?>
+		<?php
+		while ( have_posts() ) :
+			the_post();
+			?>
 			<article <?php post_class( 'mk-card' ); ?>>
 				<?php if ( has_post_thumbnail() ) : ?>
 					<a href="<?php the_permalink(); ?>" class="mk-card__media"><?php the_post_thumbnail( 'medium_large' ); ?></a>

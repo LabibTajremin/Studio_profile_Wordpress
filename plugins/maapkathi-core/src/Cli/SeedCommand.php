@@ -1,4 +1,10 @@
 <?php
+/**
+ * The `wp maapkathi seed` command.
+ *
+ * @package maapkathi-core
+ */
+
 declare( strict_types = 1 );
 
 namespace Maapkathi\Core\Cli;
@@ -90,7 +96,10 @@ final class SeedCommand {
 	 * Finds an existing post by slug+type, or creates it. This is what
 	 * makes the whole seeder idempotent.
 	 *
-	 * @param array<string,mixed> $data
+	 * @param string              $post_type Post type slug to look up or create.
+	 * @param string              $slug      Post slug to look up or create.
+	 * @param array<string,mixed> $data      Additional wp_insert_post() args merged over the defaults.
+	 * @return int The post ID, or 0 if creation failed.
 	 */
 	private function upsert( string $post_type, string $slug, array $data ): int {
 		$existing = get_posts(
@@ -130,7 +139,12 @@ final class SeedCommand {
 		return (int) $id;
 	}
 
-	/** @param array<string,mixed> $meta */
+	/**
+	 * Bulk-update post meta for a seeded post.
+	 *
+	 * @param int                 $post_id Post ID to update meta for; a falsy ID is a no-op.
+	 * @param array<string,mixed> $meta    Meta key/value pairs to write.
+	 */
 	private function set_meta( int $post_id, array $meta ): void {
 		if ( ! $post_id ) {
 			return;
@@ -140,12 +154,21 @@ final class SeedCommand {
 		}
 	}
 
+	/**
+	 * Set a post's featured image, when both IDs are present.
+	 *
+	 * @param int $post_id       Post ID to attach the thumbnail to.
+	 * @param int $attachment_id Attachment ID to use as the thumbnail.
+	 */
 	private function attach_cover( int $post_id, int $attachment_id ): void {
 		if ( $post_id && $attachment_id ) {
 			set_post_thumbnail( $post_id, $attachment_id );
 		}
 	}
 
+	/**
+	 * Remove all previously seeded demo content, generated images, and the seed marker.
+	 */
 	private function tear_down(): void {
 		foreach ( array( 'mk_project', 'mk_service', 'mk_member', 'mk_testimonial', 'mk_client', 'mk_award', 'mk_faq', 'mk_value', 'mk_stat', 'mk_process_step' ) as $type ) {
 			$ids = get_posts(
@@ -171,6 +194,9 @@ final class SeedCommand {
 	// Seeders
 	// ---------------------------------------------------------------
 
+	/**
+	 * Seed the mk_site_settings option with demo studio details, preserving any existing values.
+	 */
 	private function seed_site_settings(): void {
 		$existing = get_option( 'mk_site_settings', array() );
 		$existing = is_array( $existing ) ? $existing : array();
@@ -210,6 +236,9 @@ final class SeedCommand {
 		);
 	}
 
+	/**
+	 * Seed default site text copy if none has been set yet.
+	 */
 	private function seed_site_text(): void {
 		$existing = get_option( SiteText::OPTION, array() );
 		if ( empty( $existing ) ) {
@@ -217,12 +246,18 @@ final class SeedCommand {
 		}
 	}
 
+	/**
+	 * Seed default theme settings if none have been set yet.
+	 */
 	private function seed_theme_settings(): void {
 		if ( ! get_option( ThemeSettings::OPTION ) ) {
 			update_option( ThemeSettings::OPTION, ThemeSettings::defaults() );
 		}
 	}
 
+	/**
+	 * Generate and attach demo logo and favicon images to the site settings.
+	 */
 	private function seed_branding(): void {
 		$settings = get_option( 'mk_site_settings', array() );
 
@@ -244,6 +279,9 @@ final class SeedCommand {
 		update_option( 'mk_site_settings', $settings );
 	}
 
+	/**
+	 * Seed project categories and demo mk_project posts with imagery and meta.
+	 */
 	private function seed_categories_and_projects(): void {
 		$categories = array(
 			'residential' => 'Residential',
@@ -258,7 +296,7 @@ final class SeedCommand {
 				$term = wp_insert_term( $name, 'mk_project_category', array( 'slug' => $slug ) );
 			}
 			if ( ! is_wp_error( $term ) ) {
-				$term_ids[] = (int) ( is_array( $term ) ? $term['term_id'] : $term );
+				$term_ids[] = (int) $term['term_id'];
 			}
 		}
 
@@ -316,6 +354,9 @@ final class SeedCommand {
 		}
 	}
 
+	/**
+	 * Seed demo mk_service posts, including parent/child service groupings.
+	 */
 	private function seed_services(): void {
 		$groups = array(
 			array(
@@ -386,6 +427,9 @@ final class SeedCommand {
 		}
 	}
 
+	/**
+	 * Seed demo mk_member posts for the team page.
+	 */
 	private function seed_team(): void {
 		$members = array(
 			array( 'amara-khan', 'Amara Khan', 'Principal Designer', 'Amara founded the studio in 2013 after a decade in adaptive reuse.' ),
@@ -418,6 +462,9 @@ final class SeedCommand {
 		}
 	}
 
+	/**
+	 * Seed demo mk_testimonial posts.
+	 */
 	private function seed_testimonials(): void {
 		$quotes = array(
 			array( 'nadia-r', 'Nadia R.', 'Homeowner', 'Riverside Residence', 'They understood what we wanted before we could describe it ourselves.' ),
@@ -449,6 +496,9 @@ final class SeedCommand {
 		}
 	}
 
+	/**
+	 * Seed demo mk_client posts with logos.
+	 */
 	private function seed_clients(): void {
 		$clients = array( 'Harbour Group', 'Monsoon Hospitality', 'Quarry Ltd', 'Northline', 'Studio Verde', 'Atelier Co' );
 
@@ -476,6 +526,9 @@ final class SeedCommand {
 		}
 	}
 
+	/**
+	 * Seed demo mk_award posts.
+	 */
 	private function seed_awards(): void {
 		$awards = array(
 			array( 'regional-design-award', 'Regional Design Award', 'Bangladesh Institute of Architects' ),
@@ -504,6 +557,9 @@ final class SeedCommand {
 		}
 	}
 
+	/**
+	 * Seed demo mk_stat posts.
+	 */
 	private function seed_stats(): void {
 		$stats = array(
 			array( 'projects-completed', 'Projects completed', 120, '+' ),
@@ -533,6 +589,9 @@ final class SeedCommand {
 		}
 	}
 
+	/**
+	 * Seed demo mk_value posts.
+	 */
 	private function seed_values(): void {
 		$values = array(
 			array( 'restraint', 'Restraint', 'We design for longevity, not for the trend cycle.', 'dashicons-minus' ),
@@ -562,6 +621,9 @@ final class SeedCommand {
 		}
 	}
 
+	/**
+	 * Seed demo mk_process_step posts.
+	 */
 	private function seed_process_steps(): void {
 		$steps = array(
 			array( 'discovery', 'Discovery', 'We walk the space, listen, and agree what success looks like.' ),
@@ -591,6 +653,9 @@ final class SeedCommand {
 		}
 	}
 
+	/**
+	 * Seed demo mk_faq posts.
+	 */
 	private function seed_faqs(): void {
 		$faqs = array(
 			array( 'typical-timeline', 'What is your typical project timeline?', 'Most residential projects run 8–14 weeks from concept to handover. Larger builds and hospitality projects vary — we give you a programme in writing before you commit.' ),
@@ -619,11 +684,14 @@ final class SeedCommand {
 		}
 	}
 
+	/**
+	 * Generate demo hero slide imagery and write the mk_site_settings hero_slides option.
+	 */
 	private function seed_hero_slides(): void {
 		$settings = get_option( 'mk_site_settings', array() );
 
-		$still = DemoAssets::image( 'mk-demo-hero-still', 'Spaces, considered', 2400, 1350, 0 );
-		$gif   = DemoAssets::image( 'mk-demo-hero-motion', 'Texture in motion', 2400, 1350, 2 );
+		$still   = DemoAssets::image( 'mk-demo-hero-still', 'Spaces, considered', 2400, 1350, 0 );
+		$gif     = DemoAssets::image( 'mk-demo-hero-motion', 'Texture in motion', 2400, 1350, 2 );
 		$vposter = DemoAssets::image( 'mk-demo-hero-video-poster', 'Craft in every frame', 2400, 1350, 4 );
 		$lposter = DemoAssets::image( 'mk-demo-hero-link-poster', 'Every angle intentional', 2400, 1350, 6 );
 

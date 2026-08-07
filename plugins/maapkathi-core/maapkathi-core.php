@@ -57,18 +57,39 @@ if ( ! defined( 'MK_HERO_SLIDE_SECONDS' ) ) {
 if ( ! defined( 'MK_MAX_HERO_HOLD_SECONDS' ) ) {
 	define( 'MK_MAX_HERO_HOLD_SECONDS', 20 );
 }
+if ( ! defined( 'MK_MAIL_FROM_EMAIL' ) ) {
+	define( 'MK_MAIL_FROM_EMAIL', '' );
+}
+if ( ! defined( 'MK_MAIL_FROM_NAME' ) ) {
+	define( 'MK_MAIL_FROM_NAME', '' );
+}
+if ( ! defined( 'MK_SMTP_HOST' ) ) {
+	define( 'MK_SMTP_HOST', '' );
+}
+if ( ! defined( 'MK_SMTP_PORT' ) ) {
+	define( 'MK_SMTP_PORT', 587 );
+}
+if ( ! defined( 'MK_SMTP_USERNAME' ) ) {
+	define( 'MK_SMTP_USERNAME', '' );
+}
+if ( ! defined( 'MK_SMTP_PASSWORD' ) ) {
+	define( 'MK_SMTP_PASSWORD', '' );
+}
+if ( ! defined( 'MK_SMTP_ENCRYPTION' ) ) {
+	define( 'MK_SMTP_ENCRYPTION', 'tls' );
+}
 
 $mk_autoload = MK_PLUGIN_DIR . 'vendor/autoload.php';
 if ( file_exists( $mk_autoload ) ) {
 	require_once $mk_autoload;
 } else {
 	spl_autoload_register(
-		static function ( string $class ): void {
+		static function ( string $class_name ): void {
 			$prefix = 'Maapkathi\\Core\\';
-			if ( ! str_starts_with( $class, $prefix ) ) {
+			if ( ! str_starts_with( $class_name, $prefix ) ) {
 				return;
 			}
-			$relative = substr( $class, strlen( $prefix ) );
+			$relative = substr( $class_name, strlen( $prefix ) );
 			$path     = MK_PLUGIN_DIR . 'src/' . str_replace( '\\', '/', $relative ) . '.php';
 			if ( file_exists( $path ) ) {
 				require $path;

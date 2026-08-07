@@ -1,4 +1,10 @@
 <?php
+/**
+ * Selects and caches the active storage adapter based on configuration.
+ *
+ * @package maapkathi-core
+ */
+
 declare( strict_types = 1 );
 
 namespace Maapkathi\Core\Storage;
@@ -10,10 +16,25 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+/**
+ * Builds the storage adapter matching the configured MK_STORAGE_DRIVER
+ * constant, and caches it for the rest of the request.
+ */
 final class StorageFactory {
 
+	/**
+	 * Cached adapter instance.
+	 *
+	 * @var StorageAdapter|null Cached adapter instance for this request.
+	 */
 	private static ?StorageAdapter $instance = null;
 
+	/**
+	 * Returns the configured storage adapter, creating and caching it on
+	 * first use.
+	 *
+	 * @return StorageAdapter
+	 */
 	public static function create(): StorageAdapter {
 		if ( null !== self::$instance ) {
 			return self::$instance;
@@ -32,6 +53,12 @@ final class StorageFactory {
 		return self::$instance;
 	}
 
+	/**
+	 * Clears the cached adapter instance, so the next create() call
+	 * re-reads configuration. Used by tests.
+	 *
+	 * @return void
+	 */
 	public static function reset(): void {
 		self::$instance = null;
 	}

@@ -7,6 +7,8 @@
  *
  * Every section is self-hiding when it has no content, so a partially
  * filled site never renders an empty heading.
+ *
+ * @package maapkathi-theme
  */
 
 declare( strict_types = 1 );
@@ -70,15 +72,15 @@ $faqs         = mk_content( 'faqs' );
 	<div class="mk-container">
 		<h2 class="mk-section__heading"><?php mk_the_text( 'home_categories_heading' ); ?></h2>
 		<div class="mk-grid mk-grid--categories">
-			<?php foreach ( $categories as $term ) : ?>
-				<a class="mk-card mk-card--category" href="<?php echo esc_url( get_term_link( $term ) ); ?>">
-					<h3 class="mk-card__title"><?php echo esc_html( $term->name ); ?></h3>
+			<?php foreach ( $categories as $category_term ) : ?>
+				<a class="mk-card mk-card--category" href="<?php echo esc_url( get_term_link( $category_term ) ); ?>">
+					<h3 class="mk-card__title"><?php echo esc_html( $category_term->name ); ?></h3>
 					<span class="mk-card__count">
 						<?php
 						printf(
 							/* translators: %d: number of projects in this category. */
-							esc_html( _n( '%d project', '%d projects', (int) $term->count, 'maapkathi' ) ),
-							(int) $term->count
+							esc_html( _n( '%d project', '%d projects', (int) $category_term->count, 'maapkathi' ) ),
+							(int) $category_term->count
 						);
 						?>
 					</span>
@@ -211,10 +213,10 @@ $faqs         = mk_content( 'faqs' );
 		<div class="mk-grid mk-grid--testimonials">
 			<?php foreach ( $testimonials as $testimonial ) : ?>
 				<?php
-				$rating = (int) mk_meta( $testimonial->ID, 'mk_rating', '0' );
-				$author = mk_meta( $testimonial->ID, 'mk_author_name', get_the_title( $testimonial ) );
-				$role   = mk_meta( $testimonial->ID, 'mk_author_role' );
-				$firm   = mk_meta( $testimonial->ID, 'mk_company' );
+				$rating      = (int) mk_meta( $testimonial->ID, 'mk_rating', '0' );
+				$author      = mk_meta( $testimonial->ID, 'mk_author_name', get_the_title( $testimonial ) );
+				$author_role = mk_meta( $testimonial->ID, 'mk_author_role' );
+				$firm        = mk_meta( $testimonial->ID, 'mk_company' );
 				?>
 				<figure class="mk-card mk-card--testimonial">
 					<?php if ( $rating > 0 ) : ?>
@@ -225,8 +227,8 @@ $faqs         = mk_content( 'faqs' );
 					<blockquote><?php echo esc_html( mk_meta( $testimonial->ID, 'mk_quote' ) ); ?></blockquote>
 					<figcaption>
 						<strong><?php echo esc_html( $author ); ?></strong>
-						<?php if ( $role || $firm ) : ?>
-							<span><?php echo esc_html( trim( $role . ( $role && $firm ? ', ' : '' ) . $firm ) ); ?></span>
+						<?php if ( $author_role || $firm ) : ?>
+							<span><?php echo esc_html( trim( $author_role . ( $author_role && $firm ? ', ' : '' ) . $firm ) ); ?></span>
 						<?php endif; ?>
 					</figcaption>
 				</figure>
@@ -243,19 +245,19 @@ $faqs         = mk_content( 'faqs' );
 		<ul class="mk-awards__list">
 			<?php foreach ( $awards as $award ) : ?>
 				<?php
-				$issuer = mk_meta( $award->ID, 'mk_issuer' );
-				$year   = mk_meta( $award->ID, 'mk_year' );
-				$link   = mk_meta( $award->ID, 'mk_link' );
+				$issuer     = mk_meta( $award->ID, 'mk_issuer' );
+				$award_year = mk_meta( $award->ID, 'mk_year' );
+				$award_link = mk_meta( $award->ID, 'mk_link' );
 				?>
 				<li class="mk-awards__item">
 					<span class="mk-awards__title">
-						<?php if ( $link ) : ?>
-							<a href="<?php echo esc_url( $link ); ?>" rel="noopener noreferrer" target="_blank"><?php echo esc_html( get_the_title( $award ) ); ?></a>
+						<?php if ( $award_link ) : ?>
+							<a href="<?php echo esc_url( $award_link ); ?>" rel="noopener noreferrer" target="_blank"><?php echo esc_html( get_the_title( $award ) ); ?></a>
 						<?php else : ?>
 							<?php echo esc_html( get_the_title( $award ) ); ?>
 						<?php endif; ?>
 					</span>
-					<span class="mk-awards__meta"><?php echo esc_html( trim( $issuer . ( $issuer && $year ? ' · ' : '' ) . $year ) ); ?></span>
+					<span class="mk-awards__meta"><?php echo esc_html( trim( $issuer . ( $issuer && $award_year ? ' · ' : '' ) . $award_year ) ); ?></span>
 				</li>
 			<?php endforeach; ?>
 		</ul>

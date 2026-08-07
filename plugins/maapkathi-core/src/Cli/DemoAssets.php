@@ -1,4 +1,10 @@
 <?php
+/**
+ * Locally generated demo image/logo assets for `wp maapkathi seed`.
+ *
+ * @package maapkathi-core
+ */
+
 declare( strict_types = 1 );
 
 namespace Maapkathi\Core\Cli;
@@ -33,6 +39,11 @@ final class DemoAssets {
 		array( '#34327a', '#14132f' ),
 	);
 
+	/**
+	 * Whether the GD extension is available to generate demo images.
+	 *
+	 * @return bool True when both imagecreatetruecolor() and imagepng() exist.
+	 */
 	public static function available(): bool {
 		return function_exists( 'imagecreatetruecolor' ) && function_exists( 'imagepng' );
 	}
@@ -43,6 +54,13 @@ final class DemoAssets {
 	 * Idempotent: the generated slug is stored as post meta, so reseeding
 	 * finds the existing attachment instead of duplicating files — which
 	 * matters on a 20 GB disk.
+	 *
+	 * @param string $slug          Unique demo-asset slug used to find/dedupe the attachment.
+	 * @param string $label         Text drawn onto the generated image.
+	 * @param int    $width         Image width in pixels.
+	 * @param int    $height        Image height in pixels.
+	 * @param int    $palette_index Index into PALETTE selecting the gradient colours.
+	 * @return int Attachment ID, or 0 if generation/upload failed.
 	 */
 	public static function image( string $slug, string $label, int $width, int $height, int $palette_index = 0 ): int {
 		$existing = self::find_existing( $slug );
@@ -65,6 +83,11 @@ final class DemoAssets {
 	/**
 	 * Wordmark-style logo on a transparent background, for the client wall
 	 * and the site logo.
+	 *
+	 * @param string $slug          Unique demo-asset slug used to find/dedupe the attachment.
+	 * @param string $text          Wordmark text to render.
+	 * @param int    $palette_index Index into PALETTE selecting the ink colour.
+	 * @return int Attachment ID, or 0 if generation/upload failed.
 	 */
 	public static function logo( string $slug, string $text, int $palette_index = 0 ): int {
 		$existing = self::find_existing( $slug );
@@ -84,6 +107,12 @@ final class DemoAssets {
 		return self::sideload( $slug, $png, $text );
 	}
 
+	/**
+	 * Look up an already-generated demo attachment by its stored slug.
+	 *
+	 * @param string $slug Demo-asset slug to search for.
+	 * @return int Attachment ID, or 0 if none exists yet.
+	 */
 	private static function find_existing( string $slug ): int {
 		$found = get_posts(
 			array(
@@ -100,6 +129,15 @@ final class DemoAssets {
 		return $found ? (int) $found[0] : 0;
 	}
 
+	/**
+	 * Render a gradient placeholder image with a centred label as PNG bytes.
+	 *
+	 * @param string $label         Text drawn onto the image.
+	 * @param int    $width         Image width in pixels.
+	 * @param int    $height        Image height in pixels.
+	 * @param int    $palette_index Index into PALETTE selecting the gradient colours.
+	 * @return string Raw PNG bytes, or an empty string on failure.
+	 */
 	private static function render_png( string $label, int $width, int $height, int $palette_index ): string {
 		$image = imagecreatetruecolor( $width, $height );
 		if ( ! $image ) {
@@ -113,7 +151,7 @@ final class DemoAssets {
 		// Diagonal gradient.
 		for ( $y = 0; $y < $height; $y++ ) {
 			for ( $x = 0; $x < $width; $x += max( 1, (int) round( $width / 220 ) ) ) {
-				$t = ( ( $x / max( 1, $width ) ) + ( $y / max( 1, $height ) ) ) / 2;
+				$t      = ( ( $x / max( 1, $width ) ) + ( $y / max( 1, $height ) ) ) / 2;
 				$colour = imagecolorallocate(
 					$image,
 					(int) round( $from_rgb[0] + ( $to_rgb[0] - $from_rgb[0] ) * $t ),
@@ -145,6 +183,13 @@ final class DemoAssets {
 		return $data;
 	}
 
+	/**
+	 * Render a wordmark-style logo with a transparent background as PNG bytes.
+	 *
+	 * @param string $text          Wordmark text to render.
+	 * @param int    $palette_index Index into PALETTE selecting the ink colour.
+	 * @return string Raw PNG bytes, or an empty string on failure.
+	 */
 	private static function render_logo_png( string $text, int $palette_index ): string {
 		$width  = 480;
 		$height = 160;
@@ -179,6 +224,14 @@ final class DemoAssets {
 		return $data;
 	}
 
+	/**
+	 * Draw a drop-shadowed, centred, uppercased label onto a GD image.
+	 *
+	 * @param \GdImage $image  GD image resource to draw onto.
+	 * @param string   $label  Text to draw; a no-op when empty.
+	 * @param int      $width  Image width in pixels, used to centre the text.
+	 * @param int      $height Image height in pixels, used to centre the text.
+	 */
 	private static function draw_centred_text( $image, string $label, int $width, int $height ): void {
 		if ( '' === $label ) {
 			return;
@@ -200,6 +253,9 @@ final class DemoAssets {
 	}
 
 	/**
+	 * Convert a `#rrggbb` hex colour string to an [r, g, b] triple.
+	 *
+	 * @param string $hex Hex colour string, with or without a leading '#'.
 	 * @return array{0:int,1:int,2:int}
 	 */
 	private static function hex_to_rgb( string $hex ): array {
@@ -211,7 +267,14 @@ final class DemoAssets {
 		);
 	}
 
-	/** Writes the bytes into the uploads dir and registers an attachment. */
+	/**
+	 * Writes the bytes into the uploads dir and registers an attachment.
+	 *
+	 * @param string $slug  Demo-asset slug stored as attachment meta for later lookup.
+	 * @param string $png   Raw PNG bytes to write to the uploads directory.
+	 * @param string $title Attachment title / image alt text.
+	 * @return int Attachment ID, or 0 on failure.
+	 */
 	private static function sideload( string $slug, string $png, string $title ): int {
 		require_once ABSPATH . 'wp-admin/includes/image.php';
 
@@ -228,10 +291,12 @@ final class DemoAssets {
 				'post_content'   => '',
 				'post_status'    => 'inherit',
 			),
-			$upload['file']
+			$upload['file'],
+			0,
+			true
 		);
 
-		if ( is_wp_error( $attachment_id ) || ! $attachment_id ) {
+		if ( is_wp_error( $attachment_id ) ) {
 			return 0;
 		}
 

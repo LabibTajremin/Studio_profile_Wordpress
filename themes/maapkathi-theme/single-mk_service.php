@@ -1,4 +1,10 @@
 <?php
+/**
+ * Single template for the mk_service custom post type.
+ *
+ * @package maapkathi-theme
+ */
+
 declare( strict_types = 1 );
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -8,8 +14,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 get_header();
 while ( have_posts() ) :
 	the_post();
-	$post_id     = get_the_ID();
-	$gallery_ids = array_filter( array_map( 'absint', explode( ',', (string) get_post_meta( $post_id, 'mk_gallery', true ) ) ) );
+	$service_id  = get_the_ID();
+	$gallery_ids = array_filter( array_map( 'absint', explode( ',', (string) get_post_meta( $service_id, 'mk_gallery', true ) ) ) );
 	?>
 	<article class="mk-project-hero">
 		<?php if ( has_post_thumbnail() ) : ?>
@@ -24,7 +30,8 @@ while ( have_posts() ) :
 		<?php if ( ! empty( $gallery_ids ) ) : ?>
 			<div class="mk-gallery" data-lightbox-gallery>
 				<?php foreach ( $gallery_ids as $attachment_id ) : ?>
-					<a href="<?php echo esc_url( wp_get_attachment_image_url( $attachment_id, 'full' ) ?: '' ); ?>" data-lightbox-item>
+					<?php $attachment_url = wp_get_attachment_image_url( $attachment_id, 'full' ); ?>
+					<a href="<?php echo esc_url( $attachment_url ? $attachment_url : '' ); ?>" data-lightbox-item>
 						<?php echo wp_get_attachment_image( $attachment_id, 'medium_large' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 					</a>
 				<?php endforeach; ?>

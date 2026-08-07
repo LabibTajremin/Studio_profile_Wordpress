@@ -9,21 +9,31 @@
     <arg name="colors"/>
     <arg value="sp"/>
 
-    <rule ref="WordPress-Extra"/>
     <rule ref="WordPress-Docs"/>
 
-    <rule ref="WordPress.NamingConventions.PrefixAllGlobals">
-        <properties>
-            <property name="prefixes" type="array">
-                <element value="mk_"/>
-                <element value="Maapkathi"/>
-                <element value="maapkathi"/>
-            </property>
-        </properties>
+    <!--
+    Excluded entirely: the established project-wide identifier prefix is
+    "mk_" (functions, hooks, REST routes, DB tables — see CLAUDE.md), but
+    this sniff hard-codes a 4-character MIN_PREFIX_LENGTH and silently
+    rejects any shorter configured prefix, which then makes it flag every
+    correctly-prefixed "mk_" symbol as unprefixed. Renaming the convention
+    to satisfy a sniff default is not worth the churn/collision risk.
+    -->
+    <rule ref="WordPress-Extra">
+        <exclude name="WordPress.NamingConventions.PrefixAllGlobals"/>
     </rule>
 
     <rule ref="WordPress.Files.FileName">
+        <!-- Bootstrap file intentionally not hyphenated (matches the plugin slug). -->
         <exclude-pattern>plugins/maapkathi-core/maapkathi-core.php</exclude-pattern>
+        <!-- PSR-4 class files use StudlyCaps filenames matching their class names. -->
+        <exclude-pattern>plugins/maapkathi-core/src/*</exclude-pattern>
+        <!-- WordPress template-hierarchy filenames must literally match the
+             post type slug (mk_project, mk_service), which contains an
+             underscore — hyphenating them would break WP's template lookup. -->
+        <exclude-pattern>themes/maapkathi-theme/archive-mk_project.php</exclude-pattern>
+        <exclude-pattern>themes/maapkathi-theme/single-mk_project.php</exclude-pattern>
+        <exclude-pattern>themes/maapkathi-theme/single-mk_service.php</exclude-pattern>
     </rule>
 
     <config name="testVersion" value="8.1-"/>

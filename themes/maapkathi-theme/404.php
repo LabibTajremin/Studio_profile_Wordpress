@@ -1,4 +1,10 @@
 <?php
+/**
+ * 404 template — no post/page matched the request.
+ *
+ * @package maapkathi-theme
+ */
+
 declare( strict_types = 1 );
 
 if ( ! defined( 'ABSPATH' ) ) {

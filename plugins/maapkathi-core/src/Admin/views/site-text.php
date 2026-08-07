@@ -1,4 +1,10 @@
 <?php
+/**
+ * Site Text screen markup.
+ *
+ * @package Maapkathi\Core
+ */
+
 declare( strict_types = 1 );
 
 use Maapkathi\Core\Support\SiteText;
@@ -8,13 +14,18 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
+ * View variables provided by SiteTextScreen::render().
+ *
  * @var array<string,string> $values
  * @var string $notice
  */
 ?>
 <div class="wrap mk-admin">
 	<h1><?php esc_html_e( 'Site Text', 'maapkathi' ); ?></h1>
-	<?php if ( $notice ) : ?><div class="notice notice-success"><p><?php echo esc_html( $notice ); ?></p></div><?php endif; ?>
+	<?php
+	if ( $notice ) :
+		?>
+		<div class="notice notice-success"><p><?php echo esc_html( $notice ); ?></p></div><?php endif; ?>
 
 	<form method="post">
 		<?php wp_nonce_field( 'mk_save_site_text', 'mk_site_text_nonce' ); ?>

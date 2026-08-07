@@ -61,25 +61,37 @@ define( 'MK_CHUNK_BYTES', 2 * 1024 * 1024 );
 define( 'MK_HERO_SLIDE_SECONDS', 6 );
 define( 'MK_MAX_HERO_HOLD_SECONDS', 20 );
 
+// ---------------------------------------------------------------------
+// Outbound email — sender identity + SMTP (only used when MK_MAIL_DRIVER=1
+// above). Needed for email-verification links and password-recovery
+// emails to actually send. Hostinger's SMTP is usually
+// smtp.hostinger.com : 587 (STARTTLS) — check hPanel → Emails to confirm.
+// ---------------------------------------------------------------------
+define( 'MK_MAIL_FROM_EMAIL', 'info@maapkathi.com' );
+define( 'MK_MAIL_FROM_NAME', 'Maapkathi Studio' );
+define( 'MK_SMTP_HOST', '' );
+define( 'MK_SMTP_PORT', 587 );
+define( 'MK_SMTP_USERNAME', '' );
+define( 'MK_SMTP_PASSWORD', '' );
+define( 'MK_SMTP_ENCRYPTION', 'tls' ); // tls | ssl
+
 /*
  * ---------------------------------------------------------------------
- * First-run admin account
+ * First-run admin account (legacy / optional)
  * ---------------------------------------------------------------------
- * Set these BEFORE activating the plugin. The account is created once,
- * on activation, with the mk_admin role (full access to every Maapkathi
- * screen).
+ * The first admin is now set up on-site instead: the moment the
+ * WordPress installer's own admin first opens wp-admin, a one-time
+ * "Maapkathi Setup" screen walks them through choosing their real
+ * username, email, password, and full name — no wp-config.php editing
+ * needed for the normal path.
  *
- * Safe by design: if the username or email already exists, nothing is
- * touched — so reactivating the plugin can never reset a live password.
- *
- * Once you have logged in successfully, comment these four lines out and
- * save the file, so the credentials are not sitting in a file on the
- * server any longer than necessary.
+ * Leave these commented out unless you specifically need to pre-seed an
+ * admin account non-interactively.
  */
-define( 'MK_ADMIN_USERNAME', 'studioadmin' );          // login name
-define( 'MK_ADMIN_PASSWORD', 'CHANGE-THIS-NOW-x9F2!' ); // 16+ chars, mixed case, digit, symbol
-define( 'MK_ADMIN_EMAIL', 'you@yourdomain.com' );      // must be a real inbox for password resets
-define( 'MK_ADMIN_NAME', 'Studio Admin' );             // display name shown in the admin
+// define( 'MK_ADMIN_USERNAME', 'studioadmin' );
+// define( 'MK_ADMIN_PASSWORD', 'CHANGE-THIS-NOW-x9F2!' );
+// define( 'MK_ADMIN_EMAIL', 'you@yourdomain.com' );
+// define( 'MK_ADMIN_NAME', 'Studio Admin' );
 
 // ---------------------------------------------------------------------
 // Production hardening

@@ -1,4 +1,10 @@
 <?php
+/**
+ * Font pairing registry.
+ *
+ * @package maapkathi-core
+ */
+
 declare( strict_types = 1 );
 
 namespace Maapkathi\Core\Theme;
@@ -19,61 +25,69 @@ final class Fonts {
 	private const SANS_FALLBACK  = 'system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
 
 	/**
+	 * All 8 registered font pairings.
+	 *
 	 * @return array<int, array{id:string,name:string,display:string,body:string}>
 	 */
 	public static function all(): array {
 		return array(
 			array(
-				'id' => 'fraunces-manrope',
-				'name' => 'Fraunces + Manrope',
+				'id'      => 'fraunces-manrope',
+				'name'    => 'Fraunces + Manrope',
 				'display' => '"Fraunces", ' . self::SERIF_FALLBACK,
-				'body' => '"Manrope", ' . self::SANS_FALLBACK,
+				'body'    => '"Manrope", ' . self::SANS_FALLBACK,
 			),
 			array(
-				'id' => 'cormorant-inter',
-				'name' => 'Cormorant + Inter',
+				'id'      => 'cormorant-inter',
+				'name'    => 'Cormorant + Inter',
 				'display' => '"Cormorant Garamond", ' . self::SERIF_FALLBACK,
-				'body' => '"Inter", ' . self::SANS_FALLBACK,
+				'body'    => '"Inter", ' . self::SANS_FALLBACK,
 			),
 			array(
-				'id' => 'playfair-source',
-				'name' => 'Playfair + Source Sans',
+				'id'      => 'playfair-source',
+				'name'    => 'Playfair + Source Sans',
 				'display' => '"Playfair Display", ' . self::SERIF_FALLBACK,
-				'body' => '"Source Sans 3", ' . self::SANS_FALLBACK,
+				'body'    => '"Source Sans 3", ' . self::SANS_FALLBACK,
 			),
 			array(
-				'id' => 'instrument-geist',
-				'name' => 'Instrument Serif + Geist',
+				'id'      => 'instrument-geist',
+				'name'    => 'Instrument Serif + Geist',
 				'display' => '"Instrument Serif", ' . self::SERIF_FALLBACK,
-				'body' => '"Geist", ' . self::SANS_FALLBACK,
+				'body'    => '"Geist", ' . self::SANS_FALLBACK,
 			),
 			array(
-				'id' => 'libre-inter',
-				'name' => 'Libre Caslon + Inter',
+				'id'      => 'libre-inter',
+				'name'    => 'Libre Caslon + Inter',
 				'display' => '"Libre Caslon Display", ' . self::SERIF_FALLBACK,
-				'body' => '"Inter", ' . self::SANS_FALLBACK,
+				'body'    => '"Inter", ' . self::SANS_FALLBACK,
 			),
 			array(
-				'id' => 'dmserif-dmsans',
-				'name' => 'DM Serif + DM Sans',
+				'id'      => 'dmserif-dmsans',
+				'name'    => 'DM Serif + DM Sans',
 				'display' => '"DM Serif Display", ' . self::SERIF_FALLBACK,
-				'body' => '"DM Sans", ' . self::SANS_FALLBACK,
+				'body'    => '"DM Sans", ' . self::SANS_FALLBACK,
 			),
 			array(
-				'id' => 'spectral-work',
-				'name' => 'Spectral + Work Sans',
+				'id'      => 'spectral-work',
+				'name'    => 'Spectral + Work Sans',
 				'display' => '"Spectral", ' . self::SERIF_FALLBACK,
-				'body' => '"Work Sans", ' . self::SANS_FALLBACK,
+				'body'    => '"Work Sans", ' . self::SANS_FALLBACK,
 			),
 			array(
-				'id' => 'bricolage-manrope',
-				'name' => 'Bricolage + Manrope',
+				'id'      => 'bricolage-manrope',
+				'name'    => 'Bricolage + Manrope',
 				'display' => '"Bricolage Grotesque", ' . self::SANS_FALLBACK,
-				'body' => '"Manrope", ' . self::SANS_FALLBACK,
+				'body'    => '"Manrope", ' . self::SANS_FALLBACK,
 			),
 		);
 	}
 
+	/**
+	 * Looks up a single font pairing by its id.
+	 *
+	 * @param string $id Font pairing id to look up.
+	 * @return array{id:string,name:string,display:string,body:string}|null
+	 */
 	public static function by_id( string $id ): ?array {
 		foreach ( self::all() as $pair ) {
 			if ( $pair['id'] === $id ) {
@@ -83,6 +97,11 @@ final class Fonts {
 		return null;
 	}
 
+	/**
+	 * All registered font pairing ids, in registry order.
+	 *
+	 * @return string[]
+	 */
 	public static function ids(): array {
 		return array_column( self::all(), 'id' );
 	}

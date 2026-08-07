@@ -1,4 +1,10 @@
 <?php
+/**
+ * Accent colour registry.
+ *
+ * @package maapkathi-core
+ */
+
 declare( strict_types = 1 );
 
 namespace Maapkathi\Core\Theme;
@@ -14,161 +20,169 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 final class Accents {
 
-	public const INK  = '#141110';
+	public const INK   = '#141110';
 	public const CREAM = '#faf6f1';
 
 	/**
+	 * All 24 registered accents.
+	 *
 	 * @return array<int, array{id:string,name:string,light:string,dark:string}>
 	 */
 	public static function all(): array {
 		return array(
 			array(
-				'id' => 'obsidian-gold',
-				'name' => 'Obsidian Gold',
+				'id'    => 'obsidian-gold',
+				'name'  => 'Obsidian Gold',
 				'light' => '#6b5410',
-				'dark' => '#8a6d1f',
+				'dark'  => '#8a6d1f',
 			),
 			array(
-				'id' => 'terracotta',
-				'name' => 'Terracotta',
+				'id'    => 'terracotta',
+				'name'  => 'Terracotta',
 				'light' => '#9c4a2f',
-				'dark' => '#a8502f',
+				'dark'  => '#a8502f',
 			),
 			array(
-				'id' => 'sage',
-				'name' => 'Sage',
+				'id'    => 'sage',
+				'name'  => 'Sage',
 				'light' => '#46583c',
-				'dark' => '#8fa27f',
+				'dark'  => '#8fa27f',
 			),
 			array(
-				'id' => 'deep-teal',
-				'name' => 'Deep Teal',
+				'id'    => 'deep-teal',
+				'name'  => 'Deep Teal',
 				'light' => '#0f5a5e',
-				'dark' => '#17767b',
+				'dark'  => '#17767b',
 			),
 			array(
-				'id' => 'midnight-blue',
-				'name' => 'Midnight Blue',
+				'id'    => 'midnight-blue',
+				'name'  => 'Midnight Blue',
 				'light' => '#1e3a5f',
-				'dark' => '#2f5580',
+				'dark'  => '#2f5580',
 			),
 			array(
-				'id' => 'burnt-sienna',
-				'name' => 'Burnt Sienna',
+				'id'    => 'burnt-sienna',
+				'name'  => 'Burnt Sienna',
 				'light' => '#8f4a2a',
-				'dark' => '#a5522f',
+				'dark'  => '#a5522f',
 			),
 			array(
-				'id' => 'olive',
-				'name' => 'Olive',
+				'id'    => 'olive',
+				'name'  => 'Olive',
 				'light' => '#55591f',
-				'dark' => '#6a6f26',
+				'dark'  => '#6a6f26',
 			),
 			array(
-				'id' => 'plum',
-				'name' => 'Plum',
+				'id'    => 'plum',
+				'name'  => 'Plum',
 				'light' => '#5d2a4e',
-				'dark' => '#7e3a6a',
+				'dark'  => '#7e3a6a',
 			),
 			array(
-				'id' => 'copper',
-				'name' => 'Copper',
+				'id'    => 'copper',
+				'name'  => 'Copper',
 				'light' => '#9a5a2f',
-				'dark' => '#bd7440',
+				'dark'  => '#bd7440',
 			),
 			array(
-				'id' => 'slate',
-				'name' => 'Slate',
+				'id'    => 'slate',
+				'name'  => 'Slate',
 				'light' => '#3f4a54',
-				'dark' => '#6f8290',
+				'dark'  => '#6f8290',
 			),
 			array(
-				'id' => 'sand',
-				'name' => 'Sand',
+				'id'    => 'sand',
+				'name'  => 'Sand',
 				'light' => '#cbb389',
-				'dark' => '#d8c39c',
+				'dark'  => '#d8c39c',
 			),
 			array(
-				'id' => 'forest',
-				'name' => 'Forest',
+				'id'    => 'forest',
+				'name'  => 'Forest',
 				'light' => '#24503a',
-				'dark' => '#356b4f',
+				'dark'  => '#356b4f',
 			),
 			array(
-				'id' => 'oxblood',
-				'name' => 'Oxblood',
+				'id'    => 'oxblood',
+				'name'  => 'Oxblood',
 				'light' => '#6e1f2a',
-				'dark' => '#8f2d3b',
+				'dark'  => '#8f2d3b',
 			),
 			array(
-				'id' => 'cobalt',
-				'name' => 'Cobalt',
+				'id'    => 'cobalt',
+				'name'  => 'Cobalt',
 				'light' => '#1f3fa0',
-				'dark' => '#3357c4',
+				'dark'  => '#3357c4',
 			),
 			array(
-				'id' => 'champagne',
-				'name' => 'Champagne',
+				'id'    => 'champagne',
+				'name'  => 'Champagne',
 				'light' => '#d9c48f',
-				'dark' => '#e4d3a6',
+				'dark'  => '#e4d3a6',
 			),
 			array(
-				'id' => 'charcoal-rose',
-				'name' => 'Charcoal Rose',
+				'id'    => 'charcoal-rose',
+				'name'  => 'Charcoal Rose',
 				'light' => '#6b4a52',
-				'dark' => '#a67d86',
+				'dark'  => '#a67d86',
 			),
 			array(
-				'id' => 'emerald',
-				'name' => 'Emerald',
+				'id'    => 'emerald',
+				'name'  => 'Emerald',
 				'light' => '#0f6b47',
-				'dark' => '#128052',
+				'dark'  => '#128052',
 			),
 			array(
-				'id' => 'amber',
-				'name' => 'Amber',
+				'id'    => 'amber',
+				'name'  => 'Amber',
 				'light' => '#b5730a',
-				'dark' => '#e0940f',
+				'dark'  => '#e0940f',
 			),
 			array(
-				'id' => 'indigo',
-				'name' => 'Indigo',
+				'id'    => 'indigo',
+				'name'  => 'Indigo',
 				'light' => '#34327a',
-				'dark' => '#4a47a3',
+				'dark'  => '#4a47a3',
 			),
 			array(
-				'id' => 'clay',
-				'name' => 'Clay',
+				'id'    => 'clay',
+				'name'  => 'Clay',
 				'light' => '#9a5744',
-				'dark' => '#b56d58',
+				'dark'  => '#b56d58',
 			),
 			array(
-				'id' => 'moss',
-				'name' => 'Moss',
+				'id'    => 'moss',
+				'name'  => 'Moss',
 				'light' => '#4f5b2c',
-				'dark' => '#626f37',
+				'dark'  => '#626f37',
 			),
 			array(
-				'id' => 'bronze',
-				'name' => 'Bronze',
+				'id'    => 'bronze',
+				'name'  => 'Bronze',
 				'light' => '#7d5a2e',
-				'dark' => '#916a39',
+				'dark'  => '#916a39',
 			),
 			array(
-				'id' => 'ink-violet',
-				'name' => 'Ink Violet',
+				'id'    => 'ink-violet',
+				'name'  => 'Ink Violet',
 				'light' => '#3a2a5e',
-				'dark' => '#52407e',
+				'dark'  => '#52407e',
 			),
 			array(
-				'id' => 'warm-graphite',
-				'name' => 'Warm Graphite',
+				'id'    => 'warm-graphite',
+				'name'  => 'Warm Graphite',
 				'light' => '#44403c',
-				'dark' => '#605a54',
+				'dark'  => '#605a54',
 			),
 		);
 	}
 
+	/**
+	 * Looks up a single accent by its id.
+	 *
+	 * @param string $id Accent id to look up.
+	 * @return array{id:string,name:string,light:string,dark:string}|null
+	 */
 	public static function by_id( string $id ): ?array {
 		foreach ( self::all() as $accent ) {
 			if ( $accent['id'] === $id ) {
@@ -178,29 +192,57 @@ final class Accents {
 		return null;
 	}
 
+	/**
+	 * All registered accent ids, in registry order.
+	 *
+	 * @return string[]
+	 */
 	public static function ids(): array {
 		return array_column( self::all(), 'id' );
 	}
 
+	/**
+	 * The accent id used when no accent has been chosen yet.
+	 *
+	 * @return string
+	 */
 	public static function default_id(): string {
 		return 'oxblood';
 	}
 
-	/** The readable ink (dark or cream) to place on a given accent surface. */
+	/**
+	 * The readable ink (dark or cream) to place on a given accent surface.
+	 *
+	 * @param string $surface_hex Accent surface colour, as a hex string.
+	 * @return string Either self::INK or self::CREAM, whichever reads better.
+	 */
 	public static function on_accent( string $surface_hex ): string {
 		$ink_contrast   = self::contrast_ratio( $surface_hex, self::INK );
 		$cream_contrast = self::contrast_ratio( $surface_hex, self::CREAM );
 		return $ink_contrast >= $cream_contrast ? self::INK : self::CREAM;
 	}
 
+	/**
+	 * WCAG contrast ratio between two hex colours.
+	 *
+	 * @param string $hex_a First colour, as a hex string.
+	 * @param string $hex_b Second colour, as a hex string.
+	 * @return float Contrast ratio, from 1 (no contrast) to 21 (max contrast).
+	 */
 	public static function contrast_ratio( string $hex_a, string $hex_b ): float {
-		$lum_a = self::relative_luminance( $hex_a );
-		$lum_b = self::relative_luminance( $hex_b );
+		$lum_a   = self::relative_luminance( $hex_a );
+		$lum_b   = self::relative_luminance( $hex_b );
 		$lighter = max( $lum_a, $lum_b );
 		$darker  = min( $lum_a, $lum_b );
 		return ( $lighter + 0.05 ) / ( $darker + 0.05 );
 	}
 
+	/**
+	 * WCAG relative luminance of a hex colour.
+	 *
+	 * @param string $hex Colour, as a hex string.
+	 * @return float Relative luminance, from 0 (black) to 1 (white).
+	 */
 	private static function relative_luminance( string $hex ): float {
 		$hex = ltrim( $hex, '#' );
 		$r   = hexdec( substr( $hex, 0, 2 ) ) / 255;

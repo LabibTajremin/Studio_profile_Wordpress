@@ -1,4 +1,10 @@
 <?php
+/**
+ * Custom post type registration.
+ *
+ * @package maapkathi-core
+ */
+
 declare( strict_types = 1 );
 
 namespace Maapkathi\Core\PostTypes;
@@ -17,6 +23,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 final class PostTypes {
 
 	/**
+	 * The definitions for every custom post type the plugin registers.
+	 *
 	 * @return array<string, array<string, mixed>>
 	 */
 	public static function definitions(): array {
@@ -107,10 +115,16 @@ final class PostTypes {
 		);
 	}
 
+	/**
+	 * Wire the init hook that registers post types.
+	 */
 	public function register(): void {
 		add_action( 'init', array( $this, 'register_post_types' ) );
 	}
 
+	/**
+	 * Register every custom post type defined by definitions().
+	 */
 	public function register_post_types(): void {
 		foreach ( self::definitions() as $post_type => $definition ) {
 			register_post_type( $post_type, $this->args_for( $definition ) );
@@ -118,24 +132,26 @@ final class PostTypes {
 	}
 
 	/**
-	 * @param array<string, mixed> $definition
+	 * Build the register_post_type() args array from a post type definition.
+	 *
+	 * @param array<string, mixed> $definition Post type definition from definitions().
 	 * @return array<string, mixed>
 	 */
 	private function args_for( array $definition ): array {
 		$public = $definition['public'] ?? true;
 
 		return array(
-			'label'               => $definition['label'],
-			'labels'              => array(
+			'label'              => $definition['label'],
+			'labels'             => array(
 				'name'          => $definition['label'],
 				'singular_name' => $definition['singular'],
 			),
-			'public'              => $public,
-			'publicly_queryable'  => $public,
-			'show_ui'             => true,
-			'show_in_menu'        => 'maapkathi', // Nests as a submenu under the custom "Maapkathi" top-level menu (§9).
-			'show_in_rest'        => true,
-			'menu_icon'           => $definition['icon'],
+			'public'             => $public,
+			'publicly_queryable' => $public,
+			'show_ui'            => true,
+			'show_in_menu'       => 'maapkathi', // Nests as a submenu under the custom "Maapkathi" top-level menu (§9).
+			'show_in_rest'       => true,
+			'menu_icon'          => $definition['icon'],
 			// 'custom-fields' is required for WordPress to expose a `meta`
 			// property in the REST schema at all — without it, every field
 			// Fields\MetaBoxes registers via register_post_meta() is
@@ -143,12 +159,12 @@ final class PostTypes {
 			// register_post_meta() itself succeeds silently. Verified live:
 			// WP_REST_Posts_Controller::get_item_schema() gates the whole
 			// 'meta' property on post_type_supports( $type, 'custom-fields' ).
-			'supports'            => array_unique( array_merge( $definition['supports'], array( 'custom-fields' ) ) ),
-			'hierarchical'        => $definition['hierarchical'] ?? false,
-			'has_archive'         => $definition['has_archive'] ?? $public,
-			'rewrite'             => $public ? array( 'slug' => $definition['slug'] ) : false,
-			'capability_type'     => array( 'mk_post', 'mk_posts' ),
-			'map_meta_cap'        => true,
+			'supports'           => array_unique( array_merge( $definition['supports'], array( 'custom-fields' ) ) ),
+			'hierarchical'       => $definition['hierarchical'] ?? false,
+			'has_archive'        => $definition['has_archive'] ?? $public,
+			'rewrite'            => $public ? array( 'slug' => $definition['slug'] ) : false,
+			'capability_type'    => array( 'mk_post', 'mk_posts' ),
+			'map_meta_cap'       => true,
 			// Deliberately do NOT override 'edit_post' / 'read_post' /
 			// 'delete_post' (the singular meta-cap keys). WordPress's
 			// _post_type_meta_capabilities() globally registers whatever
@@ -162,7 +178,7 @@ final class PostTypes {
 			// these three unset lets WordPress auto-derive harmless,
 			// collision-free per-post-type strings (edit_mk_post, etc.)
 			// that are never checked directly by our own code.
-			'capabilities'        => array(
+			'capabilities'       => array(
 				'edit_posts'             => \Maapkathi\Core\Roles\Roles::CAP_EDIT_CONTENT,
 				'delete_posts'           => \Maapkathi\Core\Roles\Roles::CAP_EDIT_CONTENT,
 				'read_private_posts'     => \Maapkathi\Core\Roles\Roles::CAP_EDIT_CONTENT,

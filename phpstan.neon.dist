@@ -6,6 +6,31 @@ parameters:
     excludePaths:
         - '*/vendor/*'
     bootstrapFiles:
+        - phpstan-bootstrap.php
         - vendor/szepeviktor/phpstan-wordpress/bootstrap.php
+    # phpstan-bootstrap.php has to give MK_* deployment constants (driver
+    # selectors, admin credentials, etc.) *some* concrete value so the
+    # analyser can resolve them at all. Because PHP constants are immutable,
+    # PHPStan then treats that one arbitrary value as a literal type for the
+    # whole run — which makes a handful of genuinely config-dependent
+    # branches look permanently dead/redundant relative to that specific
+    # value, even though they are reachable for other real deployments.
+    ignoreErrors:
+        -
+            message: '#^Result of \|\| is always true\.$#'
+            paths:
+                - plugins/maapkathi-core/src/Config/Config.php
+                - plugins/maapkathi-core/src/Mail/Mailer.php
+        -
+            message: '#^Unreachable statement - code above always terminates\.$#'
+            paths:
+                - plugins/maapkathi-core/src/Inquiries/Inquiries.php
+                - plugins/maapkathi-core/src/Mail/Mailer.php
+        -
+            # add_submenu_page() genuinely accepts a null $parent_slug since
+            # WP 5.3 to register a hidden page reachable only by URL — the
+            # bundled stub's signature just wasn't updated for it.
+            message: '#^Parameter \#1 \$parent_slug of function add_submenu_page expects string, null given\.$#'
+            path: plugins/maapkathi-core/src/Setup/SetupWizard.php
 includes:
     - vendor/szepeviktor/phpstan-wordpress/extension.neon

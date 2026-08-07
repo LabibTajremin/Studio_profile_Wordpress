@@ -1,4 +1,10 @@
 <?php
+/**
+ * Locally generated gradient SVG placeholder images.
+ *
+ * @package maapkathi-core
+ */
+
 declare( strict_types = 1 );
 
 namespace Maapkathi\Core\Rest;
@@ -26,10 +32,16 @@ final class PlaceholderController {
 
 	private const MAX_DIMENSION = 4000;
 
+	/**
+	 * Wire the rest_api_init hook that registers the placeholder route.
+	 */
 	public function register_hooks(): void {
 		add_action( 'rest_api_init', array( $this, 'register_routes' ) );
 	}
 
+	/**
+	 * Register the public GET /placeholder/{width}/{height} route.
+	 */
 	public function register_routes(): void {
 		register_rest_route(
 			self::NAMESPACE,
@@ -47,6 +59,14 @@ final class PlaceholderController {
 		);
 	}
 
+	/**
+	 * Build the REST URL for a placeholder image with the given spec.
+	 *
+	 * @param string $label  Optional label text to draw on the placeholder.
+	 * @param int    $width  Requested width in pixels, clamped to MAX_DIMENSION.
+	 * @param int    $height Requested height in pixels, clamped to MAX_DIMENSION.
+	 * @return string The placeholder image's REST URL.
+	 */
 	public static function url( string $label = '', int $width = 1600, int $height = 1000 ): string {
 		$width  = max( 1, min( self::MAX_DIMENSION, $width ) );
 		$height = max( 1, min( self::MAX_DIMENSION, $height ) );
@@ -56,7 +76,12 @@ final class PlaceholderController {
 		return $label ? add_query_arg( 'label', rawurlencode( $label ), $url ) : $url;
 	}
 
-	public function render( \WP_REST_Request $request ) {
+	/**
+	 * Output a gradient placeholder SVG for the requested spec and terminate the request.
+	 *
+	 * @param \WP_REST_Request $request REST request carrying width, height, and an optional label.
+	 */
+	public function render( \WP_REST_Request $request ): never {
 		$width  = max( 1, min( self::MAX_DIMENSION, absint( $request['width'] ) ) );
 		$height = max( 1, min( self::MAX_DIMENSION, absint( $request['height'] ) ) );
 		$label  = (string) $request->get_param( 'label' );
@@ -72,6 +97,14 @@ final class PlaceholderController {
 		exit;
 	}
 
+	/**
+	 * Build the gradient placeholder SVG markup for a given spec.
+	 *
+	 * @param string $label  Optional label text to draw centred on the image.
+	 * @param int    $width  Image width in pixels.
+	 * @param int    $height Image height in pixels.
+	 * @return string SVG markup.
+	 */
 	public static function svg( string $label, int $width, int $height ): string {
 		$accent = Branding::accent_hex();
 		$dark   = self::shade( $accent, -0.35 );
@@ -89,7 +122,7 @@ final class PlaceholderController {
 			$height,
 			esc_attr( $accent ),
 			esc_attr( $dark ),
-			esc_attr( $label ?: __( 'Placeholder image', 'maapkathi' ) ),
+			esc_attr( $label ? $label : __( 'Placeholder image', 'maapkathi' ) ),
 			$label
 				? sprintf(
 					'<text x="50%%" y="50%%" dominant-baseline="middle" text-anchor="middle" font-family="Georgia,serif" font-size="%d" fill="%s" opacity="0.85">%s</text>',
@@ -101,7 +134,13 @@ final class PlaceholderController {
 		);
 	}
 
-	/** Lightens (positive) or darkens (negative) a hex colour. */
+	/**
+	 * Lightens (positive) or darkens (negative) a hex colour.
+	 *
+	 * @param string $hex    Hex colour string, with or without a leading '#'.
+	 * @param float  $amount Shade amount from -1 (fully dark) to 1 (fully light).
+	 * @return string The shaded hex colour string, prefixed with '#'.
+	 */
 	private static function shade( string $hex, float $amount ): string {
 		$hex = ltrim( $hex, '#' );
 		if ( 3 === strlen( $hex ) ) {

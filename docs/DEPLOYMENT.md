@@ -34,9 +34,13 @@ The template already sets the production hardening flags (`DISALLOW_FILE_EDIT`,
 `WP_DEBUG` off, `FORCE_SSL_ADMIN`, revision limits, memory) and the
 Maapkathi `MK_*` constants from §5.
 
-**First run only:** uncomment the three `MK_ADMIN_*` lines to bootstrap an
-admin account, load the site once, log in, change the password, then
-comment them out again.
+**Outbound email:** fill in `MK_MAIL_FROM_EMAIL`/`MK_MAIL_FROM_NAME` and, if
+you want email verification and password recovery to actually send
+(recommended), set `MK_MAIL_DRIVER` to `1` and fill in `MK_SMTP_*` from
+hPanel → Emails.
+
+The `MK_ADMIN_*` lines are legacy/optional — see step 7, "First login,"
+for the normal path.
 
 ## 4. Upload the plugin and theme
 
@@ -69,7 +73,21 @@ On activation the plugin:
 - registers the `mk_admin` / `mk_editor` roles
 - registers all post types and flushes rewrite rules
 
-## 7. Permalinks
+## 7. First login
+
+Log into wp-admin with the account WordPress's own installer just created.
+The plugin redirects you straight to a one-time **Maapkathi Setup** screen —
+set your real username, email, password, and full name there (no
+wp-config.php editing needed). The public site is already live the whole
+time; this screen only ever gates wp-admin.
+
+That email is trusted immediately (you're already an authenticated admin
+setting it directly). Any *later* change to it goes through the
+verification flow: a confirmation link is emailed to the new address, and
+account recovery for a given address only works once it has been verified
+this way — see `docs/CONFIGURATION.md`.
+
+## 8. Permalinks
 
 **Settings → Permalinks** → choose **Post name** → Save. The CPT routes
 (`/work/{slug}`, `/services/{slug}`) depend on pretty permalinks.
@@ -77,7 +95,7 @@ On activation the plugin:
 If custom URLs 404 after a migration, re-save this screen — that
 regenerates the rewrite rules.
 
-## 8. Seed demo content (optional but recommended for a first look)
+## 9. Seed demo content (optional but recommended for a first look)
 
 Hostinger Premium includes SSH. From `public_html`:
 
@@ -94,7 +112,7 @@ Without SSH, create the pages manually (Home, About, Team, Services,
 Contact, Blog), assign the matching page templates, and set
 **Settings → Reading → front page** to *Home*.
 
-## 9. SSL
+## 10. SSL
 
 hPanel → **Security → SSL** → install the free certificate for the domain,
 then in `wp-config.php` confirm `FORCE_SSL_ADMIN` is enabled and uncomment
@@ -103,7 +121,7 @@ the HTTPS redirect block in `.htaccess`.
 Update **Settings → General** so both the WordPress Address and Site
 Address use `https://`.
 
-## 10. Post-deploy checklist
+## 11. Post-deploy checklist
 
 - [ ] `https://yourdomain.com/wp-json/maapkathi/v1/health` returns
       `{"status":"ok","database":"ok","schema":"ok"}`

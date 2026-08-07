@@ -1,4 +1,10 @@
 <?php
+/**
+ * Hero carousel slide manager controller.
+ *
+ * @package Maapkathi\Core
+ */
+
 declare( strict_types = 1 );
 
 namespace Maapkathi\Core\Admin\Screens;
@@ -18,6 +24,11 @@ final class HeroScreen {
 
 	private const MAX_SLIDES = 8;
 
+	/**
+	 * Checks capability, saves the form on submit, and renders the screen.
+	 *
+	 * @return void
+	 */
 	public function render(): void {
 		if ( ! current_user_can( Roles::CAP_EDIT_CONTENT ) ) {
 			wp_die( esc_html__( 'You do not have permission to view this page.', 'maapkathi' ) );
@@ -36,6 +47,14 @@ final class HeroScreen {
 		require MK_PLUGIN_DIR . 'src/Admin/views/hero.php';
 	}
 
+	/**
+	 * Sanitizes and persists the posted slide duration and slide rows.
+	 *
+	 * Called only from render(), which has already verified the
+	 * mk_save_hero nonce before invoking this method.
+	 *
+	 * @return void
+	 */
 	private function save(): void {
 		if ( ! current_user_can( Roles::CAP_EDIT_CONTENT ) ) {
 			return;
@@ -43,11 +62,13 @@ final class HeroScreen {
 
 		$site_settings = get_option( 'mk_site_settings', array() );
 
-		$duration = absint( $_POST['hero_slide_duration'] ?? MK_HERO_SLIDE_SECONDS );
+		// phpcs:disable WordPress.Security.NonceVerification.Missing -- nonce already verified in render() before this method is called.
+		$duration                             = absint( $_POST['hero_slide_duration'] ?? MK_HERO_SLIDE_SECONDS );
 		$site_settings['hero_slide_duration'] = max( 3, min( 20, $duration ) );
 
 		$raw_slides = wp_unslash( $_POST['slides'] ?? array() );
-		$slides     = array();
+		// phpcs:enable WordPress.Security.NonceVerification.Missing
+		$slides = array();
 
 		foreach ( (array) $raw_slides as $raw ) {
 			if ( empty( $raw['headline'] ) && empty( $raw['image_url'] ) && empty( $raw['video_url'] ) && empty( $raw['video_upload_url'] ) && empty( $raw['gif_url'] ) ) {

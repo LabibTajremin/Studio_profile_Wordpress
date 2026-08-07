@@ -1,4 +1,10 @@
 <?php
+/**
+ * Chunked file upload REST endpoint.
+ *
+ * @package maapkathi-core
+ */
+
 declare( strict_types = 1 );
 
 namespace Maapkathi\Core\Rest;
@@ -20,6 +26,9 @@ final class UploadController {
 
 	private const NAMESPACE = 'maapkathi/v1';
 
+	/**
+	 * Wire the rest_api_init hook and schedule the orphaned-chunk garbage collector.
+	 */
 	public function register_hooks(): void {
 		add_action( 'rest_api_init', array( $this, 'register_routes' ) );
 		add_action( 'mk_gc_orphaned_chunks', array( $this, 'gc_orphaned_chunks' ) );
@@ -29,6 +38,9 @@ final class UploadController {
 		}
 	}
 
+	/**
+	 * Register the upload/chunk and upload/complete routes.
+	 */
 	public function register_routes(): void {
 		register_rest_route(
 			self::NAMESPACE,
@@ -51,14 +63,25 @@ final class UploadController {
 		);
 	}
 
+	/**
+	 * Permission callback for both upload routes.
+	 *
+	 * @return bool True when the current user may edit content or upload files.
+	 */
 	public function can_upload(): bool {
 		return current_user_can( Roles::CAP_EDIT_CONTENT ) || current_user_can( 'upload_files' );
 	}
 
+	/**
+	 * Store one uploaded chunk on disk under its server-issued upload_id.
+	 *
+	 * @param \WP_REST_Request $request REST request carrying upload_id, chunk_index, and the chunk file.
+	 * @return array<string,int|string>|\WP_Error Chunk receipt on success, or an error.
+	 */
 	public function handle_chunk( \WP_REST_Request $request ) {
-		$upload_id    = sanitize_key( (string) $request->get_param( 'upload_id' ) );
-		$chunk_index  = absint( $request->get_param( 'chunk_index' ) );
-		$file         = $request->get_file_params()['chunk'] ?? null;
+		$upload_id   = sanitize_key( (string) $request->get_param( 'upload_id' ) );
+		$chunk_index = absint( $request->get_param( 'chunk_index' ) );
+		$file        = $request->get_file_params()['chunk'] ?? null;
 
 		if ( ! $upload_id || null === $file ) {
 			return new \WP_Error( 'mk_bad_chunk', __( 'Missing upload_id or chunk.', 'maapkathi' ), array( 'status' => 400 ) );
@@ -71,6 +94,7 @@ final class UploadController {
 		wp_mkdir_p( $dir );
 
 		$dest = trailingslashit( $dir ) . 'chunk_' . $chunk_index;
+		// phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged -- return value is checked immediately below; the @ only suppresses the PHP-level warning noise on an expected failure (e.g. invalid/non-uploaded tmp file), not the error handling itself.
 		if ( ! @move_uploaded_file( $file['tmp_name'], $dest ) ) {
 			return new \WP_Error( 'mk_chunk_write_failed', __( 'Could not store chunk.', 'maapkathi' ), array( 'status' => 500 ) );
 		}
@@ -81,10 +105,16 @@ final class UploadController {
 		);
 	}
 
+	/**
+	 * Assemble a completed upload's chunks, validate the result, and hand it to storage.
+	 *
+	 * @param \WP_REST_Request $request REST request carrying upload_id, total_chunks, and filename.
+	 * @return array<string,int|string>|\WP_Error Stored file details on success, or an error.
+	 */
 	public function handle_complete( \WP_REST_Request $request ) {
-		$upload_id  = sanitize_key( (string) $request->get_param( 'upload_id' ) );
-		$total      = absint( $request->get_param( 'total_chunks' ) );
-		$filename   = sanitize_file_name( (string) $request->get_param( 'filename' ) );
+		$upload_id = sanitize_key( (string) $request->get_param( 'upload_id' ) );
+		$total     = absint( $request->get_param( 'total_chunks' ) );
+		$filename  = sanitize_file_name( (string) $request->get_param( 'filename' ) );
 
 		$dir = trailingslashit( $this->chunks_dir() ) . $upload_id;
 		if ( ! is_dir( $dir ) ) {
@@ -100,11 +130,12 @@ final class UploadController {
 				fclose( $out ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose
 				return new \WP_Error( 'mk_missing_chunk', sprintf( 'Missing chunk %d.', $i ), array( 'status' => 400 ) );
 			}
-			fwrite( $out, file_get_contents( $chunk_path ) ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fwrite, WordPress.WP.AlternativeFunctions.file_get_contents
+			// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fwrite, WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- reading our own just-written local chunk files (not a remote URL) to reassemble them; WP_Filesystem is not used elsewhere in this codebase.
+			fwrite( $out, file_get_contents( $chunk_path ) );
 		}
 		fclose( $out ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose
 
-		$validation = $this->validate_assembled_file( $assembled, $filename );
+		$validation = $this->validate_assembled_file( $assembled );
 		if ( is_wp_error( $validation ) ) {
 			wp_delete_file( $assembled );
 			$this->cleanup_dir( $dir );
@@ -128,8 +159,11 @@ final class UploadController {
 	/**
 	 * Magic-byte validation (§6.3, §13) — extension and client Content-Type
 	 * are never trusted. Returns the detected mime, or a WP_Error.
+	 *
+	 * @param string $path Absolute path to the assembled file on disk.
+	 * @return string|\WP_Error Detected MIME type on success, or an error.
 	 */
-	private function validate_assembled_file( string $path, string $original_filename ) {
+	private function validate_assembled_file( string $path ) {
 		$handle = fopen( $path, 'rb' ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fopen
 		$header = $handle ? fread( $handle, 16 ) : ''; // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fread
 		if ( $handle ) {
@@ -175,23 +209,36 @@ final class UploadController {
 			return;
 		}
 
-		foreach ( glob( trailingslashit( $dir ) . '*', GLOB_ONLYDIR ) ?: array() as $session_dir ) {
+		$session_dirs = glob( trailingslashit( $dir ) . '*', GLOB_ONLYDIR );
+		foreach ( $session_dirs ? $session_dirs : array() as $session_dir ) {
 			if ( filemtime( $session_dir ) < time() - DAY_IN_SECONDS ) {
 				$this->cleanup_dir( $session_dir );
 			}
 		}
 	}
 
+	/**
+	 * The local directory used to store in-progress upload chunk sessions.
+	 *
+	 * @return string Absolute directory path.
+	 */
 	private function chunks_dir(): string {
 		return trailingslashit( Config::instance()->local_storage_dir() ) . '.chunks';
 	}
 
+	/**
+	 * Delete every file in a chunk session directory, then remove the directory itself.
+	 *
+	 * @param string $dir Absolute path to the chunk session directory to remove.
+	 */
 	private function cleanup_dir( string $dir ): void {
-		foreach ( glob( trailingslashit( $dir ) . '*' ) ?: array() as $file ) {
+		$files = glob( trailingslashit( $dir ) . '*' );
+		foreach ( $files ? $files : array() as $file ) {
 			if ( is_file( $file ) ) {
 				wp_delete_file( $file );
 			}
 		}
-		@rmdir( $dir ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+		// phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged, WordPress.WP.AlternativeFunctions.file_system_operations_rmdir -- best-effort cleanup of a now-empty local temp directory; failure is non-fatal and WP_Filesystem is not used elsewhere in this codebase.
+		@rmdir( $dir );
 	}
 }

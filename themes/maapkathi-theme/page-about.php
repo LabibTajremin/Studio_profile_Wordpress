@@ -1,6 +1,8 @@
 <?php
 /**
  * Template Name: About
+ *
+ * @package maapkathi-theme
  */
 
 declare( strict_types = 1 );
