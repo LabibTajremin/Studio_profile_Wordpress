@@ -92,6 +92,12 @@ final class VideoResolver {
 		return null;
 	}
 
+	/**
+	 * Extracts the video id from a YouTube URL, if present.
+	 *
+	 * @param string $url YouTube URL.
+	 * @return ?string
+	 */
 	private function extract_youtube_id( string $url ): ?string {
 		if ( preg_match( '#(?:youtu\.be/|youtube\.com/(?:watch\?v=|embed/|shorts/))([A-Za-z0-9_-]{11})#', $url, $m ) ) {
 			return $m[1];
@@ -99,6 +105,12 @@ final class VideoResolver {
 		return null;
 	}
 
+	/**
+	 * Extracts the video id from a Vimeo URL, if present.
+	 *
+	 * @param string $url Vimeo URL.
+	 * @return ?string
+	 */
 	private function extract_vimeo_id( string $url ): ?string {
 		if ( preg_match( '#vimeo\.com/(?:video/)?(\d+)#', $url, $m ) ) {
 			return $m[1];
@@ -106,16 +118,34 @@ final class VideoResolver {
 		return null;
 	}
 
+	/**
+	 * Builds a privacy-enhanced, autoplaying YouTube embed URL.
+	 *
+	 * @param string $id YouTube video id.
+	 * @return string
+	 */
 	private function youtube_embed_url( string $id ): string {
 		$id = rawurlencode( $id );
 		return "https://www.youtube-nocookie.com/embed/{$id}?autoplay=1&mute=1&loop=1&playlist={$id}&controls=0&playsinline=1&rel=0&modestbranding=1&iv_load_policy=3&disablekb=1&fs=0";
 	}
 
+	/**
+	 * Builds an autoplaying Vimeo embed URL.
+	 *
+	 * @param string $id Vimeo video id.
+	 * @return string
+	 */
 	private function vimeo_embed_url( string $id ): string {
 		$id = rawurlencode( $id );
 		return "https://player.vimeo.com/video/{$id}?autoplay=1&muted=1&loop=1&background=1";
 	}
 
+	/**
+	 * Whether a URL points directly at a supported video file.
+	 *
+	 * @param string $url URL to check.
+	 * @return bool
+	 */
 	private function is_direct_video_file( string $url ): bool {
 		$path = (string) wp_parse_url( $url, PHP_URL_PATH );
 		return (bool) preg_match( '/\.(mp4|webm)$/i', $path );
@@ -124,6 +154,9 @@ final class VideoResolver {
 	/**
 	 * Validates a pasted URL at save time (§6.2, §13). Returns an error
 	 * string, or null when the URL is acceptable.
+	 *
+	 * @param string $raw Raw pasted video URL.
+	 * @return ?string
 	 */
 	public function validate_link( string $raw ): ?string {
 		$raw = trim( $raw );

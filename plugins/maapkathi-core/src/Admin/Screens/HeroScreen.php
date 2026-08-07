@@ -68,7 +68,7 @@ final class HeroScreen {
 
 		$raw_slides = wp_unslash( $_POST['slides'] ?? array() );
 		// phpcs:enable WordPress.Security.NonceVerification.Missing
-		$slides     = array();
+		$slides = array();
 
 		foreach ( (array) $raw_slides as $raw ) {
 			if ( empty( $raw['headline'] ) && empty( $raw['image_url'] ) && empty( $raw['video_url'] ) && empty( $raw['video_upload_url'] ) && empty( $raw['gif_url'] ) ) {

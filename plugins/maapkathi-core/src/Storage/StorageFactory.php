@@ -51,6 +51,12 @@ final class StorageFactory {
 		return self::$instance;
 	}
 
+	/**
+	 * Clears the cached adapter instance, so the next create() call
+	 * re-reads configuration. Used by tests.
+	 *
+	 * @return void
+	 */
 	public static function reset(): void {
 		self::$instance = null;
 	}

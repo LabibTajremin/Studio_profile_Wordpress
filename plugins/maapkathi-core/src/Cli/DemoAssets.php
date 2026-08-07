@@ -253,6 +253,9 @@ final class DemoAssets {
 	}
 
 	/**
+	 * Convert a `#rrggbb` hex colour string to an [r, g, b] triple.
+	 *
+	 * @param string $hex Hex colour string, with or without a leading '#'.
 	 * @return array{0:int,1:int,2:int}
 	 */
 	private static function hex_to_rgb( string $hex ): array {
@@ -264,7 +267,14 @@ final class DemoAssets {
 		);
 	}
 
-	/** Writes the bytes into the uploads dir and registers an attachment. */
+	/**
+	 * Writes the bytes into the uploads dir and registers an attachment.
+	 *
+	 * @param string $slug  Demo-asset slug stored as attachment meta for later lookup.
+	 * @param string $png   Raw PNG bytes to write to the uploads directory.
+	 * @param string $title Attachment title / image alt text.
+	 * @return int Attachment ID, or 0 on failure.
+	 */
 	private static function sideload( string $slug, string $png, string $title ): int {
 		require_once ABSPATH . 'wp-admin/includes/image.php';
 

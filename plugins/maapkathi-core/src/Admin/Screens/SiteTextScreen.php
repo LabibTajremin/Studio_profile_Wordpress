@@ -1,4 +1,10 @@
 <?php
+/**
+ * Site Text screen controller.
+ *
+ * @package Maapkathi\Core
+ */
+
 declare( strict_types = 1 );
 
 namespace Maapkathi\Core\Admin\Screens;
@@ -16,6 +22,11 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 final class SiteTextScreen {
 
+	/**
+	 * Checks capability, saves the form on submit, and renders the screen.
+	 *
+	 * @return void
+	 */
 	public function render(): void {
 		if ( ! current_user_can( Roles::CAP_MANAGE_SETTINGS ) ) {
 			wp_die( esc_html__( 'You do not have permission to view this page.', 'maapkathi' ) );
