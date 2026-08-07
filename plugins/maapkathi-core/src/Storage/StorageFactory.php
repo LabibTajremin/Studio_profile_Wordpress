@@ -23,6 +23,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 final class StorageFactory {
 
 	/**
+	 * Cached adapter instance.
+	 *
 	 * @var StorageAdapter|null Cached adapter instance for this request.
 	 */
 	private static ?StorageAdapter $instance = null;

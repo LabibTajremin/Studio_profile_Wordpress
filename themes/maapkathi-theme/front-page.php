@@ -7,6 +7,8 @@
  *
  * Every section is self-hiding when it has no content, so a partially
  * filled site never renders an empty heading.
+ *
+ * @package maapkathi-theme
  */
 
 declare( strict_types = 1 );
@@ -70,15 +72,15 @@ $faqs         = mk_content( 'faqs' );
 	<div class="mk-container">
 		<h2 class="mk-section__heading"><?php mk_the_text( 'home_categories_heading' ); ?></h2>
 		<div class="mk-grid mk-grid--categories">
-			<?php foreach ( $categories as $term ) : ?>
-				<a class="mk-card mk-card--category" href="<?php echo esc_url( get_term_link( $term ) ); ?>">
-					<h3 class="mk-card__title"><?php echo esc_html( $term->name ); ?></h3>
+			<?php foreach ( $categories as $category_term ) : ?>
+				<a class="mk-card mk-card--category" href="<?php echo esc_url( get_term_link( $category_term ) ); ?>">
+					<h3 class="mk-card__title"><?php echo esc_html( $category_term->name ); ?></h3>
 					<span class="mk-card__count">
 						<?php
 						printf(
 							/* translators: %d: number of projects in this category. */
-							esc_html( _n( '%d project', '%d projects', (int) $term->count, 'maapkathi' ) ),
-							(int) $term->count
+							esc_html( _n( '%d project', '%d projects', (int) $category_term->count, 'maapkathi' ) ),
+							(int) $category_term->count
 						);
 						?>
 					</span>

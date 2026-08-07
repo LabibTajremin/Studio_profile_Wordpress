@@ -19,6 +19,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 final class StoredObject {
 
 	/**
+	 * Creates the value object.
+	 *
 	 * @param string $key   Storage key the object was written under.
 	 * @param string $url   Direct, publicly reachable URL for the object.
 	 * @param int    $bytes Size of the object in bytes.

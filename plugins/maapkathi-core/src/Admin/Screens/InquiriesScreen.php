@@ -92,7 +92,7 @@ final class InquiriesScreen {
 		global $wpdb;
 		$table = Database::inquiries_table();
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- nonce already verified in render() before this method is called.
-		$id     = absint( $_POST['inquiry_id'] ?? 0 );
+		$id = absint( $_POST['inquiry_id'] ?? 0 );
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- nonce already verified in render() before this method is called.
 		$action = sanitize_key( $_POST['mk_action'] ?? '' );
 

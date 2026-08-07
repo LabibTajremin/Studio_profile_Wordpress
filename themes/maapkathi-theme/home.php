@@ -1,4 +1,10 @@
 <?php
+/**
+ * Blog index template — 404s when blogging is disabled in site settings.
+ *
+ * @package maapkathi-theme
+ */
+
 declare( strict_types = 1 );
 
 if ( ! defined( 'ABSPATH' ) ) {

@@ -242,6 +242,9 @@ final class Roles {
 	 * lock a legitimate user out. 'wp_login_failed' is WordPress's own
 	 * canonical hook for "a login attempt genuinely failed," fired exactly
 	 * once per failed wp_signon() call, which is what this needs.
+	 *
+	 * @param \WP_User|\WP_Error|null $user Value passed through the 'authenticate' filter chain so far.
+	 * @return \WP_User|\WP_Error|null
 	 */
 	public function block_if_rate_limited( $user ) {
 		if ( $this->attempts_for_current_ip() >= 5 ) {

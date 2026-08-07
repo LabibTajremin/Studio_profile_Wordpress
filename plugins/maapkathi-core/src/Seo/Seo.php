@@ -266,11 +266,11 @@ final class Seo {
 			return;
 		}
 
-		$summary           = get_post_meta( $post_id, 'mk_summary', true );
-		$description       = $summary ? $summary : get_the_excerpt( $post_id );
-		$thumbnail_url     = get_the_post_thumbnail_url( $post_id, 'large' );
-		$location_created  = get_post_meta( $post_id, 'mk_location', true );
-		$date_created      = get_post_meta( $post_id, 'mk_completed_at', true );
+		$summary          = get_post_meta( $post_id, 'mk_summary', true );
+		$description      = $summary ? $summary : get_the_excerpt( $post_id );
+		$thumbnail_url    = get_the_post_thumbnail_url( $post_id, 'large' );
+		$location_created = get_post_meta( $post_id, 'mk_location', true );
+		$date_created     = get_post_meta( $post_id, 'mk_completed_at', true );
 
 		$this->print_ld_json(
 			array(

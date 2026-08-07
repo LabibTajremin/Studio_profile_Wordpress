@@ -1,4 +1,10 @@
 <?php
+/**
+ * Numeric-code configuration constants reader and validator.
+ *
+ * @package maapkathi-core
+ */
+
 declare( strict_types = 1 );
 
 namespace Maapkathi\Core\Config;
@@ -18,11 +24,25 @@ final class Config {
 	private const CACHE_DRIVERS   = array( 1, 2 );
 	private const MAIL_DRIVERS    = array( 0, 1, 2 );
 
+	/**
+	 * Shared singleton instance.
+	 *
+	 * @var self|null
+	 */
 	private static ?Config $instance = null;
 
-	/** @var string[] */
+	/**
+	 * Human-readable validation error messages from the last validate() call.
+	 *
+	 * @var string[]
+	 */
 	private array $errors = array();
 
+	/**
+	 * Get the shared Config singleton, creating it on first use.
+	 *
+	 * @return self The shared instance.
+	 */
 	public static function instance(): self {
 		if ( null === self::$instance ) {
 			self::$instance = new self();
@@ -30,46 +50,101 @@ final class Config {
 		return self::$instance;
 	}
 
+	/**
+	 * The active storage driver code (MK_STORAGE_DRIVER), defaulting to 3 (Local).
+	 *
+	 * @return int Driver code.
+	 */
 	public function storage_driver(): int {
 		return $this->constant_int( 'MK_STORAGE_DRIVER', 3 );
 	}
 
+	/**
+	 * The active video driver code (MK_VIDEO_DRIVER), defaulting to 0.
+	 *
+	 * @return int Driver code.
+	 */
 	public function video_driver(): int {
 		return $this->constant_int( 'MK_VIDEO_DRIVER', 0 );
 	}
 
+	/**
+	 * The active cache driver code (MK_CACHE_DRIVER), defaulting to 1.
+	 *
+	 * @return int Driver code.
+	 */
 	public function cache_driver(): int {
 		return $this->constant_int( 'MK_CACHE_DRIVER', 1 );
 	}
 
+	/**
+	 * The active mail driver code (MK_MAIL_DRIVER), defaulting to 0.
+	 *
+	 * @return int Driver code.
+	 */
 	public function mail_driver(): int {
 		return $this->constant_int( 'MK_MAIL_DRIVER', 0 );
 	}
 
+	/**
+	 * The local storage directory, from MK_LOCAL_STORAGE_DIR or the default uploads path.
+	 *
+	 * @return string Absolute directory path.
+	 */
 	public function local_storage_dir(): string {
 		return defined( 'MK_LOCAL_STORAGE_DIR' ) ? (string) MK_LOCAL_STORAGE_DIR : WP_CONTENT_DIR . '/uploads/maapkathi';
 	}
 
+	/**
+	 * The maximum allowed video upload size in bytes (MK_MAX_VIDEO_BYTES), defaulting to 200MB.
+	 *
+	 * @return int Maximum size in bytes.
+	 */
 	public function max_video_bytes(): int {
 		return $this->constant_int( 'MK_MAX_VIDEO_BYTES', 200 * 1024 * 1024 );
 	}
 
+	/**
+	 * The maximum allowed image upload size in bytes (MK_MAX_IMAGE_BYTES), defaulting to 10MB.
+	 *
+	 * @return int Maximum size in bytes.
+	 */
 	public function max_image_bytes(): int {
 		return $this->constant_int( 'MK_MAX_IMAGE_BYTES', 10 * 1024 * 1024 );
 	}
 
+	/**
+	 * The maximum allowed GIF upload size in bytes (MK_MAX_GIF_BYTES), defaulting to 8MB.
+	 *
+	 * @return int Maximum size in bytes.
+	 */
 	public function max_gif_bytes(): int {
 		return $this->constant_int( 'MK_MAX_GIF_BYTES', 8 * 1024 * 1024 );
 	}
 
+	/**
+	 * The chunked-upload chunk size in bytes (MK_CHUNK_BYTES), defaulting to 2MB.
+	 *
+	 * @return int Chunk size in bytes.
+	 */
 	public function chunk_bytes(): int {
 		return $this->constant_int( 'MK_CHUNK_BYTES', 2 * 1024 * 1024 );
 	}
 
+	/**
+	 * The hero slide display duration in seconds (MK_HERO_SLIDE_SECONDS), defaulting to 6.
+	 *
+	 * @return int Duration in seconds.
+	 */
 	public function hero_slide_seconds(): int {
 		return $this->constant_int( 'MK_HERO_SLIDE_SECONDS', 6 );
 	}
 
+	/**
+	 * The maximum hero video hold duration in seconds (MK_MAX_HERO_HOLD_SECONDS), defaulting to 20.
+	 *
+	 * @return int Duration in seconds.
+	 */
 	public function max_hero_hold_seconds(): int {
 		return $this->constant_int( 'MK_MAX_HERO_HOLD_SECONDS', 20 );
 	}
@@ -97,6 +172,9 @@ final class Config {
 		return $this->errors;
 	}
 
+	/**
+	 * Validate configuration and, if invalid, register an admin_notices callback that reports the errors.
+	 */
 	public function validate_or_notice(): void {
 		$errors = $this->validate();
 
@@ -119,6 +197,13 @@ final class Config {
 		);
 	}
 
+	/**
+	 * Append an error when a driver code is not one of its allowed values.
+	 *
+	 * @param string $constant_name Name of the constant being checked, for the error message.
+	 * @param int    $value         Resolved driver code to check.
+	 * @param int[]  $allowed       Recognised driver codes.
+	 */
 	private function check_in_set( string $constant_name, int $value, array $allowed ): void {
 		if ( ! in_array( $value, $allowed, true ) ) {
 			$this->errors[] = sprintf(
@@ -130,6 +215,9 @@ final class Config {
 		}
 	}
 
+	/**
+	 * Append errors for any wp-config.php credential constants required by the active storage driver but not defined.
+	 */
 	private function check_driver_credentials(): void {
 		$driver = $this->storage_driver();
 
@@ -161,7 +249,14 @@ final class Config {
 		}
 	}
 
-	private function constant_int( string $name, int $default ): int {
-		return defined( $name ) ? (int) constant( $name ) : $default;
+	/**
+	 * Read a constant as an int, falling back to a default when it is not defined.
+	 *
+	 * @param string $name     Constant name to look up.
+	 * @param int    $fallback Value to use when the constant is not defined.
+	 * @return int The constant's value cast to int, or the fallback.
+	 */
+	private function constant_int( string $name, int $fallback ): int {
+		return defined( $name ) ? (int) constant( $name ) : $fallback;
 	}
 }
