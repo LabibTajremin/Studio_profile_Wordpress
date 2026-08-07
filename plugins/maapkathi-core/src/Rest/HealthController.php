@@ -1,4 +1,10 @@
 <?php
+/**
+ * Public health-check REST endpoint.
+ *
+ * @package maapkathi-core
+ */
+
 declare( strict_types = 1 );
 
 namespace Maapkathi\Core\Rest;
@@ -22,10 +28,16 @@ final class HealthController {
 
 	private const NAMESPACE = 'maapkathi/v1';
 
+	/**
+	 * Wire the rest_api_init hook that registers the health route.
+	 */
 	public function register_hooks(): void {
 		add_action( 'rest_api_init', array( $this, 'register_routes' ) );
 	}
 
+	/**
+	 * Register the public GET /health route.
+	 */
 	public function register_routes(): void {
 		register_rest_route(
 			self::NAMESPACE,
@@ -38,6 +50,11 @@ final class HealthController {
 		);
 	}
 
+	/**
+	 * Report whether the database is reachable and the plugin's schema is present.
+	 *
+	 * @return \WP_REST_Response JSON status response; HTTP 200 when healthy, 503 when degraded.
+	 */
 	public function status(): \WP_REST_Response {
 		global $wpdb;
 

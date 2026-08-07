@@ -19,6 +19,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 final class ResolvedVideo {
 
 	/**
+	 * Creates the resolved video value object.
+	 *
 	 * @param string  $kind          'file' | 'youtube' | 'vimeo'.
 	 * @param string  $src           Playable/embeddable URL.
 	 * @param ?string $poster        Poster image URL, if any.

@@ -21,21 +21,35 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 if ( ! function_exists( 'mk_text' ) ) {
-	/** One of the 29 editable copy strings, with its shipped default. */
+	/**
+	 * One of the 29 editable copy strings, with its shipped default.
+	 *
+	 * @param string $key Site Text field key.
+	 * @return string
+	 */
 	function mk_text( string $key ): string {
 		return SiteText::text( $key );
 	}
 }
 
 if ( ! function_exists( 'mk_the_text' ) ) {
-	/** Echoes an escaped copy string. */
+	/**
+	 * Echoes an escaped copy string.
+	 *
+	 * @param string $key Site Text field key.
+	 * @return void
+	 */
 	function mk_the_text( string $key ): void {
 		echo esc_html( SiteText::text( $key ) );
 	}
 }
 
 if ( ! function_exists( 'mk_settings' ) ) {
-	/** @return array<string,mixed> */
+	/**
+	 * Reads the `mk_site_settings` option, guaranteed as an array.
+	 *
+	 * @return array<string,mixed>
+	 */
 	function mk_settings(): array {
 		$settings = get_option( 'mk_site_settings', array() );
 		return is_array( $settings ) ? $settings : array();
@@ -43,10 +57,16 @@ if ( ! function_exists( 'mk_settings' ) ) {
 }
 
 if ( ! function_exists( 'mk_setting' ) ) {
-	/** @return mixed */
-	function mk_setting( string $key, $default = '' ) {
+	/**
+	 * Reads a single site setting, with a fallback default.
+	 *
+	 * @param string $key           Site settings key.
+	 * @param mixed  $default_value Value to return when the key is unset.
+	 * @return mixed
+	 */
+	function mk_setting( string $key, $default_value = '' ) {
 		$settings = mk_settings();
-		return $settings[ $key ] ?? $default;
+		return $settings[ $key ] ?? $default_value;
 	}
 }
 
@@ -58,6 +78,8 @@ if ( ! function_exists( 'mk_content' ) ) {
 	 * mk_content('featured_projects'), mk_content('project_categories'),
 	 * mk_content('top_level_services').
 	 *
+	 * @param string $what Name of the Content:: accessor method to call.
+	 * @param mixed  ...$args Arguments forwarded to that accessor method.
 	 * @return array<int,mixed>
 	 */
 	function mk_content( string $what, ...$args ): array {
