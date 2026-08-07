@@ -211,6 +211,14 @@ add_action(
 			return;
 		}
 
+		// Never 404 the front page. Until a static front page is assigned
+		// (a fresh install, or before the seeder runs), the site's homepage
+		// IS the blog index — so is_home() is true there, and without this
+		// guard disabling the blog would 404 the entire site.
+		if ( is_front_page() ) {
+			return;
+		}
+
 		if ( is_home() || is_singular( 'post' ) || is_category() || is_tag() || is_date() || is_author() ) {
 			global $wp_query;
 			$wp_query->set_404();
