@@ -141,19 +141,39 @@ final class Inquiries {
 		return false;
 	}
 
+	/**
+	 * Instance-method wrapper around ip_hash() for the current request.
+	 *
+	 * @return string Hash of the current client's IP address.
+	 */
 	private function client_ip_hash(): string {
 		return self::ip_hash();
 	}
 
+	/**
+	 * Hash the current request's IP address for use as a transient key suffix.
+	 *
+	 * @return string MD5 hash of the client IP, or of 'unknown' when absent.
+	 */
 	private static function ip_hash(): string {
 		$ip = isset( $_SERVER['REMOTE_ADDR'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) ) : 'unknown';
 		return md5( $ip );
 	}
 
+	/**
+	 * The transient key used to store the current client's last validation errors.
+	 *
+	 * @return string Transient key.
+	 */
 	private static function errors_key(): string {
 		return 'mk_inquiry_errors_' . self::ip_hash();
 	}
 
+	/**
+	 * The transient key used to store the current client's last submitted (invalid) input.
+	 *
+	 * @return string Transient key.
+	 */
 	private static function old_input_key(): string {
 		return 'mk_inquiry_old_' . self::ip_hash();
 	}
@@ -188,6 +208,13 @@ final class Inquiries {
 		return is_array( $old ) ? $old : array();
 	}
 
+	/**
+	 * Email the site admin about a new inquiry, unless MK_MAIL_DRIVER is disabled.
+	 *
+	 * @param string $name    Submitter's name.
+	 * @param string $email   Submitter's email address.
+	 * @param string $message Submitted message body.
+	 */
 	private function maybe_notify( string $name, string $email, string $message ): void {
 		$driver = defined( 'MK_MAIL_DRIVER' ) ? (int) MK_MAIL_DRIVER : 0;
 		if ( 0 === $driver ) {
@@ -202,6 +229,12 @@ final class Inquiries {
 		);
 	}
 
+	/**
+	 * Mark an inquiry as read (or unread).
+	 *
+	 * @param int  $id   Inquiry row ID.
+	 * @param bool $read True to mark read, false to mark unread.
+	 */
 	public function mark_read( int $id, bool $read = true ): void {
 		global $wpdb;
 		$wpdb->update( Database::inquiries_table(), array( 'is_read' => $read ? 1 : 0 ), array( 'id' => $id ) );

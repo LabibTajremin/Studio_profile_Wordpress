@@ -124,8 +124,8 @@ $is_custom_preset = 'custom' === $settings['motion_preset'];
 			<tr>
 				<th><?php esc_html_e( '11. Density', 'maapkathi' ); ?></th>
 				<td>
-					<?php foreach ( array_keys( Fonts::DENSITY_SCALE ) as $id ) : ?>
-						<label style="margin-right:1em"><input type="radio" name="mk_theme_settings[density]" value="<?php echo esc_attr( $id ); ?>" <?php checked( $settings['density'], $id ); ?> /> <?php echo esc_html( ucfirst( $id ) ); ?></label>
+					<?php foreach ( array_keys( Fonts::DENSITY_SCALE ) as $mk_density_id ) : ?>
+						<label style="margin-right:1em"><input type="radio" name="mk_theme_settings[density]" value="<?php echo esc_attr( $mk_density_id ); ?>" <?php checked( $settings['density'], $mk_density_id ); ?> /> <?php echo esc_html( ucfirst( $mk_density_id ) ); ?></label>
 					<?php endforeach; ?>
 				</td>
 			</tr>
@@ -141,8 +141,8 @@ $is_custom_preset = 'custom' === $settings['motion_preset'];
 				<th><?php esc_html_e( '14. Hero style', 'maapkathi' ); ?></th>
 				<td>
 					<select name="mk_theme_settings[hero_style]">
-						<?php foreach ( array( 'full-bleed', 'contained', 'split', 'minimal' ) as $id ) : ?>
-							<option value="<?php echo esc_attr( $id ); ?>" <?php selected( $settings['hero_style'], $id ); ?>><?php echo esc_html( ucwords( str_replace( '-', ' ', $id ) ) ); ?></option>
+						<?php foreach ( array( 'full-bleed', 'contained', 'split', 'minimal' ) as $mk_hero_style_id ) : ?>
+							<option value="<?php echo esc_attr( $mk_hero_style_id ); ?>" <?php selected( $settings['hero_style'], $mk_hero_style_id ); ?>><?php echo esc_html( ucwords( str_replace( '-', ' ', $mk_hero_style_id ) ) ); ?></option>
 						<?php endforeach; ?>
 					</select>
 				</td>

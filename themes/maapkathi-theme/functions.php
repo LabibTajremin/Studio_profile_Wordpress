@@ -1,4 +1,10 @@
 <?php
+/**
+ * Theme bootstrap: setup, asset enqueues, and template-rendering hooks.
+ *
+ * @package maapkathi-theme
+ */
+
 declare( strict_types = 1 );
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -184,7 +190,7 @@ add_action(
 );
 
 /**
- * data-* attributes on <html> for every setting that drives behaviour
+ * Adds data-* attributes on <html> for every setting that drives behaviour
  * rather than a single CSS variable (§11.3).
  */
 add_filter(

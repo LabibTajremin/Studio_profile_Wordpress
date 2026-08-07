@@ -1,4 +1,10 @@
 <?php
+/**
+ * Logo, favicon and accent-color resolution for site branding.
+ *
+ * @package maapkathi-core
+ */
+
 declare( strict_types = 1 );
 
 namespace Maapkathi\Core\Support;
