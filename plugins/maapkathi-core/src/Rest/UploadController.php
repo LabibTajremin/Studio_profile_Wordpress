@@ -94,6 +94,7 @@ final class UploadController {
 		wp_mkdir_p( $dir );
 
 		$dest = trailingslashit( $dir ) . 'chunk_' . $chunk_index;
+		// phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged -- return value is checked immediately below; the @ only suppresses the PHP-level warning noise on an expected failure (e.g. invalid/non-uploaded tmp file), not the error handling itself.
 		if ( ! @move_uploaded_file( $file['tmp_name'], $dest ) ) {
 			return new \WP_Error( 'mk_chunk_write_failed', __( 'Could not store chunk.', 'maapkathi' ), array( 'status' => 500 ) );
 		}
@@ -104,6 +105,12 @@ final class UploadController {
 		);
 	}
 
+	/**
+	 * Assemble a completed upload's chunks, validate the result, and hand it to storage.
+	 *
+	 * @param \WP_REST_Request $request REST request carrying upload_id, total_chunks, and filename.
+	 * @return array<string,int|string>|\WP_Error Stored file details on success, or an error.
+	 */
 	public function handle_complete( \WP_REST_Request $request ) {
 		$upload_id = sanitize_key( (string) $request->get_param( 'upload_id' ) );
 		$total     = absint( $request->get_param( 'total_chunks' ) );
@@ -123,7 +130,8 @@ final class UploadController {
 				fclose( $out ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose
 				return new \WP_Error( 'mk_missing_chunk', sprintf( 'Missing chunk %d.', $i ), array( 'status' => 400 ) );
 			}
-			fwrite( $out, file_get_contents( $chunk_path ) ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fwrite, WordPress.WP.AlternativeFunctions.file_get_contents
+			// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fwrite, WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- reading our own just-written local chunk files (not a remote URL) to reassemble them; WP_Filesystem is not used elsewhere in this codebase.
+			fwrite( $out, file_get_contents( $chunk_path ) );
 		}
 		fclose( $out ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose
 

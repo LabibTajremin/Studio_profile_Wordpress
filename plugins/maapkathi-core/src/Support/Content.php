@@ -155,7 +155,12 @@ final class Content {
 		return self::items( 'mk_service', $limit, array( 'post_parent' => 0 ) );
 	}
 
-	/** @return \WP_Post[] */
+	/**
+	 * Services whose parent is the given service.
+	 *
+	 * @param int $parent_id Parent service post ID.
+	 * @return \WP_Post[]
+	 */
 	public static function child_services( int $parent_id ): array {
 		return self::items( 'mk_service', -1, array( 'post_parent' => $parent_id ) );
 	}
