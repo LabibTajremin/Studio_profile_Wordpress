@@ -63,7 +63,7 @@ elif [[ $WP_VERSION == 'nightly' || $WP_VERSION == 'trunk' ]]; then
 else
 	# 'latest' — ask the API which stable release that currently is.
 	download http://api.wordpress.org/core/version-check/1.7/ "$TMPDIR"/wp-latest.json
-	grep -q '[0-9]+\.[0-9]+(\.[0-9]+)?' "$TMPDIR"/wp-latest.json || {
+	grep -Eq '[0-9]+\.[0-9]+(\.[0-9]+)?' "$TMPDIR"/wp-latest.json || {
 		echo "Latest WordPress version could not be determined." >&2
 		exit 1
 	}

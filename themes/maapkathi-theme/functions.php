@@ -240,7 +240,13 @@ add_action(
 		}
 
 		if ( $query->is_post_type_archive( 'mk_project' ) || $query->is_tax( 'mk_project_category' ) ) {
-			$query->set( 'orderby', array( 'menu_order' => 'ASC', 'date' => 'DESC' ) );
+			$query->set(
+				'orderby',
+				array(
+					'menu_order' => 'ASC',
+					'date'       => 'DESC',
+				)
+			);
 		}
 	}
 );

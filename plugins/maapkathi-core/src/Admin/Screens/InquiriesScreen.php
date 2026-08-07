@@ -48,9 +48,9 @@ final class InquiriesScreen {
 		}
 
 		// phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery
-		$total   = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table} {$where}" );
-		$unread  = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table} WHERE is_read = 0" );
-		$rows    = $wpdb->get_results(
+		$total  = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table} {$where}" );
+		$unread = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table} WHERE is_read = 0" );
+		$rows   = $wpdb->get_results(
 			$wpdb->prepare(
 				"SELECT * FROM {$table} {$where} ORDER BY created_at DESC LIMIT %d OFFSET %d",
 				self::PER_PAGE,

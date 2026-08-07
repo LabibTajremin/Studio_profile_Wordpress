@@ -3,6 +3,8 @@
  * Hero carousel (§6.3). One media kind per slide: still image, animated
  * GIF, uploaded MP4, or external video link — all resolved through the
  * plugin's VideoResolver, never from raw admin input.
+ *
+ * @package maapkathi-theme
  */
 
 declare( strict_types = 1 );
@@ -46,11 +48,11 @@ $mk_resolver      = class_exists( VideoResolver::class ) ? new VideoResolver() :
 	<?php else : ?>
 		<?php foreach ( $mk_slides as $mk_i => $mk_slide ) : ?>
 			<?php
-			$mk_kind    = $mk_slide['media_kind'] ?? 'image';
-			$mk_first   = 0 === $mk_i;
-			$mk_eager   = $mk_first ? 'eager' : 'lazy';
+			$mk_kind     = $mk_slide['media_kind'] ?? 'image';
+			$mk_first    = 0 === $mk_i;
+			$mk_eager    = $mk_first ? 'eager' : 'lazy';
 			$mk_priority = $mk_first ? 'high' : 'auto';
-			$mk_alt     = $mk_slide['headline'] ?? '';
+			$mk_alt      = $mk_slide['headline'] ?? '';
 			?>
 			<div class="mk-hero__slide<?php echo $mk_first ? ' is-active' : ''; ?>"
 				data-index="<?php echo esc_attr( (string) $mk_i ); ?>"
@@ -61,7 +63,7 @@ $mk_resolver      = class_exists( VideoResolver::class ) ? new VideoResolver() :
 				<?php if ( 'image' === $mk_kind ) : ?>
 					<?php $mk_src = $mk_slide['image_url'] ?? ''; ?>
 					<img class="mk-hero__media"
-						src="<?php echo esc_url( $mk_src ?: mk_placeholder_url( $mk_alt, 2400, 1350 ) ); ?>"
+						src="<?php echo esc_url( $mk_src ? $mk_src : mk_placeholder_url( $mk_alt, 2400, 1350 ) ); ?>"
 						alt="<?php echo esc_attr( $mk_alt ); ?>"
 						loading="<?php echo esc_attr( $mk_eager ); ?>"
 						fetchpriority="<?php echo esc_attr( $mk_priority ); ?>" />
@@ -72,8 +74,11 @@ $mk_resolver      = class_exists( VideoResolver::class ) ? new VideoResolver() :
 					$mk_frame = $mk_slide['gif_first_frame_url'] ?? '';
 					?>
 					<img class="mk-hero__media mk-hero__media--gif"
-						src="<?php echo esc_url( $mk_gif ?: mk_placeholder_url( $mk_alt, 2400, 1350 ) ); ?>"
-						<?php if ( $mk_frame ) : ?>data-reduced-src="<?php echo esc_url( $mk_frame ); ?>"<?php endif; ?>
+						src="<?php echo esc_url( $mk_gif ? $mk_gif : mk_placeholder_url( $mk_alt, 2400, 1350 ) ); ?>"
+						<?php
+						if ( $mk_frame ) :
+							?>
+							data-reduced-src="<?php echo esc_url( $mk_frame ); ?>"<?php endif; ?>
 						alt="<?php echo esc_attr( $mk_alt ); ?>"
 						loading="eager"
 						fetchpriority="high" />
@@ -111,7 +116,7 @@ $mk_resolver      = class_exists( VideoResolver::class ) ? new VideoResolver() :
 						<div class="mk-hero__embed" style="background-image:url('<?php echo esc_url( $mk_poster ); ?>')">
 							<iframe
 								src="<?php echo esc_url( $mk_video->src ); ?>"
-								title="<?php echo esc_attr( $mk_alt ?: __( 'Hero video', 'maapkathi' ) ); ?>"
+								title="<?php echo esc_attr( $mk_alt ? $mk_alt : __( 'Hero video', 'maapkathi' ) ); ?>"
 								allow="autoplay; encrypted-media; picture-in-picture"
 								referrerpolicy="strict-origin-when-cross-origin"
 								loading="<?php echo esc_attr( $mk_first ? 'eager' : 'lazy' ); ?>"

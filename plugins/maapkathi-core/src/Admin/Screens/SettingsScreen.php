@@ -36,13 +36,13 @@ final class SettingsScreen {
 	private function save(): void {
 		$settings = get_option( 'mk_site_settings', array() );
 
-		$settings['studio_name']                 = sanitize_text_field( wp_unslash( $_POST['studio_name'] ?? '' ) );
-		$settings['tagline']                      = sanitize_text_field( wp_unslash( $_POST['tagline'] ?? '' ) );
-		$settings['contact_email']                = sanitize_email( wp_unslash( $_POST['contact_email'] ?? '' ) );
-		$settings['contact_phone']                = sanitize_text_field( wp_unslash( $_POST['contact_phone'] ?? '' ) );
-		$settings['whatsapp']                     = sanitize_text_field( wp_unslash( $_POST['whatsapp'] ?? '' ) );
-		$settings['address']                      = sanitize_textarea_field( wp_unslash( $_POST['address'] ?? '' ) );
-		$settings['logo_show_title']              = ! empty( $_POST['logo_show_title'] );
+		$settings['studio_name']     = sanitize_text_field( wp_unslash( $_POST['studio_name'] ?? '' ) );
+		$settings['tagline']         = sanitize_text_field( wp_unslash( $_POST['tagline'] ?? '' ) );
+		$settings['contact_email']   = sanitize_email( wp_unslash( $_POST['contact_email'] ?? '' ) );
+		$settings['contact_phone']   = sanitize_text_field( wp_unslash( $_POST['contact_phone'] ?? '' ) );
+		$settings['whatsapp']        = sanitize_text_field( wp_unslash( $_POST['whatsapp'] ?? '' ) );
+		$settings['address']         = sanitize_textarea_field( wp_unslash( $_POST['address'] ?? '' ) );
+		$settings['logo_show_title'] = ! empty( $_POST['logo_show_title'] );
 
 		// Branding images are stored as attachment IDs (0/'' clears them),
 		// which Branding::attachment_url() resolves at render time.
@@ -54,7 +54,7 @@ final class SettingsScreen {
 		$settings['vision_text']                  = sanitize_textarea_field( wp_unslash( $_POST['vision_text'] ?? '' ) );
 		$settings['mission_text']                 = sanitize_textarea_field( wp_unslash( $_POST['mission_text'] ?? '' ) );
 		$settings['editor_verification_required'] = ! empty( $_POST['editor_verification_required'] );
-		$settings['show_admin_shield']             = ! empty( $_POST['show_admin_shield'] );
+		$settings['show_admin_shield']            = ! empty( $_POST['show_admin_shield'] );
 
 		$socials = array();
 		foreach ( array( 'facebook', 'instagram', 'linkedin', 'twitter', 'pinterest' ) as $platform ) {

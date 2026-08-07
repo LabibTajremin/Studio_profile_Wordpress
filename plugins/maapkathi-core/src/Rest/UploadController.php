@@ -56,9 +56,9 @@ final class UploadController {
 	}
 
 	public function handle_chunk( \WP_REST_Request $request ) {
-		$upload_id    = sanitize_key( (string) $request->get_param( 'upload_id' ) );
-		$chunk_index  = absint( $request->get_param( 'chunk_index' ) );
-		$file         = $request->get_file_params()['chunk'] ?? null;
+		$upload_id   = sanitize_key( (string) $request->get_param( 'upload_id' ) );
+		$chunk_index = absint( $request->get_param( 'chunk_index' ) );
+		$file        = $request->get_file_params()['chunk'] ?? null;
 
 		if ( ! $upload_id || null === $file ) {
 			return new \WP_Error( 'mk_bad_chunk', __( 'Missing upload_id or chunk.', 'maapkathi' ), array( 'status' => 400 ) );
@@ -82,9 +82,9 @@ final class UploadController {
 	}
 
 	public function handle_complete( \WP_REST_Request $request ) {
-		$upload_id  = sanitize_key( (string) $request->get_param( 'upload_id' ) );
-		$total      = absint( $request->get_param( 'total_chunks' ) );
-		$filename   = sanitize_file_name( (string) $request->get_param( 'filename' ) );
+		$upload_id = sanitize_key( (string) $request->get_param( 'upload_id' ) );
+		$total     = absint( $request->get_param( 'total_chunks' ) );
+		$filename  = sanitize_file_name( (string) $request->get_param( 'filename' ) );
 
 		$dir = trailingslashit( $this->chunks_dir() ) . $upload_id;
 		if ( ! is_dir( $dir ) ) {

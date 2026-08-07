@@ -1,4 +1,10 @@
 <?php
+/**
+ * Site footer: brand, footer nav, contact/NAP details, and Organization JSON-LD.
+ *
+ * @package maapkathi-theme
+ */
+
 declare( strict_types = 1 );
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -22,7 +28,7 @@ $mk_org = array(
 	'url'         => home_url( '/' ),
 );
 
-$mk_logo_for_schema = mk_logo_light_url() ?: mk_logo_dark_url();
+$mk_logo_for_schema = mk_logo_light_url() ? mk_logo_light_url() : mk_logo_dark_url();
 if ( $mk_logo_for_schema ) {
 	$mk_org['logo'] = $mk_logo_for_schema;
 }

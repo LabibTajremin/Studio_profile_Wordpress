@@ -63,12 +63,12 @@ if ( file_exists( $mk_autoload ) ) {
 	require_once $mk_autoload;
 } else {
 	spl_autoload_register(
-		static function ( string $class ): void {
+		static function ( string $class_name ): void {
 			$prefix = 'Maapkathi\\Core\\';
-			if ( ! str_starts_with( $class, $prefix ) ) {
+			if ( ! str_starts_with( $class_name, $prefix ) ) {
 				return;
 			}
-			$relative = substr( $class, strlen( $prefix ) );
+			$relative = substr( $class_name, strlen( $prefix ) );
 			$path     = MK_PLUGIN_DIR . 'src/' . str_replace( '\\', '/', $relative ) . '.php';
 			if ( file_exists( $path ) ) {
 				require $path;

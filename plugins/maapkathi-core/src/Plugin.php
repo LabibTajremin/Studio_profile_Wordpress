@@ -1,4 +1,10 @@
 <?php
+/**
+ * Plugin bootstrap: activation, deactivation and boot wiring.
+ *
+ * @package maapkathi-core
+ */
+
 declare( strict_types = 1 );
 
 namespace Maapkathi\Core;
@@ -30,6 +36,12 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 final class Plugin {
 
+	/**
+	 * Runs on plugin activation: registers roles/tables/post types and
+	 * flushes rewrite rules so CPT permalinks work immediately.
+	 *
+	 * @return void
+	 */
 	public static function activate(): void {
 		Roles::register_roles();
 		Database::install();
@@ -43,10 +55,22 @@ final class Plugin {
 		flush_rewrite_rules();
 	}
 
+	/**
+	 * Runs on plugin deactivation: flushes rewrite rules to remove the
+	 * plugin's CPT permalinks.
+	 *
+	 * @return void
+	 */
 	public static function deactivate(): void {
 		flush_rewrite_rules();
 	}
 
+	/**
+	 * Boots the plugin on `plugins_loaded`: loads translations, template
+	 * helpers and config, then wires up every subsystem's hooks.
+	 *
+	 * @return void
+	 */
 	public static function boot(): void {
 		load_plugin_textdomain( 'maapkathi', false, dirname( plugin_basename( MK_PLUGIN_FILE ) ) . '/languages' );
 

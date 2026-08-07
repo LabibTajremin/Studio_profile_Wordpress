@@ -113,7 +113,7 @@ final class DemoAssets {
 		// Diagonal gradient.
 		for ( $y = 0; $y < $height; $y++ ) {
 			for ( $x = 0; $x < $width; $x += max( 1, (int) round( $width / 220 ) ) ) {
-				$t = ( ( $x / max( 1, $width ) ) + ( $y / max( 1, $height ) ) ) / 2;
+				$t      = ( ( $x / max( 1, $width ) ) + ( $y / max( 1, $height ) ) ) / 2;
 				$colour = imagecolorallocate(
 					$image,
 					(int) round( $from_rgb[0] + ( $to_rgb[0] - $from_rgb[0] ) * $t ),

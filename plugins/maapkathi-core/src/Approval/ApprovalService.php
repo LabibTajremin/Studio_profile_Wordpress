@@ -1,4 +1,10 @@
 <?php
+/**
+ * The mk_revisions queue and audit log writes.
+ *
+ * @package maapkathi-core
+ */
+
 declare( strict_types = 1 );
 
 namespace Maapkathi\Core\Approval;
@@ -11,16 +17,24 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * mk_revisions queue + audit log writes (§8). The Approvals admin screen
+ * The mk_revisions queue and audit log writer (§8). The Approvals admin screen
  * (§9 #12) reads pending rows from here.
  */
 final class ApprovalService {
 
+	/**
+	 * Wire the save_post hook that enforces editor publish restrictions.
+	 */
 	public function register_hooks(): void {
-		add_action( 'save_post', array( $this, 'maybe_queue_revision' ), 20, 3 );
+		add_action( 'save_post', array( $this, 'maybe_queue_revision' ), 20, 1 );
 	}
 
-	public function maybe_queue_revision( int $post_id, \WP_Post $post, bool $update ): void {
+	/**
+	 * Prevent an editor's direct save from leaving a post in the 'publish' status.
+	 *
+	 * @param int $post_id ID of the post being saved.
+	 */
+	public function maybe_queue_revision( int $post_id ): void {
 		if ( wp_is_post_revision( $post_id ) || wp_is_post_autosave( $post_id ) ) {
 			return;
 		}
@@ -41,13 +55,24 @@ final class ApprovalService {
 		}
 	}
 
+	/**
+	 * Whether the site currently requires editor verification before content goes live.
+	 *
+	 * @return bool True when pending review is required, defaulting to true when unset.
+	 */
 	public function verification_required(): bool {
 		$settings = get_option( 'mk_site_settings', array() );
 		return ! isset( $settings['editor_verification_required'] ) || (bool) $settings['editor_verification_required'];
 	}
 
 	/**
-	 * @param array<string,mixed> $payload
+	 * Insert a pending revision row for an entity awaiting approval.
+	 *
+	 * @param string              $entity        Entity type, e.g. a CPT slug.
+	 * @param int                 $entity_id     ID of the entity the revision applies to.
+	 * @param array<string,mixed> $payload       Proposed field changes to store as JSON.
+	 * @param int                 $submitted_by  User ID that submitted the revision.
+	 * @return int The inserted revision row's ID.
 	 */
 	public function queue_revision( string $entity, int $entity_id, array $payload, int $submitted_by ): int {
 		global $wpdb;
@@ -68,11 +93,20 @@ final class ApprovalService {
 		return (int) $wpdb->insert_id;
 	}
 
+	/**
+	 * Approve a pending revision, applying its payload to the live entity.
+	 *
+	 * @param int    $revision_id ID of the pending revision to approve.
+	 * @param int    $reviewer_id User ID of the reviewer approving it.
+	 * @param string $note        Optional reviewer note to store alongside the decision.
+	 * @return bool True on success, false if the revision was not found or not pending.
+	 */
 	public function approve( int $revision_id, int $reviewer_id, string $note = '' ): bool {
 		global $wpdb;
 
 		$revision = $wpdb->get_row(
-			$wpdb->prepare( 'SELECT * FROM ' . Database::revisions_table() . ' WHERE id = %d', $revision_id ) // phpcs:ignore WordPress.DB.PreparedSQLPlaceholders.PreparedSQLPlaceholders -- table name has no user input
+			// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- table name comes from Database::revisions_table(), built from $wpdb->prefix, no user input; the %d value is properly prepared.
+			$wpdb->prepare( 'SELECT * FROM ' . Database::revisions_table() . ' WHERE id = %d', $revision_id )
 		);
 
 		if ( ! $revision || 'pending' !== $revision->status ) {
@@ -102,6 +136,14 @@ final class ApprovalService {
 		return true;
 	}
 
+	/**
+	 * Reject a pending revision.
+	 *
+	 * @param int    $revision_id ID of the pending revision to reject.
+	 * @param int    $reviewer_id User ID of the reviewer rejecting it.
+	 * @param string $note        Reviewer note explaining the rejection.
+	 * @return bool True if a pending row was updated, false otherwise.
+	 */
 	public function reject( int $revision_id, int $reviewer_id, string $note ): bool {
 		global $wpdb;
 
@@ -127,7 +169,13 @@ final class ApprovalService {
 	}
 
 	/**
-	 * @param array<string,mixed> $diff
+	 * Write an audit log entry.
+	 *
+	 * @param int                 $actor_id  User ID performing the action.
+	 * @param string              $action    Short action identifier, e.g. 'approve_revision'.
+	 * @param string              $entity    Entity type the action applies to.
+	 * @param int                 $entity_id ID of the entity the action applies to.
+	 * @param array<string,mixed> $diff      Optional data describing what changed.
 	 */
 	public function log( int $actor_id, string $action, string $entity, int $entity_id, array $diff = array() ): void {
 		global $wpdb;

@@ -1,4 +1,10 @@
 <?php
+/**
+ * Custom top-level "Maapkathi" admin menu and its top-level screen renderers.
+ *
+ * @package Maapkathi\Core
+ */
+
 declare( strict_types = 1 );
 
 namespace Maapkathi\Core\Admin;
@@ -28,11 +34,21 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 final class Menu {
 
+	/**
+	 * Wires up the admin_menu and admin_enqueue_scripts hooks.
+	 *
+	 * @return void
+	 */
 	public function register_hooks(): void {
 		add_action( 'admin_menu', array( $this, 'register_menu' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_assets' ) );
 	}
 
+	/**
+	 * Registers the "Maapkathi" top-level menu and its 17 §3.3 submenu pages.
+	 *
+	 * @return void
+	 */
 	public function register_menu(): void {
 		$cap = Roles::CAP_EDIT_CONTENT;
 
@@ -117,12 +133,12 @@ final class Menu {
 			wp_die( esc_html__( 'You do not have permission to view this page.', 'maapkathi' ) );
 		}
 
-		$usage    = ( new LocalStorageAdapter() )->usage();
-		$disk_gb  = round( $usage['bytes'] / ( 1024 ** 3 ), 2 );
-		$percent  = round( ( $usage['bytes'] / ( 20 * 1024 ** 3 ) ) * 100, 1 );
+		$usage   = ( new LocalStorageAdapter() )->usage();
+		$disk_gb = round( $usage['bytes'] / ( 1024 ** 3 ), 2 );
+		$percent = round( ( $usage['bytes'] / ( 20 * 1024 ** 3 ) ) * 100, 1 );
 
 		global $wpdb;
-		$pending_count = (int) $wpdb->get_var( "SELECT COUNT(*) FROM " . \Maapkathi\Core\Support\Database::revisions_table() . " WHERE status = 'pending'" ); // phpcs:ignore WordPress.DB.PreparedSQLPlaceholders.PreparedSQLPlaceholders
+		$pending_count = (int) $wpdb->get_var( 'SELECT COUNT(*) FROM ' . \Maapkathi\Core\Support\Database::revisions_table() . " WHERE status = 'pending'" ); // phpcs:ignore WordPress.DB.PreparedSQLPlaceholders.PreparedSQLPlaceholders
 
 		echo '<div class="wrap mk-admin"><h1>' . esc_html__( 'Maapkathi Dashboard', 'maapkathi' ) . '</h1>';
 		echo '<p><a href="' . esc_url( home_url( '/' ) ) . '" target="_blank" rel="noopener">' . esc_html__( 'View public site ↗', 'maapkathi' ) . '</a></p>';

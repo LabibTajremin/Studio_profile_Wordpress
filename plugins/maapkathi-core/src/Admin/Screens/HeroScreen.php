@@ -43,7 +43,7 @@ final class HeroScreen {
 
 		$site_settings = get_option( 'mk_site_settings', array() );
 
-		$duration = absint( $_POST['hero_slide_duration'] ?? MK_HERO_SLIDE_SECONDS );
+		$duration                             = absint( $_POST['hero_slide_duration'] ?? MK_HERO_SLIDE_SECONDS );
 		$site_settings['hero_slide_duration'] = max( 3, min( 20, $duration ) );
 
 		$raw_slides = wp_unslash( $_POST['slides'] ?? array() );

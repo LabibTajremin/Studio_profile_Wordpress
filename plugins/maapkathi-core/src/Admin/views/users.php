@@ -14,7 +14,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 ?>
 <div class="wrap mk-admin">
 	<h1><?php esc_html_e( 'Users', 'maapkathi' ); ?></h1>
-	<?php if ( $notice ) : ?><div class="notice notice-success"><p><?php echo esc_html( $notice ); ?></p></div><?php endif; ?>
+	<?php
+	if ( $notice ) :
+		?>
+		<div class="notice notice-success"><p><?php echo esc_html( $notice ); ?></p></div><?php endif; ?>
 
 	<h2><?php esc_html_e( 'Invite a user', 'maapkathi' ); ?></h2>
 	<form method="post" class="mk-card" style="max-width:480px">

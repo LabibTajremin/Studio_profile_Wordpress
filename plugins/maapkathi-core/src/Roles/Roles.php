@@ -1,4 +1,10 @@
 <?php
+/**
+ * Custom roles, capabilities, admin bootstrap and login rate limiting.
+ *
+ * @package maapkathi-core
+ */
+
 declare( strict_types = 1 );
 
 namespace Maapkathi\Core\Roles;
@@ -24,6 +30,12 @@ final class Roles {
 	public const CAP_PUBLISH_CONTENT   = 'mk_publish_content';
 	public const CAP_EDIT_CONTENT      = 'mk_edit_content';
 
+	/**
+	 * Registers every hook this class needs: login gating, rate limiting
+	 * and the password-change nag.
+	 *
+	 * @return void
+	 */
 	public function register_hooks(): void {
 		add_action( 'wp_login', array( $this, 'block_inactive_users' ), 10, 2 );
 		add_filter( 'authenticate', array( $this, 'block_if_rate_limited' ), 30, 1 );
@@ -33,6 +45,12 @@ final class Roles {
 		add_action( 'profile_update', array( $this, 'maybe_clear_password_notice' ), 10, 2 );
 	}
 
+	/**
+	 * (Re)creates both custom roles with their capability sets, and grants
+	 * every Maapkathi capability to core Administrators too.
+	 *
+	 * @return void
+	 */
 	public static function register_roles(): void {
 		// Every CPT's per-post permissions are enforced through our own
 		// mk_* capabilities via map_meta_cap (§PostTypes::args_for). But
@@ -45,22 +63,22 @@ final class Roles {
 		// type's admin screens — confirmed by direct testing, not a
 		// theoretical concern.
 		$admin_caps = array(
-			'read'                        => true,
-			'edit_posts'                  => true,
-			self::CAP_MANAGE_SETTINGS     => true,
-			self::CAP_MANAGE_APPEARANCE   => true,
-			self::CAP_MANAGE_USERS        => true,
-			self::CAP_APPROVE_REVISIONS   => true,
-			self::CAP_PUBLISH_CONTENT     => true,
-			self::CAP_EDIT_CONTENT        => true,
-			'upload_files'                => true,
+			'read'                      => true,
+			'edit_posts'                => true,
+			self::CAP_MANAGE_SETTINGS   => true,
+			self::CAP_MANAGE_APPEARANCE => true,
+			self::CAP_MANAGE_USERS      => true,
+			self::CAP_APPROVE_REVISIONS => true,
+			self::CAP_PUBLISH_CONTENT   => true,
+			self::CAP_EDIT_CONTENT      => true,
+			'upload_files'              => true,
 		);
 
 		$editor_caps = array(
-			'read'                    => true,
-			'edit_posts'              => true,
-			self::CAP_EDIT_CONTENT    => true,
-			'upload_files'            => true,
+			'read'                 => true,
+			'edit_posts'           => true,
+			self::CAP_EDIT_CONTENT => true,
+			'upload_files'         => true,
 		);
 
 		remove_role( self::ADMIN_ROLE );
@@ -166,18 +184,24 @@ final class Roles {
 		);
 	}
 
-	/** Clears the nag once the password has actually been changed. */
+	/**
+	 * Clears the nag once the password has actually been changed.
+	 *
+	 * @param int|\WP_User $user_id User ID, or the WP_User whose password reset just fired.
+	 * @return void
+	 */
 	public function clear_password_notice( $user_id ): void {
 		$id = $user_id instanceof \WP_User ? $user_id->ID : (int) $user_id;
 		delete_user_meta( $id, 'mk_must_change_password' );
 	}
 
 	/**
-	 * profile_update fires on any profile save, so only clear the nag when
+	 * Profile_update fires on any profile save, so only clear the nag when
 	 * the password hash actually changed.
 	 *
 	 * @param int      $user_id       Updated user.
 	 * @param \WP_User $old_user_data User before the update.
+	 * @return void
 	 */
 	public function maybe_clear_password_notice( int $user_id, $old_user_data ): void {
 		if ( ! $old_user_data instanceof \WP_User ) {
@@ -190,6 +214,14 @@ final class Roles {
 		}
 	}
 
+	/**
+	 * Logs a user straight back out if their `mk_is_active` user meta has
+	 * been explicitly set to a falsy value.
+	 *
+	 * @param string   $user_login Username used to log in (unused, required by the `wp_login` hook signature).
+	 * @param \WP_User $user       The user who just logged in.
+	 * @return void
+	 */
 	public function block_inactive_users( string $user_login, \WP_User $user ): void {
 		$is_active = get_user_meta( $user->ID, 'mk_is_active', true );
 		if ( '' !== $is_active && ! $is_active ) {
@@ -219,15 +251,33 @@ final class Roles {
 		return $user;
 	}
 
-	public function record_failed_login( string $username ): void {
+	/**
+	 * Increments the failed-attempt counter for the current IP, with the
+	 * transient TTL backing off further the more attempts accumulate.
+	 *
+	 * @param string $username Username attempted (unused, required by the `wp_login_failed` hook signature).
+	 * @return void
+	 */
+	public function record_failed_login( string $username ): void { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.Found -- required by the wp_login_failed hook signature.
 		$attempts = $this->attempts_for_current_ip();
 		set_transient( $this->rate_limit_key(), $attempts + 1, 15 * MINUTE_IN_SECONDS * ( 1 + $attempts ) );
 	}
 
+	/**
+	 * Reads the current failed-login count for the requesting IP.
+	 *
+	 * @return int Number of recorded failed attempts within the current window.
+	 */
 	private function attempts_for_current_ip(): int {
 		return (int) get_transient( $this->rate_limit_key() );
 	}
 
+	/**
+	 * Builds the transient key used to track failed login attempts for the
+	 * current request's IP address.
+	 *
+	 * @return string Transient key, unique per IP.
+	 */
 	private function rate_limit_key(): string {
 		$ip = ! empty( $_SERVER['REMOTE_ADDR'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) ) : 'unknown';
 		return 'mk_login_attempts_' . md5( $ip );

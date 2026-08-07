@@ -622,8 +622,8 @@ final class SeedCommand {
 	private function seed_hero_slides(): void {
 		$settings = get_option( 'mk_site_settings', array() );
 
-		$still = DemoAssets::image( 'mk-demo-hero-still', 'Spaces, considered', 2400, 1350, 0 );
-		$gif   = DemoAssets::image( 'mk-demo-hero-motion', 'Texture in motion', 2400, 1350, 2 );
+		$still   = DemoAssets::image( 'mk-demo-hero-still', 'Spaces, considered', 2400, 1350, 0 );
+		$gif     = DemoAssets::image( 'mk-demo-hero-motion', 'Texture in motion', 2400, 1350, 2 );
 		$vposter = DemoAssets::image( 'mk-demo-hero-video-poster', 'Craft in every frame', 2400, 1350, 4 );
 		$lposter = DemoAssets::image( 'mk-demo-hero-link-poster', 'Every angle intentional', 2400, 1350, 6 );
 

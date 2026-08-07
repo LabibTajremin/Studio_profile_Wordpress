@@ -12,7 +12,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 ?>
 <div class="wrap mk-admin">
 	<h1><?php esc_html_e( 'Approvals', 'maapkathi' ); ?></h1>
-	<?php if ( $notice ) : ?><div class="notice notice-success"><p><?php echo esc_html( $notice ); ?></p></div><?php endif; ?>
+	<?php
+	if ( $notice ) :
+		?>
+		<div class="notice notice-success"><p><?php echo esc_html( $notice ); ?></p></div><?php endif; ?>
 
 	<?php if ( empty( $pending ) ) : ?>
 		<p><?php esc_html_e( 'No pending revisions.', 'maapkathi' ); ?></p>

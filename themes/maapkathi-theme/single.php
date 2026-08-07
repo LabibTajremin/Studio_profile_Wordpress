@@ -20,7 +20,10 @@ while ( have_posts() ) :
 	?>
 	<article class="mk-container mk-section">
 		<h1><?php the_title(); ?></h1>
-		<?php if ( has_post_thumbnail() ) : ?><div class="mk-post-cover"><?php the_post_thumbnail( 'full' ); ?></div><?php endif; ?>
+		<?php
+		if ( has_post_thumbnail() ) :
+			?>
+			<div class="mk-post-cover"><?php the_post_thumbnail( 'full' ); ?></div><?php endif; ?>
 		<div class="mk-prose"><?php the_content(); ?></div>
 	</article>
 	<?php

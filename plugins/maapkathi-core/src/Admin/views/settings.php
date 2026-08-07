@@ -14,7 +14,10 @@ $socials = $settings['socials'] ?? array();
 ?>
 <div class="wrap mk-admin">
 	<h1><?php esc_html_e( 'Settings', 'maapkathi' ); ?></h1>
-	<?php if ( $notice ) : ?><div class="notice notice-success"><p><?php echo esc_html( $notice ); ?></p></div><?php endif; ?>
+	<?php
+	if ( $notice ) :
+		?>
+		<div class="notice notice-success"><p><?php echo esc_html( $notice ); ?></p></div><?php endif; ?>
 
 	<form method="post">
 		<?php wp_nonce_field( 'mk_save_settings', 'mk_settings_nonce' ); ?>

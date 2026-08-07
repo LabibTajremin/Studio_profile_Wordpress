@@ -1,4 +1,10 @@
 <?php
+/**
+ * Hand-written meta tags and JSON-LD structured data for the public site.
+ *
+ * @package maapkathi-core
+ */
+
 declare( strict_types = 1 );
 
 namespace Maapkathi\Core\Seo;
@@ -17,6 +23,12 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 final class Seo {
 
+	/**
+	 * Registers every SEO-related hook: meta tags, JSON-LD, robots.txt and
+	 * the sitemap post-type filter.
+	 *
+	 * @return void
+	 */
 	public function register_hooks(): void {
 		add_action( 'wp_head', array( $this, 'render_meta' ), 2 );
 		add_action( 'wp_head', array( $this, 'render_json_ld' ), 5 );
@@ -24,6 +36,12 @@ final class Seo {
 		add_filter( 'wp_sitemaps_post_types', array( $this, 'filter_sitemap_post_types' ) );
 	}
 
+	/**
+	 * Prints the description, canonical link and Open Graph/Twitter meta
+	 * tags for the current request, on the `wp_head` hook.
+	 *
+	 * @return void
+	 */
 	public function render_meta(): void {
 		$seo = get_option( 'mk_seo_settings', array() );
 
@@ -52,11 +70,25 @@ final class Seo {
 		}
 	}
 
+	/**
+	 * Reads the `mk_site_settings` option, guaranteed as an array even if
+	 * the option was never saved.
+	 *
+	 * @return array<string,mixed>
+	 */
 	private function site_settings(): array {
 		$settings = get_option( 'mk_site_settings', array() );
 		return is_array( $settings ) ? $settings : array();
 	}
 
+	/**
+	 * Resolves the page title: the post title when singular, otherwise the
+	 * first non-empty candidate from the SEO default, studio name, or the
+	 * site's own name.
+	 *
+	 * @param array<string,mixed> $seo The `mk_seo_settings` option contents.
+	 * @return string
+	 */
 	private function resolve_title( array $seo ): string {
 		if ( is_singular() ) {
 			return wp_strip_all_tags( get_the_title() );
@@ -205,28 +237,53 @@ final class Seo {
 
 		$this->print_ld_json(
 			array(
-				'@context'       => 'https://schema.org',
-				'@type'          => 'CreativeWork',
-				'name'           => get_the_title( $post_id ),
-				'description'    => wp_strip_all_tags( get_post_meta( $post_id, 'mk_summary', true ) ?: get_the_excerpt( $post_id ) ),
-				'image'          => get_the_post_thumbnail_url( $post_id, 'large' ) ?: null,
+				'@context'        => 'https://schema.org',
+				'@type'           => 'CreativeWork',
+				'name'            => get_the_title( $post_id ),
+				'description'     => wp_strip_all_tags( get_post_meta( $post_id, 'mk_summary', true ) ?: get_the_excerpt( $post_id ) ),
+				'image'           => get_the_post_thumbnail_url( $post_id, 'large' ) ?: null,
 				'locationCreated' => get_post_meta( $post_id, 'mk_location', true ) ?: null,
-				'dateCreated'    => get_post_meta( $post_id, 'mk_completed_at', true ) ?: null,
+				'dateCreated'     => get_post_meta( $post_id, 'mk_completed_at', true ) ?: null,
 			)
 		);
 	}
 
 	private function render_breadcrumbs(): void {
 		$items = array(
-			array( '@type' => 'ListItem', 'position' => 1, 'name' => __( 'Home', 'maapkathi' ), 'item' => home_url( '/' ) ),
+			array(
+				'@type'    => 'ListItem',
+				'position' => 1,
+				'name'     => __( 'Home', 'maapkathi' ),
+				'item'     => home_url( '/' ),
+			),
 		);
 
 		if ( is_singular( 'mk_project' ) ) {
-			$items[] = array( '@type' => 'ListItem', 'position' => 2, 'name' => __( 'Work', 'maapkathi' ), 'item' => home_url( '/work/' ) );
-			$items[] = array( '@type' => 'ListItem', 'position' => 3, 'name' => get_the_title(), 'item' => get_permalink() );
+			$items[] = array(
+				'@type'    => 'ListItem',
+				'position' => 2,
+				'name'     => __( 'Work', 'maapkathi' ),
+				'item'     => home_url( '/work/' ),
+			);
+			$items[] = array(
+				'@type'    => 'ListItem',
+				'position' => 3,
+				'name'     => get_the_title(),
+				'item'     => get_permalink(),
+			);
 		} else {
-			$items[] = array( '@type' => 'ListItem', 'position' => 2, 'name' => __( 'Services', 'maapkathi' ), 'item' => home_url( '/services/' ) );
-			$items[] = array( '@type' => 'ListItem', 'position' => 3, 'name' => get_the_title(), 'item' => get_permalink() );
+			$items[] = array(
+				'@type'    => 'ListItem',
+				'position' => 2,
+				'name'     => __( 'Services', 'maapkathi' ),
+				'item'     => home_url( '/services/' ),
+			);
+			$items[] = array(
+				'@type'    => 'ListItem',
+				'position' => 3,
+				'name'     => get_the_title(),
+				'item'     => get_permalink(),
+			);
 		}
 
 		$this->print_ld_json(

@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 final class ThemeSettings {
 
-	public const OPTION = 'mk_theme_settings';
+	public const OPTION    = 'mk_theme_settings';
 	public const CACHE_KEY = 'mk_theme_vars_cache';
 
 	/**
@@ -24,38 +24,38 @@ final class ThemeSettings {
 	public static function defaults(): array {
 		return array(
 			// Appearance group (#1–14).
-			'mode'               => 'system',
-			'accent_id'          => Accents::default_id(),
-			'custom_accent_hex'  => null,
-			'pattern_id'         => 'none',
-			'pattern_opacity'    => 6,
-			'font_pair_id'       => 'fraunces-manrope',
-			'font_overrides'     => array(), // headings, body, nav, buttons, hero, accents => {fontId, colorHex}
-			'heading_color_hex'  => null,
-			'body_color_hex'     => null,
-			'radius'             => 'subtle',
-			'density'            => 'comfortable',
-			'grain'              => false,
-			'glass'              => true,
-			'hero_style'         => 'full-bleed',
+			'mode'                => 'system',
+			'accent_id'           => Accents::default_id(),
+			'custom_accent_hex'   => null,
+			'pattern_id'          => 'none',
+			'pattern_opacity'     => 6,
+			'font_pair_id'        => 'fraunces-manrope',
+			'font_overrides'      => array(), // headings, body, nav, buttons, hero, accents => {fontId, colorHex}
+			'heading_color_hex'   => null,
+			'body_color_hex'      => null,
+			'radius'              => 'subtle',
+			'density'             => 'comfortable',
+			'grain'               => false,
+			'glass'               => true,
+			'hero_style'          => 'full-bleed',
 			// Motion group (#15–31).
-			'motion_preset'        => 'refined',
-			'motion_level'         => 'refined',
-			'scroll_reveal_style'  => 'fade-up-soft',
-			'hero_animation'       => 'ken-burns-drift',
-			'image_hover_style'    => 'zoom',
-			'card_hover_style'     => 'lift-shadow',
-			'text_reveal_style'    => 'mask-slide-up',
-			'page_transition'      => 'fade',
-			'cursor_style'         => 'none',
-			'loader_style'         => 'none',
-			'scroll_progress'      => false,
-			'smooth_scroll'        => false,
-			'parallax_intensity'   => 20,
-			'motion_speed'         => 100,
-			'stagger_ms'           => 70,
-			'animate_once'         => true,
-			'motion_on_mobile'     => 'reduced',
+			'motion_preset'       => 'refined',
+			'motion_level'        => 'refined',
+			'scroll_reveal_style' => 'fade-up-soft',
+			'hero_animation'      => 'ken-burns-drift',
+			'image_hover_style'   => 'zoom',
+			'card_hover_style'    => 'lift-shadow',
+			'text_reveal_style'   => 'mask-slide-up',
+			'page_transition'     => 'fade',
+			'cursor_style'        => 'none',
+			'loader_style'        => 'none',
+			'scroll_progress'     => false,
+			'smooth_scroll'       => false,
+			'parallax_intensity'  => 20,
+			'motion_speed'        => 100,
+			'stagger_ms'          => 70,
+			'animate_once'        => true,
+			'motion_on_mobile'    => 'reduced',
 		);
 	}
 
@@ -166,9 +166,9 @@ final class ThemeSettings {
 			if ( empty( $overrides[ $area ] ) || ! is_array( $overrides[ $area ] ) ) {
 				continue;
 			}
-			$row      = $overrides[ $area ];
-			$font_id  = $row['fontId'] ?? null;
-			$color    = $row['colorHex'] ?? null;
+			$row     = $overrides[ $area ];
+			$font_id = $row['fontId'] ?? null;
+			$color   = $row['colorHex'] ?? null;
 
 			$entry = array();
 			if ( $font_id && in_array( $font_id, Fonts::ids(), true ) ) {

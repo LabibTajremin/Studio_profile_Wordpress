@@ -23,63 +23,220 @@ final class MetaBoxes {
 	public static function schema(): array {
 		return array(
 			'mk_project'      => array(
-				array( 'key' => 'mk_summary', 'label' => __( 'Summary', 'maapkathi' ), 'type' => 'textarea' ),
-				array( 'key' => 'mk_is_featured', 'label' => __( 'Featured on homepage', 'maapkathi' ), 'type' => 'checkbox' ),
-				array( 'key' => 'mk_sort_order', 'label' => __( 'Sort order', 'maapkathi' ), 'type' => 'number' ),
-				array( 'key' => 'mk_completed_at', 'label' => __( 'Completed', 'maapkathi' ), 'type' => 'date' ),
-				array( 'key' => 'mk_location', 'label' => __( 'Location', 'maapkathi' ), 'type' => 'text' ),
-				array( 'key' => 'mk_client_name', 'label' => __( 'Client name', 'maapkathi' ), 'type' => 'text' ),
-				array( 'key' => 'mk_area_sqft', 'label' => __( 'Area (sq ft)', 'maapkathi' ), 'type' => 'number' ),
-				array( 'key' => 'mk_gallery', 'label' => __( 'Gallery (comma-separated attachment IDs)', 'maapkathi' ), 'type' => 'gallery', 'help' => __( 'Media ratio hint: project gallery images should be 4:5.', 'maapkathi' ) ),
+				array(
+					'key'   => 'mk_summary',
+					'label' => __( 'Summary', 'maapkathi' ),
+					'type'  => 'textarea',
+				),
+				array(
+					'key'   => 'mk_is_featured',
+					'label' => __( 'Featured on homepage', 'maapkathi' ),
+					'type'  => 'checkbox',
+				),
+				array(
+					'key'   => 'mk_sort_order',
+					'label' => __( 'Sort order', 'maapkathi' ),
+					'type'  => 'number',
+				),
+				array(
+					'key'   => 'mk_completed_at',
+					'label' => __( 'Completed', 'maapkathi' ),
+					'type'  => 'date',
+				),
+				array(
+					'key'   => 'mk_location',
+					'label' => __( 'Location', 'maapkathi' ),
+					'type'  => 'text',
+				),
+				array(
+					'key'   => 'mk_client_name',
+					'label' => __( 'Client name', 'maapkathi' ),
+					'type'  => 'text',
+				),
+				array(
+					'key'   => 'mk_area_sqft',
+					'label' => __( 'Area (sq ft)', 'maapkathi' ),
+					'type'  => 'number',
+				),
+				array(
+					'key'   => 'mk_gallery',
+					'label' => __( 'Gallery (comma-separated attachment IDs)', 'maapkathi' ),
+					'type'  => 'gallery',
+					'help'  => __( 'Media ratio hint: project gallery images should be 4:5.', 'maapkathi' ),
+				),
 			),
 			'mk_service'      => array(
-				array( 'key' => 'mk_icon', 'label' => __( 'Icon (dashicon class)', 'maapkathi' ), 'type' => 'text' ),
-				array( 'key' => 'mk_sort_order', 'label' => __( 'Sort order', 'maapkathi' ), 'type' => 'number' ),
-				array( 'key' => 'mk_gallery', 'label' => __( 'Gallery (comma-separated attachment IDs)', 'maapkathi' ), 'type' => 'gallery' ),
+				array(
+					'key'   => 'mk_icon',
+					'label' => __( 'Icon (dashicon class)', 'maapkathi' ),
+					'type'  => 'text',
+				),
+				array(
+					'key'   => 'mk_sort_order',
+					'label' => __( 'Sort order', 'maapkathi' ),
+					'type'  => 'number',
+				),
+				array(
+					'key'   => 'mk_gallery',
+					'label' => __( 'Gallery (comma-separated attachment IDs)', 'maapkathi' ),
+					'type'  => 'gallery',
+				),
 			),
 			'mk_member'       => array(
-				array( 'key' => 'mk_role_title', 'label' => __( 'Role / title', 'maapkathi' ), 'type' => 'text' ),
-				array( 'key' => 'mk_bio', 'label' => __( 'Bio', 'maapkathi' ), 'type' => 'textarea' ),
-				array( 'key' => 'mk_social_linkedin', 'label' => __( 'LinkedIn URL', 'maapkathi' ), 'type' => 'url' ),
-				array( 'key' => 'mk_social_instagram', 'label' => __( 'Instagram URL', 'maapkathi' ), 'type' => 'url' ),
-				array( 'key' => 'mk_sort_order', 'label' => __( 'Sort order', 'maapkathi' ), 'type' => 'number' ),
+				array(
+					'key'   => 'mk_role_title',
+					'label' => __( 'Role / title', 'maapkathi' ),
+					'type'  => 'text',
+				),
+				array(
+					'key'   => 'mk_bio',
+					'label' => __( 'Bio', 'maapkathi' ),
+					'type'  => 'textarea',
+				),
+				array(
+					'key'   => 'mk_social_linkedin',
+					'label' => __( 'LinkedIn URL', 'maapkathi' ),
+					'type'  => 'url',
+				),
+				array(
+					'key'   => 'mk_social_instagram',
+					'label' => __( 'Instagram URL', 'maapkathi' ),
+					'type'  => 'url',
+				),
+				array(
+					'key'   => 'mk_sort_order',
+					'label' => __( 'Sort order', 'maapkathi' ),
+					'type'  => 'number',
+				),
 			),
 			'mk_testimonial'  => array(
-				array( 'key' => 'mk_author_name', 'label' => __( 'Author name', 'maapkathi' ), 'type' => 'text' ),
-				array( 'key' => 'mk_author_role', 'label' => __( 'Author role', 'maapkathi' ), 'type' => 'text' ),
-				array( 'key' => 'mk_company', 'label' => __( 'Company', 'maapkathi' ), 'type' => 'text' ),
-				array( 'key' => 'mk_quote', 'label' => __( 'Quote', 'maapkathi' ), 'type' => 'textarea' ),
-				array( 'key' => 'mk_rating', 'label' => __( 'Rating (1-5)', 'maapkathi' ), 'type' => 'number' ),
-				array( 'key' => 'mk_sort_order', 'label' => __( 'Sort order', 'maapkathi' ), 'type' => 'number' ),
+				array(
+					'key'   => 'mk_author_name',
+					'label' => __( 'Author name', 'maapkathi' ),
+					'type'  => 'text',
+				),
+				array(
+					'key'   => 'mk_author_role',
+					'label' => __( 'Author role', 'maapkathi' ),
+					'type'  => 'text',
+				),
+				array(
+					'key'   => 'mk_company',
+					'label' => __( 'Company', 'maapkathi' ),
+					'type'  => 'text',
+				),
+				array(
+					'key'   => 'mk_quote',
+					'label' => __( 'Quote', 'maapkathi' ),
+					'type'  => 'textarea',
+				),
+				array(
+					'key'   => 'mk_rating',
+					'label' => __( 'Rating (1-5)', 'maapkathi' ),
+					'type'  => 'number',
+				),
+				array(
+					'key'   => 'mk_sort_order',
+					'label' => __( 'Sort order', 'maapkathi' ),
+					'type'  => 'number',
+				),
 			),
 			'mk_client'       => array(
-				array( 'key' => 'mk_website', 'label' => __( 'Website', 'maapkathi' ), 'type' => 'url' ),
-				array( 'key' => 'mk_is_featured', 'label' => __( 'Featured', 'maapkathi' ), 'type' => 'checkbox' ),
-				array( 'key' => 'mk_sort_order', 'label' => __( 'Sort order', 'maapkathi' ), 'type' => 'number' ),
+				array(
+					'key'   => 'mk_website',
+					'label' => __( 'Website', 'maapkathi' ),
+					'type'  => 'url',
+				),
+				array(
+					'key'   => 'mk_is_featured',
+					'label' => __( 'Featured', 'maapkathi' ),
+					'type'  => 'checkbox',
+				),
+				array(
+					'key'   => 'mk_sort_order',
+					'label' => __( 'Sort order', 'maapkathi' ),
+					'type'  => 'number',
+				),
 			),
 			'mk_award'        => array(
-				array( 'key' => 'mk_issuer', 'label' => __( 'Issuer', 'maapkathi' ), 'type' => 'text' ),
-				array( 'key' => 'mk_year', 'label' => __( 'Year', 'maapkathi' ), 'type' => 'number' ),
-				array( 'key' => 'mk_link', 'label' => __( 'Link', 'maapkathi' ), 'type' => 'url' ),
-				array( 'key' => 'mk_sort_order', 'label' => __( 'Sort order', 'maapkathi' ), 'type' => 'number' ),
+				array(
+					'key'   => 'mk_issuer',
+					'label' => __( 'Issuer', 'maapkathi' ),
+					'type'  => 'text',
+				),
+				array(
+					'key'   => 'mk_year',
+					'label' => __( 'Year', 'maapkathi' ),
+					'type'  => 'number',
+				),
+				array(
+					'key'   => 'mk_link',
+					'label' => __( 'Link', 'maapkathi' ),
+					'type'  => 'url',
+				),
+				array(
+					'key'   => 'mk_sort_order',
+					'label' => __( 'Sort order', 'maapkathi' ),
+					'type'  => 'number',
+				),
 			),
 			'mk_faq'          => array(
-				array( 'key' => 'mk_group', 'label' => __( 'Group', 'maapkathi' ), 'type' => 'text' ),
-				array( 'key' => 'mk_sort_order', 'label' => __( 'Sort order', 'maapkathi' ), 'type' => 'number' ),
+				array(
+					'key'   => 'mk_group',
+					'label' => __( 'Group', 'maapkathi' ),
+					'type'  => 'text',
+				),
+				array(
+					'key'   => 'mk_sort_order',
+					'label' => __( 'Sort order', 'maapkathi' ),
+					'type'  => 'number',
+				),
 			),
 			'mk_value'        => array(
-				array( 'key' => 'mk_icon', 'label' => __( 'Icon (dashicon class)', 'maapkathi' ), 'type' => 'text' ),
-				array( 'key' => 'mk_sort_order', 'label' => __( 'Sort order', 'maapkathi' ), 'type' => 'number' ),
+				array(
+					'key'   => 'mk_icon',
+					'label' => __( 'Icon (dashicon class)', 'maapkathi' ),
+					'type'  => 'text',
+				),
+				array(
+					'key'   => 'mk_sort_order',
+					'label' => __( 'Sort order', 'maapkathi' ),
+					'type'  => 'number',
+				),
 			),
 			'mk_stat'         => array(
-				array( 'key' => 'mk_value_number', 'label' => __( 'Value', 'maapkathi' ), 'type' => 'number' ),
-				array( 'key' => 'mk_suffix', 'label' => __( 'Suffix (e.g. +, %)', 'maapkathi' ), 'type' => 'text' ),
-				array( 'key' => 'mk_sort_order', 'label' => __( 'Sort order', 'maapkathi' ), 'type' => 'number' ),
+				array(
+					'key'   => 'mk_value_number',
+					'label' => __( 'Value', 'maapkathi' ),
+					'type'  => 'number',
+				),
+				array(
+					'key'   => 'mk_suffix',
+					'label' => __( 'Suffix (e.g. +, %)', 'maapkathi' ),
+					'type'  => 'text',
+				),
+				array(
+					'key'   => 'mk_sort_order',
+					'label' => __( 'Sort order', 'maapkathi' ),
+					'type'  => 'number',
+				),
 			),
 			'mk_process_step' => array(
-				array( 'key' => 'mk_step_no', 'label' => __( 'Step number', 'maapkathi' ), 'type' => 'number' ),
-				array( 'key' => 'mk_icon', 'label' => __( 'Icon (dashicon class)', 'maapkathi' ), 'type' => 'text' ),
-				array( 'key' => 'mk_sort_order', 'label' => __( 'Sort order', 'maapkathi' ), 'type' => 'number' ),
+				array(
+					'key'   => 'mk_step_no',
+					'label' => __( 'Step number', 'maapkathi' ),
+					'type'  => 'number',
+				),
+				array(
+					'key'   => 'mk_icon',
+					'label' => __( 'Icon (dashicon class)', 'maapkathi' ),
+					'type'  => 'text',
+				),
+				array(
+					'key'   => 'mk_sort_order',
+					'label' => __( 'Sort order', 'maapkathi' ),
+					'type'  => 'number',
+				),
 			),
 		);
 	}
@@ -97,13 +254,13 @@ final class MetaBoxes {
 					$post_type,
 					$field['key'],
 					array(
-						'type'         => match ( $field['type'] ) {
+						'type'          => match ( $field['type'] ) {
 							'number'   => 'number',
 							'checkbox' => 'boolean',
 							default    => 'string',
 						},
-						'single'       => true,
-						'show_in_rest' => true,
+						'single'        => true,
+						'show_in_rest'  => true,
 						'auth_callback' => static function () {
 							return current_user_can( Roles::CAP_EDIT_CONTENT );
 						},
@@ -196,7 +353,7 @@ final class MetaBoxes {
 			if ( ! isset( $_POST[ $key ] ) ) {
 				continue;
 			}
-			$raw = wp_unslash( $_POST[ $key ] );
+			$raw       = wp_unslash( $_POST[ $key ] );
 			$sanitized = match ( $field['type'] ) {
 				'textarea' => sanitize_textarea_field( $raw ),
 				'number'   => is_numeric( $raw ) ? (float) $raw : 0,

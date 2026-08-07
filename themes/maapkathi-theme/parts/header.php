@@ -1,4 +1,11 @@
 <?php
+/**
+ * Site header: logo (light/dark), primary nav, header actions, mobile menu,
+ * and the optional admin sign-in shield.
+ *
+ * @package maapkathi-theme
+ */
+
 declare( strict_types = 1 );
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -20,8 +27,8 @@ $mk_studio_name = mk_setting( 'studio_name', get_bloginfo( 'name' ) );
 				// Both logos render; CSS shows the right one per active
 				// theme. Doing this in CSS rather than JS is what stops a
 				// flash of the wrong logo on load (§3.5).
-				$mk_light_src = $mk_logo_light ?: $mk_logo_dark;
-				$mk_dark_src  = $mk_logo_dark ?: $mk_logo_light;
+				$mk_light_src = $mk_logo_light ? $mk_logo_light : $mk_logo_dark;
+				$mk_dark_src  = $mk_logo_dark ? $mk_logo_dark : $mk_logo_light;
 				?>
 				<img class="mk-logo__img mk-logo__img--light" src="<?php echo esc_url( $mk_light_src ); ?>" alt="<?php echo esc_attr( $mk_studio_name ); ?>" />
 				<img class="mk-logo__img mk-logo__img--dark" src="<?php echo esc_url( $mk_dark_src ); ?>" alt="<?php echo esc_attr( $mk_studio_name ); ?>" />

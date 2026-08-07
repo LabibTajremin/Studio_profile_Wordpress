@@ -1,4 +1,10 @@
 <?php
+/**
+ * Theme CSS custom-property builder.
+ *
+ * @package maapkathi-core
+ */
+
 declare( strict_types = 1 );
 
 namespace Maapkathi\Core\Theme;
@@ -14,6 +20,13 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 final class ThemeVarsBuilder {
 
+	/**
+	 * Builds (or returns the cached) `:root{}` CSS block for the current
+	 * theme settings.
+	 *
+	 * @param bool $reduced_motion Whether to build the reduced-motion variant.
+	 * @return string Complete CSS, ready to inline in <head>.
+	 */
 	public static function build( bool $reduced_motion = false ): string {
 		$cache_key = ThemeSettings::CACHE_KEY . ( $reduced_motion ? '_rm' : '' );
 		$cached    = get_transient( $cache_key );
@@ -43,14 +56,17 @@ final class ThemeVarsBuilder {
 	}
 
 	/**
-	 * @param array<string,mixed> $settings
+	 * Resolves a full settings payload into the CSS custom-property map.
+	 *
+	 * @param array<string,mixed> $settings       Sanitized theme settings.
+	 * @param bool                $reduced_motion Whether to resolve the reduced-motion variant.
 	 * @return array<string,string>
 	 */
 	public static function vars_for( array $settings, bool $reduced_motion = false ): array {
 		$accent = Accents::by_id( $settings['accent_id'] ) ?? Accents::by_id( Accents::default_id() );
 
-		$accent_light = $settings['custom_accent_hex'] ?: $accent['light'];
-		$accent_dark  = $settings['custom_accent_hex'] ?: $accent['dark'];
+		$accent_light = $settings['custom_accent_hex'] ? $settings['custom_accent_hex'] : $accent['light'];
+		$accent_dark  = $settings['custom_accent_hex'] ? $settings['custom_accent_hex'] : $accent['dark'];
 
 		$pattern = Patterns::by_id( $settings['pattern_id'] ) ?? Patterns::by_id( 'none' );
 		$fonts   = Fonts::by_id( $settings['font_pair_id'] ) ?? Fonts::by_id( 'fraunces-manrope' );
@@ -67,8 +83,8 @@ final class ThemeVarsBuilder {
 			'--font-buttons'      => self::area_font( $settings, 'buttons', $fonts['body'] ),
 			'--font-hero'         => self::area_font( $settings, 'hero', $fonts['display'] ),
 			'--font-accents'      => self::area_font( $settings, 'accents', $fonts['body'] ),
-			'--heading-color'     => $settings['heading_color_hex'] ?: 'inherit',
-			'--body-color'        => $settings['body_color_hex'] ?: 'inherit',
+			'--heading-color'     => $settings['heading_color_hex'] ? $settings['heading_color_hex'] : 'inherit',
+			'--body-color'        => $settings['body_color_hex'] ? $settings['body_color_hex'] : 'inherit',
 			'--radius'            => Fonts::RADIUS_SCALE[ $settings['radius'] ] ?? Fonts::RADIUS_SCALE['subtle'],
 			'--density'           => Fonts::DENSITY_SCALE[ $settings['density'] ] ?? Fonts::DENSITY_SCALE['comfortable'],
 			'--grain-opacity'     => $settings['grain'] ? '0.06' : '0',
@@ -89,7 +105,13 @@ final class ThemeVarsBuilder {
 	}
 
 	/**
-	 * @param array<string,mixed> $settings
+	 * Resolves the font-family value for a single theming area, honouring
+	 * any per-area font override.
+	 *
+	 * @param array<string,mixed> $settings Sanitized theme settings.
+	 * @param string               $area     Theming area key, e.g. 'headings'.
+	 * @param string               $fallback Font-family to use when no override applies.
+	 * @return string
 	 */
 	private static function area_font( array $settings, string $area, string $fallback ): string {
 		$override = $settings['font_overrides'][ $area ] ?? null;
@@ -108,6 +130,7 @@ final class ThemeVarsBuilder {
 	 * page_transition, cursor_style, scroll_progress, grain, glass, and the
 	 * remaining motion selects driving JS behaviour.
 	 *
+	 * @param array<string,mixed> $settings Sanitized theme settings.
 	 * @return array<string,string>
 	 */
 	public static function data_attrs_for( array $settings ): array {

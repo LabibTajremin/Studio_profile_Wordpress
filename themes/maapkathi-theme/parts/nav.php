@@ -6,6 +6,8 @@
  * template-functions.php (which loads first, on plugins_loaded), and an
  * unguarded redeclaration here would be a fatal error. The theme keeps its
  * own definition only as a fallback for when the plugin is inactive.
+ *
+ * @package maapkathi-theme
  */
 
 declare( strict_types = 1 );
@@ -15,6 +17,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 if ( ! function_exists( 'mk_blog_enabled' ) ) {
+	/**
+	 * Whether the blog is enabled in the site settings.
+	 *
+	 * @return bool True when the blog is enabled.
+	 */
 	function mk_blog_enabled(): bool {
 		$settings = get_option( 'mk_site_settings', array() );
 		return ! empty( $settings['blog_enabled'] );
@@ -47,10 +54,12 @@ if ( ! function_exists( 'mk_nav_items' ) ) {
 			}
 		}
 
+		$work_archive_link = (string) get_post_type_archive_link( 'mk_project' );
+
 		$items = array(
 			array(
 				'label' => __( 'Work', 'maapkathi' ),
-				'href'  => (string) get_post_type_archive_link( 'mk_project' ) ?: home_url( '/work/' ),
+				'href'  => $work_archive_link ? $work_archive_link : home_url( '/work/' ),
 			),
 			array(
 				'label' => __( 'Services', 'maapkathi' ),
