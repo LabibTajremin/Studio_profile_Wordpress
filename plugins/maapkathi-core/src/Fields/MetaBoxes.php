@@ -305,7 +305,7 @@ final class MetaBoxes {
 	/**
 	 * Render the meta box table for a post's fields.
 	 *
-	 * @param \WP_Post                                                          $post   Post being edited.
+	 * @param \WP_Post                                                           $post   Post being edited.
 	 * @param array<int,array{key:string,label:string,type:string,help?:string}> $fields Field definitions to render.
 	 */
 	private function render( \WP_Post $post, array $fields ): void {
@@ -327,7 +327,7 @@ final class MetaBoxes {
 	 * Render a single field's input control, matched to its declared type.
 	 *
 	 * @param array{key:string,label:string,type:string} $field Field definition to render an input for.
-	 * @param mixed                                       $value Current stored value for the field.
+	 * @param mixed                                      $value Current stored value for the field.
 	 */
 	private function render_input( array $field, $value ): void {
 		$id = $field['key'];

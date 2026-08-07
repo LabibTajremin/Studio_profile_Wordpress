@@ -106,8 +106,22 @@ settings_errors( 'mk_hero' );
 				</p>
 
 				<p class="mk-hero-length-note" hidden>
-					<strong><?php printf( esc_html__( 'Keep it to about %d seconds.', 'maapkathi' ), (int) $duration ); ?></strong>
-					<?php printf( esc_html__( 'Hero slides change automatically every %d seconds, so anything longer gets cut off mid-play. Silent, seamless loops work best. Recommended: MP4 (H.264), 1080p, 2–4 Mbps — roughly 2–3 MB for a 6-second clip.', 'maapkathi' ), (int) $duration ); ?>
+					<strong>
+						<?php
+						printf(
+							/* translators: %d: hero slide duration in seconds. */
+							esc_html__( 'Keep it to about %d seconds.', 'maapkathi' ),
+							(int) $duration
+						);
+						?>
+					</strong>
+					<?php
+					printf(
+						/* translators: %d: hero slide duration in seconds. */
+						esc_html__( 'Hero slides change automatically every %d seconds, so anything longer gets cut off mid-play. Silent, seamless loops work best. Recommended: MP4 (H.264), 1080p, 2–4 Mbps — roughly 2–3 MB for a 6-second clip.', 'maapkathi' ),
+						(int) $duration
+					);
+					?>
 				</p>
 
 				<!-- Image -->
@@ -168,7 +182,15 @@ settings_errors( 'mk_hero' );
 						<input type="checkbox" name="<?php echo esc_attr( $mk_name ); ?>[hold_until_video_ends]" value="1" <?php checked( ! empty( $mk_slide['hold_until_video_ends'] ) ); ?> />
 						<?php esc_html_e( 'Hold slide until the video ends', 'maapkathi' ); ?>
 					</label>
-					<span class="description"><?php printf( esc_html__( 'Capped at %d seconds so one long clip cannot strand the carousel.', 'maapkathi' ), (int) ( defined( 'MK_MAX_HERO_HOLD_SECONDS' ) ? MK_MAX_HERO_HOLD_SECONDS : 20 ) ); ?></span>
+					<span class="description">
+						<?php
+						printf(
+							/* translators: %d: maximum hold duration in seconds. */
+							esc_html__( 'Capped at %d seconds so one long clip cannot strand the carousel.', 'maapkathi' ),
+							(int) ( defined( 'MK_MAX_HERO_HOLD_SECONDS' ) ? MK_MAX_HERO_HOLD_SECONDS : 20 )
+						);
+						?>
+					</span>
 				</p>
 
 				<hr />

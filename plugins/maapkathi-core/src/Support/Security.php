@@ -65,6 +65,12 @@ final class Security {
 		add_filter( 'upload_mimes', array( $this, 'restrict_upload_mimes' ) );
 	}
 
+	/**
+	 * Strips the `?ver=` query arg from an enqueued asset URL.
+	 *
+	 * @param string $src Enqueued script/style source URL.
+	 * @return string
+	 */
 	public function strip_version_arg( string $src ): string {
 		if ( str_contains( $src, 'ver=' ) ) {
 			$src = remove_query_arg( 'ver', $src );
@@ -73,7 +79,9 @@ final class Security {
 	}
 
 	/**
-	 * @param array<string,string> $headers
+	 * Removes the X-Pingback header, since XML-RPC is disabled.
+	 *
+	 * @param array<string,string> $headers Response headers keyed by name.
 	 * @return array<string,string>
 	 */
 	public function remove_pingback_header( array $headers ): array {
@@ -81,6 +89,12 @@ final class Security {
 		return $headers;
 	}
 
+	/**
+	 * Empties the XML-RPC method list so no methods remain callable even
+	 * if something re-enables the xmlrpc_enabled filter.
+	 *
+	 * @return void
+	 */
 	public function disable_xmlrpc_methods(): void {
 		add_filter(
 			'xmlrpc_methods',
@@ -91,7 +105,10 @@ final class Security {
 	}
 
 	/**
-	 * @param array<string,mixed> $endpoints
+	 * Removes the unauthenticated REST users endpoints, so anonymous
+	 * requests cannot enumerate valid usernames.
+	 *
+	 * @param array<string,mixed> $endpoints Registered REST endpoints keyed by route.
 	 * @return array<string,mixed>
 	 */
 	public function block_user_enumeration( array $endpoints ): array {
@@ -105,6 +122,12 @@ final class Security {
 		return $endpoints;
 	}
 
+	/**
+	 * Redirects anonymous `?author=N` requests home, closing off the
+	 * classic username-enumeration probe.
+	 *
+	 * @return void
+	 */
 	public function block_author_scan(): void {
 		if ( is_admin() || is_user_logged_in() ) {
 			return;
@@ -117,10 +140,22 @@ final class Security {
 		}
 	}
 
+	/**
+	 * Generic login-failure message that doesn't reveal which credential
+	 * (username or password) was wrong.
+	 *
+	 * @return string
+	 */
 	public function generic_login_error(): string {
 		return __( 'The username or password you entered is incorrect.', 'maapkathi' );
 	}
 
+	/**
+	 * Sends hardening HTTP response headers (clickjacking, MIME-sniffing,
+	 * referrer, permissions, and a restrictive CSP on the front end).
+	 *
+	 * @return void
+	 */
 	public function send_security_headers(): void {
 		if ( headers_sent() ) {
 			return;

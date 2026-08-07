@@ -1,4 +1,10 @@
 <?php
+/**
+ * Contact form submission handling.
+ *
+ * @package maapkathi-core
+ */
+
 declare( strict_types = 1 );
 
 namespace Maapkathi\Core\Inquiries;

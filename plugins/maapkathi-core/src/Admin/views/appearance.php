@@ -1,4 +1,10 @@
 <?php
+/**
+ * Appearance screen markup.
+ *
+ * @package Maapkathi\Core
+ */
+
 declare( strict_types = 1 );
 
 use Maapkathi\Core\Theme\Accents;
