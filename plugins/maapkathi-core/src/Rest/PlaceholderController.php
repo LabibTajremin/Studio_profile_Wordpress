@@ -80,7 +80,6 @@ final class PlaceholderController {
 	 * Output a gradient placeholder SVG for the requested spec and terminate the request.
 	 *
 	 * @param \WP_REST_Request $request REST request carrying width, height, and an optional label.
-	 * @return never
 	 */
 	public function render( \WP_REST_Request $request ) {
 		$width  = max( 1, min( self::MAX_DIMENSION, absint( $request['width'] ) ) );
@@ -98,6 +97,14 @@ final class PlaceholderController {
 		exit;
 	}
 
+	/**
+	 * Build the gradient placeholder SVG markup for a given spec.
+	 *
+	 * @param string $label  Optional label text to draw centred on the image.
+	 * @param int    $width  Image width in pixels.
+	 * @param int    $height Image height in pixels.
+	 * @return string SVG markup.
+	 */
 	public static function svg( string $label, int $width, int $height ): string {
 		$accent = Branding::accent_hex();
 		$dark   = self::shade( $accent, -0.35 );
@@ -115,7 +122,7 @@ final class PlaceholderController {
 			$height,
 			esc_attr( $accent ),
 			esc_attr( $dark ),
-			esc_attr( $label ?: __( 'Placeholder image', 'maapkathi' ) ),
+			esc_attr( $label ? $label : __( 'Placeholder image', 'maapkathi' ) ),
 			$label
 				? sprintf(
 					'<text x="50%%" y="50%%" dominant-baseline="middle" text-anchor="middle" font-family="Georgia,serif" font-size="%d" fill="%s" opacity="0.85">%s</text>',
