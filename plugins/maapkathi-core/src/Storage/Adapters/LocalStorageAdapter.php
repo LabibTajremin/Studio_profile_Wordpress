@@ -44,6 +44,7 @@ final class LocalStorageAdapter implements StorageAdapter {
 	 * @param string $mime       MIME type of the file.
 	 * @param string $visibility Unused — local storage has no per-object visibility.
 	 * @return StoredObject
+	 * @throws \RuntimeException If the file could not be copied into storage.
 	 */
 	public function put( string $key, string $tmp_path, string $mime, string $visibility ): StoredObject {
 		$this->ensure_htaccess();

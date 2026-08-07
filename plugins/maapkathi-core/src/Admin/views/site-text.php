@@ -1,4 +1,10 @@
 <?php
+/**
+ * Site Text screen markup.
+ *
+ * @package Maapkathi\Core
+ */
+
 declare( strict_types = 1 );
 
 use Maapkathi\Core\Support\SiteText;
@@ -8,6 +14,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
+ * View variables provided by SiteTextScreen::render().
+ *
  * @var array<string,string> $values
  * @var string $notice
  */

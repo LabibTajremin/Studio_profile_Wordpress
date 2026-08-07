@@ -1,4 +1,10 @@
 <?php
+/**
+ * Native meta box field definitions and rendering for every CPT.
+ *
+ * @package maapkathi-core
+ */
+
 declare( strict_types = 1 );
 
 namespace Maapkathi\Core\Fields;
@@ -18,6 +24,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 final class MetaBoxes {
 
 	/**
+	 * The field schema for every CPT: post type slug to an ordered list of field definitions.
+	 *
 	 * @return array<string, array<int, array{key:string,label:string,type:string,help?:string}>>
 	 */
 	public static function schema(): array {
@@ -241,12 +249,18 @@ final class MetaBoxes {
 		);
 	}
 
+	/**
+	 * Wire the hooks that register meta, render meta boxes, and save field values.
+	 */
 	public function register_hooks(): void {
 		add_action( 'init', array( $this, 'register_meta' ) );
 		add_action( 'add_meta_boxes', array( $this, 'add_meta_boxes' ) );
 		add_action( 'save_post', array( $this, 'save' ), 10, 2 );
 	}
 
+	/**
+	 * Register every field in the schema as post meta with REST support.
+	 */
 	public function register_meta(): void {
 		foreach ( self::schema() as $post_type => $fields ) {
 			foreach ( $fields as $field ) {

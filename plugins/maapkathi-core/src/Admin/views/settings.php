@@ -1,4 +1,10 @@
 <?php
+/**
+ * Settings screen markup.
+ *
+ * @package Maapkathi\Core
+ */
+
 declare( strict_types = 1 );
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -6,6 +12,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
+ * View variables provided by SettingsScreen::render().
+ *
  * @var array<string,mixed> $settings
  * @var array<string,mixed> $seo
  * @var string $notice

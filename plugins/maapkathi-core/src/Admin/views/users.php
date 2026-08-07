@@ -1,4 +1,10 @@
 <?php
+/**
+ * Users screen markup.
+ *
+ * @package Maapkathi\Core
+ */
+
 declare( strict_types = 1 );
 
 use Maapkathi\Core\Roles\Roles;
@@ -8,6 +14,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
+ * View variables provided by UsersScreen::render().
+ *
  * @var \WP_User[] $users
  * @var string $notice
  */

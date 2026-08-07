@@ -213,10 +213,10 @@ $faqs         = mk_content( 'faqs' );
 		<div class="mk-grid mk-grid--testimonials">
 			<?php foreach ( $testimonials as $testimonial ) : ?>
 				<?php
-				$rating = (int) mk_meta( $testimonial->ID, 'mk_rating', '0' );
-				$author = mk_meta( $testimonial->ID, 'mk_author_name', get_the_title( $testimonial ) );
-				$role   = mk_meta( $testimonial->ID, 'mk_author_role' );
-				$firm   = mk_meta( $testimonial->ID, 'mk_company' );
+				$rating      = (int) mk_meta( $testimonial->ID, 'mk_rating', '0' );
+				$author      = mk_meta( $testimonial->ID, 'mk_author_name', get_the_title( $testimonial ) );
+				$author_role = mk_meta( $testimonial->ID, 'mk_author_role' );
+				$firm        = mk_meta( $testimonial->ID, 'mk_company' );
 				?>
 				<figure class="mk-card mk-card--testimonial">
 					<?php if ( $rating > 0 ) : ?>
@@ -227,8 +227,8 @@ $faqs         = mk_content( 'faqs' );
 					<blockquote><?php echo esc_html( mk_meta( $testimonial->ID, 'mk_quote' ) ); ?></blockquote>
 					<figcaption>
 						<strong><?php echo esc_html( $author ); ?></strong>
-						<?php if ( $role || $firm ) : ?>
-							<span><?php echo esc_html( trim( $role . ( $role && $firm ? ', ' : '' ) . $firm ) ); ?></span>
+						<?php if ( $author_role || $firm ) : ?>
+							<span><?php echo esc_html( trim( $author_role . ( $author_role && $firm ? ', ' : '' ) . $firm ) ); ?></span>
 						<?php endif; ?>
 					</figcaption>
 				</figure>

@@ -1,4 +1,10 @@
 <?php
+/**
+ * Editable copy strings ("Site Text") schema, defaults and accessors.
+ *
+ * @package maapkathi-core
+ */
+
 declare( strict_types = 1 );
 
 namespace Maapkathi\Core\Support;
@@ -16,6 +22,8 @@ final class SiteText {
 	public const OPTION = 'mk_site_text';
 
 	/**
+	 * The full Site Text schema, grouped by page/section.
+	 *
 	 * @return array<string, array<int, array{key:string,label:string}>> group label => fields
 	 */
 	public static function schema(): array {
