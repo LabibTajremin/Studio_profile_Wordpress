@@ -1,4 +1,10 @@
 <?php
+/**
+ * Background pattern registry.
+ *
+ * @package maapkathi-core
+ */
+
 declare( strict_types = 1 );
 
 namespace Maapkathi\Core\Theme;
@@ -15,6 +21,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 final class Patterns {
 
 	/**
+	 * All 22 registered background patterns.
+	 *
 	 * @return array<int, array{id:string,name:string,css:string}>
 	 */
 	public static function all(): array {
@@ -134,6 +142,12 @@ final class Patterns {
 		);
 	}
 
+	/**
+	 * Looks up a single pattern by its id.
+	 *
+	 * @param string $id Pattern id to look up.
+	 * @return array{id:string,name:string,css:string}|null
+	 */
 	public static function by_id( string $id ): ?array {
 		foreach ( self::all() as $pattern ) {
 			if ( $pattern['id'] === $id ) {
@@ -143,6 +157,11 @@ final class Patterns {
 		return null;
 	}
 
+	/**
+	 * All registered pattern ids, in registry order.
+	 *
+	 * @return string[]
+	 */
 	public static function ids(): array {
 		return array_column( self::all(), 'id' );
 	}

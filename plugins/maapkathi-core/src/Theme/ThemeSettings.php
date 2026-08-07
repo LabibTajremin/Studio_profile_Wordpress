@@ -142,7 +142,7 @@ final class ThemeSettings {
 	 * registry. Unknown keys are dropped; unknown enum values and
 	 * out-of-range numbers fall back to the default (§11.2, §11.3).
 	 *
-	 * @param array<string,mixed> $input
+	 * @param array<string,mixed> $input Full or partial settings payload.
 	 * @return array<string,mixed>
 	 */
 	public static function sanitize( array $input ): array {
@@ -179,7 +179,9 @@ final class ThemeSettings {
 	}
 
 	/**
-	 * @param array<string,mixed> $overrides
+	 * Validates a font_overrides payload, dropping unknown areas/font ids.
+	 *
+	 * @param array<string,mixed> $overrides Raw per-area font override payload.
 	 * @return array<string,array{fontId:?string,colorHex:?string}>
 	 */
 	private static function sanitize_font_overrides( array $overrides ): array {

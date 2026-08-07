@@ -1,4 +1,10 @@
 <?php
+/**
+ * Users screen controller.
+ *
+ * @package Maapkathi\Core
+ */
+
 declare( strict_types = 1 );
 
 namespace Maapkathi\Core\Admin\Screens;
@@ -14,6 +20,11 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 final class UsersScreen {
 
+	/**
+	 * Checks capability, handles invite/toggle submissions, and renders the screen.
+	 *
+	 * @return void
+	 */
 	public function render(): void {
 		if ( ! current_user_can( Roles::CAP_MANAGE_USERS ) ) {
 			wp_die( esc_html__( 'You do not have permission to view this page.', 'maapkathi' ) );
@@ -35,10 +46,20 @@ final class UsersScreen {
 		require MK_PLUGIN_DIR . 'src/Admin/views/users.php';
 	}
 
+	/**
+	 * Creates and invites a new editor/admin user from the posted form.
+	 *
+	 * Called only from render(), which has already verified the
+	 * mk_invite_user nonce before invoking this method.
+	 *
+	 * @return string Notice message describing the result.
+	 */
 	private function handle_invite(): string {
+		// phpcs:disable WordPress.Security.NonceVerification.Missing -- nonce already verified in render() before this method is called.
 		$email = sanitize_email( wp_unslash( $_POST['email'] ?? '' ) );
 		$name  = sanitize_text_field( wp_unslash( $_POST['display_name'] ?? '' ) );
 		$role  = sanitize_key( $_POST['role'] ?? Roles::EDITOR_ROLE );
+		// phpcs:enable WordPress.Security.NonceVerification.Missing
 
 		if ( ! is_email( $email ) ) {
 			return __( 'A valid email is required.', 'maapkathi' );
@@ -50,12 +71,14 @@ final class UsersScreen {
 			$role = Roles::EDITOR_ROLE;
 		}
 
+		$local_part = strstr( $email, '@', true );
+
 		$user_id = wp_insert_user(
 			array(
-				'user_login'   => sanitize_user( strstr( $email, '@', true ) ?: $email ),
+				'user_login'   => sanitize_user( $local_part ? $local_part : $email ),
 				'user_email'   => $email,
 				'user_pass'    => wp_generate_password( 20 ),
-				'display_name' => $name ?: $email,
+				'display_name' => $name ? $name : $email,
 				'role'         => $role,
 			)
 		);
@@ -72,7 +95,16 @@ final class UsersScreen {
 		return __( 'User invited.', 'maapkathi' );
 	}
 
+	/**
+	 * Updates a user's active state and/or role from the posted form.
+	 *
+	 * Called only from render(), which has already verified the
+	 * mk_toggle_user nonce before invoking this method.
+	 *
+	 * @return void
+	 */
 	private function handle_toggle(): void {
+		// phpcs:disable WordPress.Security.NonceVerification.Missing -- nonce already verified in render() before this method is called.
 		$user_id = absint( $_POST['user_id'] ?? 0 );
 		if ( ! $user_id ) {
 			return;
@@ -89,5 +121,6 @@ final class UsersScreen {
 				$user->set_role( $role );
 			}
 		}
+		// phpcs:enable WordPress.Security.NonceVerification.Missing
 	}
 }

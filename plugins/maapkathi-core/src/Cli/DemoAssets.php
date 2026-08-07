@@ -1,4 +1,10 @@
 <?php
+/**
+ * Locally generated demo image/logo assets for `wp maapkathi seed`.
+ *
+ * @package maapkathi-core
+ */
+
 declare( strict_types = 1 );
 
 namespace Maapkathi\Core\Cli;
@@ -33,6 +39,11 @@ final class DemoAssets {
 		array( '#34327a', '#14132f' ),
 	);
 
+	/**
+	 * Whether the GD extension is available to generate demo images.
+	 *
+	 * @return bool True when both imagecreatetruecolor() and imagepng() exist.
+	 */
 	public static function available(): bool {
 		return function_exists( 'imagecreatetruecolor' ) && function_exists( 'imagepng' );
 	}
@@ -43,6 +54,13 @@ final class DemoAssets {
 	 * Idempotent: the generated slug is stored as post meta, so reseeding
 	 * finds the existing attachment instead of duplicating files — which
 	 * matters on a 20 GB disk.
+	 *
+	 * @param string $slug          Unique demo-asset slug used to find/dedupe the attachment.
+	 * @param string $label         Text drawn onto the generated image.
+	 * @param int    $width         Image width in pixels.
+	 * @param int    $height        Image height in pixels.
+	 * @param int    $palette_index Index into PALETTE selecting the gradient colours.
+	 * @return int Attachment ID, or 0 if generation/upload failed.
 	 */
 	public static function image( string $slug, string $label, int $width, int $height, int $palette_index = 0 ): int {
 		$existing = self::find_existing( $slug );
@@ -65,6 +83,11 @@ final class DemoAssets {
 	/**
 	 * Wordmark-style logo on a transparent background, for the client wall
 	 * and the site logo.
+	 *
+	 * @param string $slug          Unique demo-asset slug used to find/dedupe the attachment.
+	 * @param string $text          Wordmark text to render.
+	 * @param int    $palette_index Index into PALETTE selecting the ink colour.
+	 * @return int Attachment ID, or 0 if generation/upload failed.
 	 */
 	public static function logo( string $slug, string $text, int $palette_index = 0 ): int {
 		$existing = self::find_existing( $slug );
@@ -84,6 +107,12 @@ final class DemoAssets {
 		return self::sideload( $slug, $png, $text );
 	}
 
+	/**
+	 * Look up an already-generated demo attachment by its stored slug.
+	 *
+	 * @param string $slug Demo-asset slug to search for.
+	 * @return int Attachment ID, or 0 if none exists yet.
+	 */
 	private static function find_existing( string $slug ): int {
 		$found = get_posts(
 			array(
@@ -100,6 +129,15 @@ final class DemoAssets {
 		return $found ? (int) $found[0] : 0;
 	}
 
+	/**
+	 * Render a gradient placeholder image with a centred label as PNG bytes.
+	 *
+	 * @param string $label         Text drawn onto the image.
+	 * @param int    $width         Image width in pixels.
+	 * @param int    $height        Image height in pixels.
+	 * @param int    $palette_index Index into PALETTE selecting the gradient colours.
+	 * @return string Raw PNG bytes, or an empty string on failure.
+	 */
 	private static function render_png( string $label, int $width, int $height, int $palette_index ): string {
 		$image = imagecreatetruecolor( $width, $height );
 		if ( ! $image ) {
@@ -145,6 +183,13 @@ final class DemoAssets {
 		return $data;
 	}
 
+	/**
+	 * Render a wordmark-style logo with a transparent background as PNG bytes.
+	 *
+	 * @param string $text          Wordmark text to render.
+	 * @param int    $palette_index Index into PALETTE selecting the ink colour.
+	 * @return string Raw PNG bytes, or an empty string on failure.
+	 */
 	private static function render_logo_png( string $text, int $palette_index ): string {
 		$width  = 480;
 		$height = 160;
@@ -179,6 +224,14 @@ final class DemoAssets {
 		return $data;
 	}
 
+	/**
+	 * Draw a drop-shadowed, centred, uppercased label onto a GD image.
+	 *
+	 * @param \GdImage $image  GD image resource to draw onto.
+	 * @param string   $label  Text to draw; a no-op when empty.
+	 * @param int      $width  Image width in pixels, used to centre the text.
+	 * @param int      $height Image height in pixels, used to centre the text.
+	 */
 	private static function draw_centred_text( $image, string $label, int $width, int $height ): void {
 		if ( '' === $label ) {
 			return;

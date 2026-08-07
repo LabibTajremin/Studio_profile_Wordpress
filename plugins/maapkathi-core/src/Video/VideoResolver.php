@@ -1,4 +1,10 @@
 <?php
+/**
+ * Video field resolver.
+ *
+ * @package maapkathi-core
+ */
+
 declare( strict_types = 1 );
 
 namespace Maapkathi\Core\Video;
@@ -18,7 +24,11 @@ final class VideoResolver {
 	private const VIMEO_HOSTS   = array( 'vimeo.com', 'player.vimeo.com' );
 
 	/**
-	 * @param array{video_source:string,video_upload_url?:?string,video_url?:?string,video_poster?:?string} $field
+	 * Resolves a video meta field into a single renderable shape.
+	 *
+	 * @param array{video_source:string,video_upload_url?:?string,video_url?:?string,video_poster?:?string} $field         Raw video field values.
+	 * @param bool                                                                                            $is_background Whether this video plays as a background loop.
+	 * @return ?ResolvedVideo
 	 */
 	public function resolve( array $field, bool $is_background = false ): ?ResolvedVideo {
 		$source = $field['video_source'] ?? 'upload';
@@ -40,6 +50,15 @@ final class VideoResolver {
 		return $this->resolve_link( $raw, $poster, $is_background );
 	}
 
+	/**
+	 * Resolves a pasted video link (YouTube, Vimeo, or direct file) into a
+	 * single renderable shape.
+	 *
+	 * @param string  $raw           Raw pasted video URL.
+	 * @param ?string $poster        Poster image URL, if any.
+	 * @param bool    $is_background Whether this video plays as a background loop.
+	 * @return ?ResolvedVideo
+	 */
 	private function resolve_link( string $raw, ?string $poster, bool $is_background ): ?ResolvedVideo {
 		$scheme = wp_parse_url( $raw, PHP_URL_SCHEME );
 		$host   = wp_parse_url( $raw, PHP_URL_HOST );
