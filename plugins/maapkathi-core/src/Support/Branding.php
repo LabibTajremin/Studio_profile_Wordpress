@@ -88,7 +88,7 @@ final class Branding {
 			esc_attr( self::on_accent_hex( $accent ) )
 		);
 
-		return 'data:image/svg+xml;base64,' . base64_encode( $svg );
+		return 'data:image/svg+xml;base64,' . base64_encode( $svg ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode -- encoding an inline SVG data: URI, not obfuscating code.
 	}
 
 	/**

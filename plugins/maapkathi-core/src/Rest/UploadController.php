@@ -135,7 +135,7 @@ final class UploadController {
 		}
 		fclose( $out ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose
 
-		$validation = $this->validate_assembled_file( $assembled, $filename );
+		$validation = $this->validate_assembled_file( $assembled );
 		if ( is_wp_error( $validation ) ) {
 			wp_delete_file( $assembled );
 			$this->cleanup_dir( $dir );
@@ -159,8 +159,11 @@ final class UploadController {
 	/**
 	 * Magic-byte validation (§6.3, §13) — extension and client Content-Type
 	 * are never trusted. Returns the detected mime, or a WP_Error.
+	 *
+	 * @param string $path Absolute path to the assembled file on disk.
+	 * @return string|\WP_Error Detected MIME type on success, or an error.
 	 */
-	private function validate_assembled_file( string $path, string $original_filename ) {
+	private function validate_assembled_file( string $path ) {
 		$handle = fopen( $path, 'rb' ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fopen
 		$header = $handle ? fread( $handle, 16 ) : ''; // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fread
 		if ( $handle ) {
