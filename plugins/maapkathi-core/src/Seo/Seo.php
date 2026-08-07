@@ -109,6 +109,9 @@ final class Seo {
 	 * Every page must end up with a non-empty description (§11 gate), so
 	 * this walks a real fallback chain rather than trusting one option to
 	 * be filled in.
+	 *
+	 * @param array<string,mixed> $seo The `mk_seo_settings` option contents.
+	 * @return string
 	 */
 	private function resolve_description( array $seo ): string {
 		$site = $this->site_settings();
@@ -144,6 +147,9 @@ final class Seo {
 	 * OG image chain: the post's own cover → the configured default →
 	 * the site logo → a generated branded placeholder, so social shares
 	 * never fall back to a blank card.
+	 *
+	 * @param array<string,mixed> $seo The `mk_seo_settings` option contents.
+	 * @return string
 	 */
 	private function resolve_image( array $seo ): string {
 		if ( is_singular() && has_post_thumbnail() ) {
@@ -157,7 +163,8 @@ final class Seo {
 			return (string) $seo['og_image'];
 		}
 
-		$logo = \Maapkathi\Core\Support\Branding::logo_light_url() ?: \Maapkathi\Core\Support\Branding::logo_dark_url();
+		$logo_light = \Maapkathi\Core\Support\Branding::logo_light_url();
+		$logo       = $logo_light ? $logo_light : \Maapkathi\Core\Support\Branding::logo_dark_url();
 		if ( $logo ) {
 			return $logo;
 		}
@@ -170,11 +177,24 @@ final class Seo {
 		);
 	}
 
+	/**
+	 * Builds the canonical URL for the current request from the global
+	 * `$wp` request object, with any query args stripped.
+	 *
+	 * @return string
+	 */
 	private function canonical_url(): string {
 		global $wp;
 		return home_url( add_query_arg( array(), $wp->request ?? '' ) );
 	}
 
+	/**
+	 * Prints every JSON-LD block relevant to the current page: FAQPage on
+	 * the front page, and CreativeWork/BreadcrumbList on project and
+	 * service singulars.
+	 *
+	 * @return void
+	 */
 	public function render_json_ld(): void {
 		if ( is_front_page() ) {
 			$this->render_faq_page();
@@ -190,6 +210,12 @@ final class Seo {
 		}
 	}
 
+	/**
+	 * Prints a FAQPage JSON-LD block built from the site's FAQ content, if
+	 * any FAQs exist.
+	 *
+	 * @return void
+	 */
 	private function render_faq_page(): void {
 		// Read through the same accessor the template uses, so the
 		// structured data can never describe a different set of FAQs than
@@ -229,25 +255,42 @@ final class Seo {
 		);
 	}
 
+	/**
+	 * Prints a CreativeWork JSON-LD block describing the current project.
+	 *
+	 * @return void
+	 */
 	private function render_creative_work(): void {
 		$post_id = get_the_ID();
 		if ( ! $post_id ) {
 			return;
 		}
 
+		$summary           = get_post_meta( $post_id, 'mk_summary', true );
+		$description       = $summary ? $summary : get_the_excerpt( $post_id );
+		$thumbnail_url     = get_the_post_thumbnail_url( $post_id, 'large' );
+		$location_created  = get_post_meta( $post_id, 'mk_location', true );
+		$date_created      = get_post_meta( $post_id, 'mk_completed_at', true );
+
 		$this->print_ld_json(
 			array(
 				'@context'        => 'https://schema.org',
 				'@type'           => 'CreativeWork',
 				'name'            => get_the_title( $post_id ),
-				'description'     => wp_strip_all_tags( get_post_meta( $post_id, 'mk_summary', true ) ?: get_the_excerpt( $post_id ) ),
-				'image'           => get_the_post_thumbnail_url( $post_id, 'large' ) ?: null,
-				'locationCreated' => get_post_meta( $post_id, 'mk_location', true ) ?: null,
-				'dateCreated'     => get_post_meta( $post_id, 'mk_completed_at', true ) ?: null,
+				'description'     => wp_strip_all_tags( $description ),
+				'image'           => $thumbnail_url ? $thumbnail_url : null,
+				'locationCreated' => $location_created ? $location_created : null,
+				'dateCreated'     => $date_created ? $date_created : null,
 			)
 		);
 	}
 
+	/**
+	 * Prints a BreadcrumbList JSON-LD block for the current project or
+	 * service page.
+	 *
+	 * @return void
+	 */
 	private function render_breadcrumbs(): void {
 		$items = array(
 			array(
@@ -295,13 +338,28 @@ final class Seo {
 		);
 	}
 
+	/**
+	 * Filters out null values and echoes the given data as a JSON-LD
+	 * `<script>` block.
+	 *
+	 * @param array<string,mixed> $data Structured-data payload to encode.
+	 * @return void
+	 */
 	private function print_ld_json( array $data ): void {
 		$data = array_filter( $data, static fn( $v ) => null !== $v );
 		echo '<script type="application/ld+json">' . wp_json_encode( $data ) . '</script>' . "\n"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	}
 
-	public function robots_txt( string $output, bool $public ): string {
-		if ( $public ) {
+	/**
+	 * Appends a Disallow rule and the sitemap URL to robots.txt output when
+	 * the site is set to be publicly indexable.
+	 *
+	 * @param string $output       Existing robots.txt output.
+	 * @param bool   $is_public Whether the site is marked public (Settings > Reading).
+	 * @return string
+	 */
+	public function robots_txt( string $output, bool $is_public ): string {
+		if ( $is_public ) {
 			$output .= "Disallow: /wp-admin/\n";
 			$output .= 'Sitemap: ' . home_url( '/wp-sitemap.xml' ) . "\n";
 		}
@@ -309,7 +367,10 @@ final class Seo {
 	}
 
 	/**
-	 * @param string[] $post_types
+	 * Removes the built-in `post` type from the WP sitemap when the blog
+	 * feature is disabled in site settings.
+	 *
+	 * @param string[] $post_types Post type names currently included in the sitemap.
 	 * @return string[]
 	 */
 	public function filter_sitemap_post_types( $post_types ) {

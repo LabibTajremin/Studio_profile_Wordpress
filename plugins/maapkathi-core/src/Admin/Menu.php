@@ -107,6 +107,12 @@ final class Menu {
 		add_submenu_page( 'maapkathi', __( 'Account', 'maapkathi' ), __( 'Account', 'maapkathi' ), 'read', 'profile.php' );
 	}
 
+	/**
+	 * Enqueues the admin CSS/JS bundle on Maapkathi screens only.
+	 *
+	 * @param string $hook Current admin page hook suffix.
+	 * @return void
+	 */
 	public function enqueue_assets( string $hook ): void {
 		if ( ! str_contains( $hook, 'maapkathi' ) ) {
 			return;
@@ -128,6 +134,11 @@ final class Menu {
 		);
 	}
 
+	/**
+	 * Renders the Maapkathi dashboard: storage usage and pending-approval count.
+	 *
+	 * @return void
+	 */
 	public function render_dashboard(): void {
 		if ( ! current_user_can( Roles::CAP_EDIT_CONTENT ) ) {
 			wp_die( esc_html__( 'You do not have permission to view this page.', 'maapkathi' ) );
@@ -138,7 +149,12 @@ final class Menu {
 		$percent = round( ( $usage['bytes'] / ( 20 * 1024 ** 3 ) ) * 100, 1 );
 
 		global $wpdb;
-		$pending_count = (int) $wpdb->get_var( 'SELECT COUNT(*) FROM ' . \Maapkathi\Core\Support\Database::revisions_table() . " WHERE status = 'pending'" ); // phpcs:ignore WordPress.DB.PreparedSQLPlaceholders.PreparedSQLPlaceholders
+		$pending_count = (int) $wpdb->get_var(
+			$wpdb->prepare(
+				"SELECT COUNT(*) FROM %i WHERE status = 'pending'",
+				\Maapkathi\Core\Support\Database::revisions_table()
+			)
+		);
 
 		echo '<div class="wrap mk-admin"><h1>' . esc_html__( 'Maapkathi Dashboard', 'maapkathi' ) . '</h1>';
 		echo '<p><a href="' . esc_url( home_url( '/' ) ) . '" target="_blank" rel="noopener">' . esc_html__( 'View public site ↗', 'maapkathi' ) . '</a></p>';
@@ -164,30 +180,65 @@ final class Menu {
 		echo '</div></div>';
 	}
 
+	/**
+	 * Renders the Hero carousel screen.
+	 *
+	 * @return void
+	 */
 	public function render_hero(): void {
 		( new HeroScreen() )->render();
 	}
 
+	/**
+	 * Renders the Enquiries inbox screen.
+	 *
+	 * @return void
+	 */
 	public function render_inquiries(): void {
 		( new InquiriesScreen() )->render();
 	}
 
+	/**
+	 * Renders the Approvals queue screen.
+	 *
+	 * @return void
+	 */
 	public function render_approvals(): void {
 		( new ApprovalsScreen() )->render();
 	}
 
+	/**
+	 * Renders the Users screen.
+	 *
+	 * @return void
+	 */
 	public function render_users(): void {
 		( new UsersScreen() )->render();
 	}
 
+	/**
+	 * Renders the Site Text screen.
+	 *
+	 * @return void
+	 */
 	public function render_site_text(): void {
 		( new SiteTextScreen() )->render();
 	}
 
+	/**
+	 * Renders the Settings screen.
+	 *
+	 * @return void
+	 */
 	public function render_settings(): void {
 		( new SettingsScreen() )->render();
 	}
 
+	/**
+	 * Renders and saves the Appearance (theme + motion) screen.
+	 *
+	 * @return void
+	 */
 	public function render_appearance(): void {
 		if ( ! current_user_can( Roles::CAP_MANAGE_APPEARANCE ) ) {
 			wp_die( esc_html__( 'You do not have permission to view this page.', 'maapkathi' ) );

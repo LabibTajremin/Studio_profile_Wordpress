@@ -1,4 +1,10 @@
 <?php
+/**
+ * Font pairing registry.
+ *
+ * @package maapkathi-core
+ */
+
 declare( strict_types = 1 );
 
 namespace Maapkathi\Core\Theme;
@@ -19,6 +25,8 @@ final class Fonts {
 	private const SANS_FALLBACK  = 'system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
 
 	/**
+	 * All 8 registered font pairings.
+	 *
 	 * @return array<int, array{id:string,name:string,display:string,body:string}>
 	 */
 	public static function all(): array {
@@ -74,6 +82,12 @@ final class Fonts {
 		);
 	}
 
+	/**
+	 * Looks up a single font pairing by its id.
+	 *
+	 * @param string $id Font pairing id to look up.
+	 * @return array{id:string,name:string,display:string,body:string}|null
+	 */
 	public static function by_id( string $id ): ?array {
 		foreach ( self::all() as $pair ) {
 			if ( $pair['id'] === $id ) {
@@ -83,6 +97,11 @@ final class Fonts {
 		return null;
 	}
 
+	/**
+	 * All registered font pairing ids, in registry order.
+	 *
+	 * @return string[]
+	 */
 	public static function ids(): array {
 		return array_column( self::all(), 'id' );
 	}

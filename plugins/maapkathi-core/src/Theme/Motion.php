@@ -43,7 +43,11 @@ final class Motion {
 		);
 	}
 
-	/** @return array<int,array{id:string,name:string}> */
+	/**
+	 * All registered hero-animation styles.
+	 *
+	 * @return array<int,array{id:string,name:string}>
+	 */
 	public static function hero_animations(): array {
 		return self::items(
 			array(
@@ -59,7 +63,11 @@ final class Motion {
 		);
 	}
 
-	/** @return array<int,array{id:string,name:string}> */
+	/**
+	 * All registered image-hover styles.
+	 *
+	 * @return array<int,array{id:string,name:string}>
+	 */
 	public static function image_hover_styles(): array {
 		return self::items(
 			array(
@@ -75,7 +83,11 @@ final class Motion {
 		);
 	}
 
-	/** @return array<int,array{id:string,name:string}> */
+	/**
+	 * All registered card-hover styles.
+	 *
+	 * @return array<int,array{id:string,name:string}>
+	 */
 	public static function card_hover_styles(): array {
 		return self::items(
 			array(
@@ -89,7 +101,11 @@ final class Motion {
 		);
 	}
 
-	/** @return array<int,array{id:string,name:string}> */
+	/**
+	 * All registered text-reveal styles.
+	 *
+	 * @return array<int,array{id:string,name:string}>
+	 */
 	public static function text_reveal_styles(): array {
 		return self::items(
 			array(
@@ -103,7 +119,11 @@ final class Motion {
 		);
 	}
 
-	/** @return array<int,array{id:string,name:string}> */
+	/**
+	 * All registered page-transition styles.
+	 *
+	 * @return array<int,array{id:string,name:string}>
+	 */
 	public static function page_transitions(): array {
 		return self::items(
 			array(
@@ -145,7 +165,10 @@ final class Motion {
 	);
 
 	/**
-	 * @param array{motionPreset:string,motionSpeed:int,staggerMs:int,parallaxIntensity:int} $input
+	 * Resolves the motion CSS custom-property map for the given settings.
+	 *
+	 * @param array{motionPreset:string,motionSpeed:int,staggerMs:int,parallaxIntensity:int} $input          Motion-related theme settings.
+	 * @param bool                                                                            $reduced_motion Whether to resolve the reduced-motion variant.
 	 * @return array<string,string>
 	 */
 	public static function resolve_vars( array $input, bool $reduced_motion ): array {
@@ -175,7 +198,9 @@ final class Motion {
 	}
 
 	/**
-	 * @param array<string,string> $map
+	 * Turns an id => name map into a list of {id, name} entries.
+	 *
+	 * @param array<string,string> $map Id => name map.
 	 * @return array<int,array{id:string,name:string}>
 	 */
 	private static function items( array $map ): array {

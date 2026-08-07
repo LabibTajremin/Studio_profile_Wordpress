@@ -1,4 +1,10 @@
 <?php
+/**
+ * Theme settings registry.
+ *
+ * @package maapkathi-core
+ */
+
 declare( strict_types = 1 );
 
 namespace Maapkathi\Core\Theme;
@@ -30,7 +36,7 @@ final class ThemeSettings {
 			'pattern_id'          => 'none',
 			'pattern_opacity'     => 6,
 			'font_pair_id'        => 'fraunces-manrope',
-			'font_overrides'      => array(), // headings, body, nav, buttons, hero, accents => {fontId, colorHex}
+			'font_overrides'      => array(), // headings, body, nav, buttons, hero, accents => {fontId, colorHex}.
 			'heading_color_hex'   => null,
 			'body_color_hex'      => null,
 			'radius'              => 'subtle',
@@ -59,6 +65,11 @@ final class ThemeSettings {
 		);
 	}
 
+	/**
+	 * All registered setting keys.
+	 *
+	 * @return string[]
+	 */
 	public static function keys(): array {
 		return array_keys( self::defaults() );
 	}
@@ -93,16 +104,29 @@ final class ThemeSettings {
 		);
 	}
 
+	/**
+	 * Registers the hooks that keep the theme-vars cache in sync with the
+	 * stored settings.
+	 *
+	 * @return void
+	 */
 	public function register_hooks(): void {
 		add_action( 'update_option_' . self::OPTION, array( $this, 'bust_cache' ) );
 		add_action( 'add_option_' . self::OPTION, array( $this, 'bust_cache' ) );
 	}
 
+	/**
+	 * Clears the cached theme-vars CSS so it is rebuilt on next request.
+	 *
+	 * @return void
+	 */
 	public function bust_cache(): void {
 		delete_transient( self::CACHE_KEY );
 	}
 
 	/**
+	 * The current, sanitized theme settings.
+	 *
 	 * @return array<string,mixed>
 	 */
 	public static function get(): array {
