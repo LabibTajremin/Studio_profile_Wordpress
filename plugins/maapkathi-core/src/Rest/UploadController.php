@@ -1,4 +1,10 @@
 <?php
+/**
+ * Chunked file upload REST endpoint.
+ *
+ * @package maapkathi-core
+ */
+
 declare( strict_types = 1 );
 
 namespace Maapkathi\Core\Rest;
@@ -20,6 +26,9 @@ final class UploadController {
 
 	private const NAMESPACE = 'maapkathi/v1';
 
+	/**
+	 * Wire the rest_api_init hook and schedule the orphaned-chunk garbage collector.
+	 */
 	public function register_hooks(): void {
 		add_action( 'rest_api_init', array( $this, 'register_routes' ) );
 		add_action( 'mk_gc_orphaned_chunks', array( $this, 'gc_orphaned_chunks' ) );
@@ -29,6 +38,9 @@ final class UploadController {
 		}
 	}
 
+	/**
+	 * Register the upload/chunk and upload/complete routes.
+	 */
 	public function register_routes(): void {
 		register_rest_route(
 			self::NAMESPACE,
@@ -51,10 +63,21 @@ final class UploadController {
 		);
 	}
 
+	/**
+	 * Permission callback for both upload routes.
+	 *
+	 * @return bool True when the current user may edit content or upload files.
+	 */
 	public function can_upload(): bool {
 		return current_user_can( Roles::CAP_EDIT_CONTENT ) || current_user_can( 'upload_files' );
 	}
 
+	/**
+	 * Store one uploaded chunk on disk under its server-issued upload_id.
+	 *
+	 * @param \WP_REST_Request $request REST request carrying upload_id, chunk_index, and the chunk file.
+	 * @return array<string,int|string>|\WP_Error Chunk receipt on success, or an error.
+	 */
 	public function handle_chunk( \WP_REST_Request $request ) {
 		$upload_id   = sanitize_key( (string) $request->get_param( 'upload_id' ) );
 		$chunk_index = absint( $request->get_param( 'chunk_index' ) );
