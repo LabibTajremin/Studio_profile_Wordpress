@@ -25,6 +25,8 @@ final class ThemeSettings {
 	public const CACHE_KEY = 'mk_theme_vars_cache';
 
 	/**
+	 * The default value for every registered setting.
+	 *
 	 * @return array<string,mixed> setting key => default value
 	 */
 	public static function defaults(): array {

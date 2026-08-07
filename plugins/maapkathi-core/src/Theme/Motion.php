@@ -168,7 +168,7 @@ final class Motion {
 	 * Resolves the motion CSS custom-property map for the given settings.
 	 *
 	 * @param array{motionPreset:string,motionSpeed:int,staggerMs:int,parallaxIntensity:int} $input          Motion-related theme settings.
-	 * @param bool                                                                            $reduced_motion Whether to resolve the reduced-motion variant.
+	 * @param bool                                                                           $reduced_motion Whether to resolve the reduced-motion variant.
 	 * @return array<string,string>
 	 */
 	public static function resolve_vars( array $input, bool $reduced_motion ): array {

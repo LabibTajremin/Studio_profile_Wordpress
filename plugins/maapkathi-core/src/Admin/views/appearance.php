@@ -155,8 +155,8 @@ $is_custom_preset = 'custom' === $settings['motion_preset'];
 			<tr>
 				<th><?php esc_html_e( '15. Motion preset', 'maapkathi' ); ?></th>
 				<td>
-					<?php foreach ( array( 'off', 'subtle', 'refined', 'expressive', 'custom' ) as $id ) : ?>
-						<label style="margin-right:1em"><input type="radio" name="mk_theme_settings[motion_preset]" value="<?php echo esc_attr( $id ); ?>" <?php checked( $settings['motion_preset'], $id ); ?> /> <?php echo esc_html( ucfirst( $id ) ); ?></label>
+					<?php foreach ( array( 'off', 'subtle', 'refined', 'expressive', 'custom' ) as $mk_motion_preset_id ) : ?>
+						<label style="margin-right:1em"><input type="radio" name="mk_theme_settings[motion_preset]" value="<?php echo esc_attr( $mk_motion_preset_id ); ?>" <?php checked( $settings['motion_preset'], $mk_motion_preset_id ); ?> /> <?php echo esc_html( ucfirst( $mk_motion_preset_id ) ); ?></label>
 					<?php endforeach; ?>
 				</td>
 			</tr>
@@ -186,8 +186,8 @@ $is_custom_preset = 'custom' === $settings['motion_preset'];
 				<th><?php esc_html_e( '23. Cursor style', 'maapkathi' ); ?></th>
 				<td>
 					<select name="mk_theme_settings[cursor_style]">
-						<?php foreach ( array( 'none', 'dot', 'ring', 'accent-blend' ) as $id ) : ?>
-							<option value="<?php echo esc_attr( $id ); ?>" <?php selected( $settings['cursor_style'], $id ); ?>><?php echo esc_html( ucwords( str_replace( '-', ' ', $id ) ) ); ?></option>
+						<?php foreach ( array( 'none', 'dot', 'ring', 'accent-blend' ) as $mk_cursor_style_id ) : ?>
+							<option value="<?php echo esc_attr( $mk_cursor_style_id ); ?>" <?php selected( $settings['cursor_style'], $mk_cursor_style_id ); ?>><?php echo esc_html( ucwords( str_replace( '-', ' ', $mk_cursor_style_id ) ) ); ?></option>
 						<?php endforeach; ?>
 					</select>
 				</td>
@@ -196,8 +196,8 @@ $is_custom_preset = 'custom' === $settings['motion_preset'];
 				<th><?php esc_html_e( '24. Loader style', 'maapkathi' ); ?></th>
 				<td>
 					<select name="mk_theme_settings[loader_style]">
-						<?php foreach ( array( 'none', 'bar', 'logo-fade' ) as $id ) : ?>
-							<option value="<?php echo esc_attr( $id ); ?>" <?php selected( $settings['loader_style'], $id ); ?>><?php echo esc_html( ucwords( str_replace( '-', ' ', $id ) ) ); ?></option>
+						<?php foreach ( array( 'none', 'bar', 'logo-fade' ) as $mk_loader_style_id ) : ?>
+							<option value="<?php echo esc_attr( $mk_loader_style_id ); ?>" <?php selected( $settings['loader_style'], $mk_loader_style_id ); ?>><?php echo esc_html( ucwords( str_replace( '-', ' ', $mk_loader_style_id ) ) ); ?></option>
 						<?php endforeach; ?>
 					</select>
 				</td>
@@ -235,8 +235,8 @@ $is_custom_preset = 'custom' === $settings['motion_preset'];
 			<tr>
 				<th><?php esc_html_e( '31. Motion on mobile', 'maapkathi' ); ?></th>
 				<td>
-					<?php foreach ( array( 'full', 'reduced', 'off' ) as $id ) : ?>
-						<label style="margin-right:1em"><input type="radio" name="mk_theme_settings[motion_on_mobile]" value="<?php echo esc_attr( $id ); ?>" <?php checked( $settings['motion_on_mobile'], $id ); ?> /> <?php echo esc_html( ucfirst( $id ) ); ?></label>
+					<?php foreach ( array( 'full', 'reduced', 'off' ) as $mk_mobile_motion_id ) : ?>
+						<label style="margin-right:1em"><input type="radio" name="mk_theme_settings[motion_on_mobile]" value="<?php echo esc_attr( $mk_mobile_motion_id ); ?>" <?php checked( $settings['motion_on_mobile'], $mk_mobile_motion_id ); ?> /> <?php echo esc_html( ucfirst( $mk_mobile_motion_id ) ); ?></label>
 					<?php endforeach; ?>
 				</td>
 			</tr>

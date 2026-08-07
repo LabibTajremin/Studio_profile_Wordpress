@@ -27,7 +27,7 @@ final class VideoResolver {
 	 * Resolves a video meta field into a single renderable shape.
 	 *
 	 * @param array{video_source:string,video_upload_url?:?string,video_url?:?string,video_poster?:?string} $field         Raw video field values.
-	 * @param bool                                                                                            $is_background Whether this video plays as a background loop.
+	 * @param bool                                                                                          $is_background Whether this video plays as a background loop.
 	 * @return ?ResolvedVideo
 	 */
 	public function resolve( array $field, bool $is_background = false ): ?ResolvedVideo {

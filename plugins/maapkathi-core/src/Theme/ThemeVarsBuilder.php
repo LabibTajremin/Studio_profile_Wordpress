@@ -109,8 +109,8 @@ final class ThemeVarsBuilder {
 	 * any per-area font override.
 	 *
 	 * @param array<string,mixed> $settings Sanitized theme settings.
-	 * @param string               $area     Theming area key, e.g. 'headings'.
-	 * @param string               $fallback Font-family to use when no override applies.
+	 * @param string              $area     Theming area key, e.g. 'headings'.
+	 * @param string              $fallback Font-family to use when no override applies.
 	 * @return string
 	 */
 	private static function area_font( array $settings, string $area, string $fallback ): string {
@@ -125,8 +125,8 @@ final class ThemeVarsBuilder {
 	}
 
 	/**
-	 * data-* attributes for <html>, for settings that don't map to a single
-	 * CSS var (§11.4): hero_style, hero_animation, loader_style,
+	 * Resolves the data-* attributes for <html>, for settings that don't map
+	 * to a single CSS var (§11.4): hero_style, hero_animation, loader_style,
 	 * page_transition, cursor_style, scroll_progress, grain, glass, and the
 	 * remaining motion selects driving JS behaviour.
 	 *

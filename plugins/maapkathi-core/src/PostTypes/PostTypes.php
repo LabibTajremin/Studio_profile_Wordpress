@@ -1,4 +1,10 @@
 <?php
+/**
+ * Custom post type registration.
+ *
+ * @package maapkathi-core
+ */
+
 declare( strict_types = 1 );
 
 namespace Maapkathi\Core\PostTypes;
@@ -17,6 +23,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 final class PostTypes {
 
 	/**
+	 * The definitions for every custom post type the plugin registers.
+	 *
 	 * @return array<string, array<string, mixed>>
 	 */
 	public static function definitions(): array {
@@ -107,10 +115,16 @@ final class PostTypes {
 		);
 	}
 
+	/**
+	 * Wire the init hook that registers post types.
+	 */
 	public function register(): void {
 		add_action( 'init', array( $this, 'register_post_types' ) );
 	}
 
+	/**
+	 * Register every custom post type defined by definitions().
+	 */
 	public function register_post_types(): void {
 		foreach ( self::definitions() as $post_type => $definition ) {
 			register_post_type( $post_type, $this->args_for( $definition ) );
@@ -118,7 +132,9 @@ final class PostTypes {
 	}
 
 	/**
-	 * @param array<string, mixed> $definition
+	 * Build the register_post_type() args array from a post type definition.
+	 *
+	 * @param array<string, mixed> $definition Post type definition from definitions().
 	 * @return array<string, mixed>
 	 */
 	private function args_for( array $definition ): array {
