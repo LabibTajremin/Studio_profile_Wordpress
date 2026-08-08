@@ -85,6 +85,7 @@ h1, h2, h3, h4, h5, h6 {
 	z-index: 100;
 	backdrop-filter: blur(var(--glass-blur));
 	background: color-mix(in srgb, var(--background) 80%, transparent);
+	border-bottom: 1px solid color-mix(in srgb, var(--foreground) 10%, transparent);
 }
 .mk-site-header__inner {
 	max-width: 1200px;
@@ -107,24 +108,30 @@ h1, h2, h3, h4, h5, h6 {
 .mk-nav--desktop ul { list-style: none; display: flex; gap: 1.5rem; margin: 0; padding: 0; font-family: var(--font-nav); }
 .mk-nav--desktop a { text-decoration: none; color: inherit; }
 
-.mk-header-actions { display: flex; align-items: center; gap: 0.75rem; }
+.mk-header-actions { display: flex; align-items: center; gap: 0.5rem; }
+/* Header pill/circle controls (call button, theme toggle, admin shield,
+   hamburger) are always fully rounded, independent of the site's --radius
+   appearance setting — this matches the reference app, where they use
+   Tailwind's rounded-full rather than a themeable radius token. */
 .mk-call-btn {
 	background: var(--accent);
 	color: var(--accent-foreground);
-	padding: 0.5em 1em;
-	border-radius: var(--radius);
+	padding: 0.5em 1.1em;
+	border-radius: 999px;
 	text-decoration: none;
 	min-height: 44px;
 	display: inline-flex;
 	align-items: center;
+	font-size: 0.9rem;
+	font-weight: 500;
 }
 .mk-call-btn--mobile { display: none; }
 
-.mk-theme-toggle, .mk-menu-toggle {
-	background: color-mix(in srgb, var(--foreground) 8%, transparent);
-	border: 1px solid color-mix(in srgb, var(--foreground) 25%, transparent);
+.mk-theme-toggle {
+	background: transparent;
+	border: 1px solid color-mix(in srgb, var(--foreground) 15%, transparent);
 	color: var(--foreground);
-	border-radius: var(--radius);
+	border-radius: 999px;
 	min-width: 44px;
 	min-height: 44px;
 	cursor: pointer;
@@ -132,24 +139,30 @@ h1, h2, h3, h4, h5, h6 {
 	align-items: center;
 	justify-content: center;
 }
-.mk-theme-toggle:hover, .mk-menu-toggle:hover {
-	background: color-mix(in srgb, var(--foreground) 14%, transparent);
+.mk-theme-toggle:hover {
+	background: color-mix(in srgb, var(--foreground) 8%, transparent);
 }
 
-/* Sun/moon glyph — swaps on the same [data-theme] attribute the pre-paint
-   script in <head> sets, so it always matches the resolved theme, not
-   just the visitor's stored preference (which may be "system"). */
-.mk-theme-toggle__icon {
-	display: block;
-	width: 1em;
-	line-height: 1;
-	font-size: 1.1rem;
-}
-.mk-theme-toggle__icon::before {
-	content: "\2600";
-}
-:root[data-theme="dark"] .mk-theme-toggle__icon::before {
-	content: "\263E";
+/* Sun/moon glyph as real text nodes (not CSS generated content) — a custom
+   @font-face like Manrope doesn't ship these glyphs, and generated-content
+   glyphs are less reliable at triggering the browser's symbol-font fallback
+   than an actual text node is. Both render; [data-theme] shows/hides one,
+   same swap technique as the light/dark logo above. */
+.mk-theme-toggle__icon--dark { display: none; }
+:root[data-theme="dark"] .mk-theme-toggle__icon--light { display: none; }
+:root[data-theme="dark"] .mk-theme-toggle__icon--dark { display: inline; }
+
+.mk-menu-toggle {
+	background: transparent;
+	border: 0;
+	color: var(--foreground);
+	min-width: 44px;
+	min-height: 44px;
+	cursor: pointer;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 1.2rem;
 }
 
 .mk-mobile-menu {

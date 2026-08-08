@@ -53,7 +53,8 @@ $mk_studio_name = mk_setting( 'studio_name', get_bloginfo( 'name' ) );
 
 		<div class="mk-header-actions">
 			<button type="button" class="mk-theme-toggle" aria-label="<?php esc_attr_e( 'Toggle light and dark mode', 'maapkathi' ); ?>">
-				<span class="mk-theme-toggle__icon" aria-hidden="true"></span>
+				<span class="mk-theme-toggle__icon mk-theme-toggle__icon--light" aria-hidden="true">&#9728;</span>
+				<span class="mk-theme-toggle__icon mk-theme-toggle__icon--dark" aria-hidden="true">&#9790;</span>
 			</button>
 
 			<?php if ( $mk_phone ) : ?>
@@ -61,7 +62,7 @@ $mk_studio_name = mk_setting( 'studio_name', get_bloginfo( 'name' ) );
 			<?php endif; ?>
 
 			<button type="button" class="mk-menu-toggle" aria-label="<?php esc_attr_e( 'Open menu', 'maapkathi' ); ?>" aria-expanded="false" aria-controls="mk-mobile-menu">
-				<span></span><span></span><span></span>
+				<span aria-hidden="true">&#9776;</span>
 			</button>
 		</div>
 	</div>
