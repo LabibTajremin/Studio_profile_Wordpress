@@ -170,12 +170,20 @@ h1, h2, h3, h4, h5, h6 {
 	inset: 0;
 	background: var(--background);
 	z-index: 200;
-	display: flex;
+	display: none;
 	flex-direction: column;
 	justify-content: center;
 	align-items: center;
 	gap: 2rem;
 }
+/* Visibility is driven by this class, not the [hidden] attribute alone —
+   an author stylesheet display rule always wins the cascade over the
+   browser's built-in `[hidden] { display: none }`, regardless of
+   specificity, so a bare `display: flex` here would render this
+   full-screen overlay permanently, [hidden] attribute or not. JS still
+   toggles both hidden and this class together (theme-toggle.js) so
+   assistive tech gets the [hidden] semantics too. */
+.mk-mobile-menu.is-open { display: flex; }
 .mk-mobile-menu ul { list-style: none; padding: 0; text-align: center; }
 .mk-mobile-menu li { font-size: 1.5rem; margin-block: 1rem; opacity: 0; transform: translateY(var(--motion-distance)); transition: opacity var(--motion-duration) var(--motion-ease), transform var(--motion-duration) var(--motion-ease); transition-delay: calc(var(--mk-stagger-index, 0) * var(--motion-stagger)); }
 .mk-mobile-menu.is-open li { opacity: 1; transform: none; }
