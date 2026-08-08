@@ -126,6 +126,7 @@ final class ThemeSettings {
 	 */
 	public function bust_cache(): void {
 		delete_transient( self::CACHE_KEY );
+		delete_transient( self::CACHE_KEY . '_rm' );
 	}
 
 	/**

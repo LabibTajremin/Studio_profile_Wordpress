@@ -150,11 +150,11 @@ $is_custom_preset = 'custom' === $settings['motion_preset'];
 			</tr>
 			<tr>
 				<th><?php esc_html_e( '12. Grain', 'maapkathi' ); ?></th>
-				<td><label><input type="checkbox" name="mk_theme_settings[grain]" value="1" <?php checked( $settings['grain'] ); ?> /> <?php esc_html_e( 'On', 'maapkathi' ); ?></label></td>
+				<td><label><input type="hidden" name="mk_theme_settings[grain]" value="0" /><input type="checkbox" name="mk_theme_settings[grain]" value="1" <?php checked( $settings['grain'] ); ?> /> <?php esc_html_e( 'On', 'maapkathi' ); ?></label></td>
 			</tr>
 			<tr>
 				<th><?php esc_html_e( '13. Glass', 'maapkathi' ); ?></th>
-				<td><label><input type="checkbox" name="mk_theme_settings[glass]" value="1" <?php checked( $settings['glass'] ); ?> /> <?php esc_html_e( 'On', 'maapkathi' ); ?></label></td>
+				<td><label><input type="hidden" name="mk_theme_settings[glass]" value="0" /><input type="checkbox" name="mk_theme_settings[glass]" value="1" <?php checked( $settings['glass'] ); ?> /> <?php esc_html_e( 'On', 'maapkathi' ); ?></label></td>
 			</tr>
 			<tr>
 				<th><?php esc_html_e( '14. Hero style', 'maapkathi' ); ?></th>
@@ -223,11 +223,11 @@ $is_custom_preset = 'custom' === $settings['motion_preset'];
 			</tr>
 			<tr>
 				<th><?php esc_html_e( '25. Scroll progress', 'maapkathi' ); ?></th>
-				<td><label><input type="checkbox" name="mk_theme_settings[scroll_progress]" value="1" <?php checked( $settings['scroll_progress'] ); ?> /> <?php esc_html_e( 'On', 'maapkathi' ); ?></label></td>
+				<td><label><input type="hidden" name="mk_theme_settings[scroll_progress]" value="0" /><input type="checkbox" name="mk_theme_settings[scroll_progress]" value="1" <?php checked( $settings['scroll_progress'] ); ?> /> <?php esc_html_e( 'On', 'maapkathi' ); ?></label></td>
 			</tr>
 			<tr>
 				<th><?php esc_html_e( '26. Smooth scroll', 'maapkathi' ); ?></th>
-				<td><label><input type="checkbox" name="mk_theme_settings[smooth_scroll]" value="1" <?php checked( $settings['smooth_scroll'] ); ?> /> <?php esc_html_e( 'On', 'maapkathi' ); ?></label></td>
+				<td><label><input type="hidden" name="mk_theme_settings[smooth_scroll]" value="0" /><input type="checkbox" name="mk_theme_settings[smooth_scroll]" value="1" <?php checked( $settings['smooth_scroll'] ); ?> /> <?php esc_html_e( 'On', 'maapkathi' ); ?></label></td>
 			</tr>
 			<tr>
 				<th><?php esc_html_e( '27. Parallax intensity', 'maapkathi' ); ?></th>
@@ -249,7 +249,7 @@ $is_custom_preset = 'custom' === $settings['motion_preset'];
 			</tr>
 			<tr>
 				<th><?php esc_html_e( '30. Animate once', 'maapkathi' ); ?></th>
-				<td><label><input type="checkbox" name="mk_theme_settings[animate_once]" value="1" <?php checked( $settings['animate_once'] ); ?> /> <?php esc_html_e( 'On', 'maapkathi' ); ?></label></td>
+				<td><label><input type="hidden" name="mk_theme_settings[animate_once]" value="0" /><input type="checkbox" name="mk_theme_settings[animate_once]" value="1" <?php checked( $settings['animate_once'] ); ?> /> <?php esc_html_e( 'On', 'maapkathi' ); ?></label></td>
 			</tr>
 			<tr>
 				<th><?php esc_html_e( '31. Motion on mobile', 'maapkathi' ); ?></th>

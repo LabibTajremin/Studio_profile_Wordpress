@@ -98,9 +98,11 @@ if ( $mk_socials ) {
 		</address>
 	</div>
 
-	<p class="mk-copyright">
-		&copy; <?php echo esc_html( gmdate( 'Y' ) ); ?> <?php echo esc_html( $mk_studio_name ); ?>
-	</p>
+	<div class="mk-site-footer__bottom">
+		<p class="mk-copyright">
+			&copy; <?php echo esc_html( gmdate( 'Y' ) ); ?> <?php echo esc_html( $mk_studio_name ); ?>
+		</p>
+	</div>
 
 	<script type="application/ld+json"><?php echo wp_json_encode( $mk_org ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></script>
 </footer>

@@ -135,6 +135,14 @@ function mk_theme_google_fonts_url(): string {
 /**
  * Theme-vars block, injected inline in <head> so there is no second
  * request and no flash of unstyled theme (§10).
+ *
+ * Priority 20 is load-bearing: WordPress prints enqueued stylesheets from
+ * wp_print_styles on wp_head at priority 8, and tokens.css declares the
+ * same `:root` custom properties as fallbacks. Emitting this block any
+ * earlier than 8 puts it *before* tokens.css in the document, and since
+ * both selectors are plain `:root` (identical specificity) the later rule
+ * wins — so every admin-chosen accent, font, radius and background was
+ * being silently overridden by the static fallback. Must stay > 8.
  */
 add_action(
 	'wp_head',
@@ -144,7 +152,7 @@ add_action(
 		}
 		echo '<style id="mk-theme-vars">' . "\n" . ThemeVarsBuilder::build() . "</style>\n"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- generated CSS, values validated against the registry.
 	},
-	1
+	20
 );
 
 /**

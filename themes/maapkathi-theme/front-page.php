@@ -167,9 +167,14 @@ $faqs         = mk_setting( 'section_faq_enabled', true ) ? mk_content( 'faqs' )
 		<h2 class="mk-section__heading mk-section__heading--on-accent"><?php mk_the_text( 'home_stats_heading' ); ?></h2>
 		<div class="mk-grid mk-grid--stats">
 			<?php foreach ( $stats as $stat ) : ?>
+				<?php
+				$stat_value    = (float) mk_meta( $stat->ID, 'mk_value_number' );
+				$stat_is_whole = (float) (int) $stat_value === $stat_value;
+				$stat_display  = $stat_is_whole ? (string) (int) $stat_value : (string) $stat_value;
+				?>
 				<div class="mk-stat">
-					<span class="mk-stat__value">
-						<?php echo esc_html( mk_meta( $stat->ID, 'mk_value_number' ) ); ?><?php echo esc_html( mk_meta( $stat->ID, 'mk_suffix' ) ); ?>
+					<span class="mk-stat__value" data-count-to="<?php echo esc_attr( (string) $stat_value ); ?>">
+						<span class="mk-stat__value-number"><?php echo esc_html( $stat_display ); ?></span><span class="mk-stat__value-suffix"><?php echo esc_html( mk_meta( $stat->ID, 'mk_suffix' ) ); ?></span>
 					</span>
 					<span class="mk-stat__label"><?php echo esc_html( get_the_title( $stat ) ); ?></span>
 				</div>
