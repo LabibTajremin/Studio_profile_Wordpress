@@ -262,3 +262,35 @@ add_action(
  */
 add_filter( 'excerpt_more', static fn() => '…' );
 add_filter( 'excerpt_length', static fn() => 28, 999 );
+
+if ( ! function_exists( 'mk_client_initials' ) ) {
+	/**
+	 * Up to two uppercase initials from a client name, for the colour-mark
+	 * placeholder the client-logo wall shows when no logo has been
+	 * uploaded (reference: sections.tsx ClientLetterMark).
+	 *
+	 * @param string $name Client display name.
+	 * @return string
+	 */
+	function mk_client_initials( string $name ): string {
+		$words  = preg_split( '/\s+/', trim( $name ) );
+		$first  = $words[0][0] ?? '';
+		$second = $words[1][0] ?? '';
+		return strtoupper( $first . $second );
+	}
+}
+
+if ( ! function_exists( 'mk_client_mark_color' ) ) {
+	/**
+	 * A stable colour derived from a client's name, so the same client
+	 * always gets the same placeholder mark colour across page loads.
+	 *
+	 * @param string $name Client display name.
+	 * @return string CSS `hsl()` colour value.
+	 */
+	function mk_client_mark_color( string $name ): string {
+		$hues = array( 162, 200, 20, 260, 320, 40 );
+		$hue  = $hues[ abs( crc32( $name ) ) % count( $hues ) ];
+		return "hsl({$hue} 45% 38%)";
+	}
+}
