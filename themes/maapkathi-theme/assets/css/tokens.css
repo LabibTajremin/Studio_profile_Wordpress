@@ -8,8 +8,8 @@
 	--accent: #6e1f2a;
 	--accent-dark: #8f2d3b;
 	--accent-foreground: #faf6f1;
-	--background: #faf8f5;
-	--foreground: #141110;
+	--background: #f9f0e4;
+	--foreground: #171310;
 	--pattern-css: background: none;
 	--pattern-opacity: 0.06;
 	--font-headings: "Fraunces", Georgia, "Times New Roman", serif;
@@ -32,7 +32,7 @@
 }
 
 :root[data-theme="dark"] {
-	--background: #17130f;
+	--background: #1c150e;
 	--foreground: #faf6f1;
 	--accent: var(--accent-dark);
 }

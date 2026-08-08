@@ -18,7 +18,7 @@ npm run test:e2e
 ## Layers
 
 - **Unit** (`tests/Unit`) — pure logic: `ContentVisibilityPolicy`,
-  `Theme\Motion::resolve_vars()`, `Theme\ThemeSettings` (the 31-setting
+  `Theme\Motion::resolve_vars()`, `Theme\ThemeSettings` (the 32-setting
   registry + sanitisation), `Video\VideoResolver`. No WordPress functions
   required beyond a handful stubbed in `tests/bootstrap.php` when
   `WP_TESTS_DIR` is unset.

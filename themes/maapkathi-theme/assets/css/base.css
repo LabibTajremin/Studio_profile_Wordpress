@@ -121,8 +121,9 @@ h1, h2, h3, h4, h5, h6 {
 .mk-call-btn--mobile { display: none; }
 
 .mk-theme-toggle, .mk-menu-toggle {
-	background: transparent;
-	border: 1px solid currentColor;
+	background: color-mix(in srgb, var(--foreground) 8%, transparent);
+	border: 1px solid color-mix(in srgb, var(--foreground) 25%, transparent);
+	color: var(--foreground);
 	border-radius: var(--radius);
 	min-width: 44px;
 	min-height: 44px;
@@ -130,6 +131,9 @@ h1, h2, h3, h4, h5, h6 {
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
+}
+.mk-theme-toggle:hover, .mk-menu-toggle:hover {
+	background: color-mix(in srgb, var(--foreground) 14%, transparent);
 }
 
 /* Sun/moon glyph — swaps on the same [data-theme] attribute the pre-paint

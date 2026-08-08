@@ -21,17 +21,21 @@ get_header();
 
 get_template_part( 'parts/hero' );
 
+// Each section already self-hides when it has no content; these settings
+// let an admin hide a section on purpose even when it has content, by
+// simply not fetching it at all — same effect as "no content", so no
+// other part of this template needs to know the toggle exists.
 $tagline_note = mk_text( 'home_tagline_note' );
-$clients      = mk_content( 'clients' );
-$categories   = mk_content( 'project_categories' );
-$projects     = mk_content( 'featured_projects', 6 );
-$services     = mk_content( 'top_level_services', 4 );
-$stats        = mk_content( 'stats' );
-$values       = mk_content( 'values' );
-$members      = mk_content( 'members', 4 );
-$testimonials = mk_content( 'testimonials' );
-$awards       = mk_content( 'awards' );
-$faqs         = mk_content( 'faqs' );
+$clients      = mk_setting( 'section_clients_enabled', true ) ? mk_content( 'clients' ) : array();
+$categories   = mk_setting( 'section_categories_enabled', true ) ? mk_content( 'project_categories' ) : array();
+$projects     = mk_setting( 'section_projects_enabled', true ) ? mk_content( 'featured_projects', 6 ) : array();
+$services     = mk_setting( 'section_services_enabled', true ) ? mk_content( 'top_level_services', 4 ) : array();
+$stats        = mk_setting( 'section_stats_enabled', true ) ? mk_content( 'stats' ) : array();
+$values       = mk_setting( 'section_values_enabled', true ) ? mk_content( 'values' ) : array();
+$members      = mk_setting( 'section_team_enabled', true ) ? mk_content( 'members', 4 ) : array();
+$testimonials = mk_setting( 'section_testimonials_enabled', true ) ? mk_content( 'testimonials' ) : array();
+$awards       = mk_setting( 'section_awards_enabled', true ) ? mk_content( 'awards' ) : array();
+$faqs         = mk_setting( 'section_faq_enabled', true ) ? mk_content( 'faqs' ) : array();
 ?>
 
 <?php if ( $tagline_note ) : ?>

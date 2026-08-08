@@ -79,6 +79,31 @@ $socials = $settings['socials'] ?? array();
 			<?php endforeach; ?>
 		</table>
 
+		<h2><?php esc_html_e( 'Homepage sections', 'maapkathi' ); ?></h2>
+		<table class="form-table">
+			<?php
+			$mk_sections = array(
+				'section_clients_enabled'      => __( 'Trusted by (client logos)', 'maapkathi' ),
+				'section_categories_enabled'   => __( 'Portfolio categories', 'maapkathi' ),
+				'section_projects_enabled'     => __( 'Featured work', 'maapkathi' ),
+				'section_services_enabled'     => __( 'Services', 'maapkathi' ),
+				'section_stats_enabled'        => __( 'Stats band', 'maapkathi' ),
+				'section_values_enabled'       => __( 'Values', 'maapkathi' ),
+				'section_team_enabled'         => __( 'Team', 'maapkathi' ),
+				'section_testimonials_enabled' => __( 'Testimonials', 'maapkathi' ),
+				'section_awards_enabled'       => __( 'Awards', 'maapkathi' ),
+				'section_faq_enabled'          => __( 'FAQ', 'maapkathi' ),
+			);
+			foreach ( $mk_sections as $mk_key => $mk_label ) :
+				?>
+				<tr>
+					<th><?php echo esc_html( $mk_label ); ?></th>
+					<td><label><input type="checkbox" name="<?php echo esc_attr( $mk_key ); ?>" value="1" <?php checked( ! isset( $settings[ $mk_key ] ) || $settings[ $mk_key ] ); ?> /> <?php esc_html_e( 'On', 'maapkathi' ); ?></label></td>
+				</tr>
+			<?php endforeach; ?>
+			<tr><td colspan="2"><p class="description"><?php esc_html_e( 'A section with no content underneath already hides itself — these switches are for hiding a section on purpose even when it has content.', 'maapkathi' ); ?></p></td></tr>
+		</table>
+
 		<h2><?php esc_html_e( 'Behaviour', 'maapkathi' ); ?></h2>
 		<table class="form-table">
 			<tr><th><?php esc_html_e( 'Blog enabled', 'maapkathi' ); ?></th><td><label><input type="checkbox" name="blog_enabled" value="1" <?php checked( ! empty( $settings['blog_enabled'] ) ); ?> /> <?php esc_html_e( 'On', 'maapkathi' ); ?></label></td></tr>

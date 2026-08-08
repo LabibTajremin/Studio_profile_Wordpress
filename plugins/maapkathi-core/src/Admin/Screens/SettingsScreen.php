@@ -69,6 +69,10 @@ final class SettingsScreen {
 		foreach ( array( 'logo_light', 'logo_dark', 'favicon' ) as $image_key ) {
 			$settings[ $image_key ] = absint( $_POST[ $image_key ] ?? 0 );
 		}
+		foreach ( array( 'section_clients_enabled', 'section_categories_enabled', 'section_projects_enabled', 'section_services_enabled', 'section_stats_enabled', 'section_values_enabled', 'section_team_enabled', 'section_testimonials_enabled', 'section_awards_enabled', 'section_faq_enabled' ) as $section_key ) {
+			$settings[ $section_key ] = ! empty( $_POST[ $section_key ] );
+		}
+
 		$settings['blog_enabled']                 = ! empty( $_POST['blog_enabled'] );
 		$settings['vision_mission_enabled']       = ! empty( $_POST['vision_mission_enabled'] );
 		$settings['vision_text']                  = sanitize_textarea_field( wp_unslash( $_POST['vision_text'] ?? '' ) );

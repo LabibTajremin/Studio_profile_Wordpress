@@ -14,7 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * The complete 31-setting registry (§11.1). This is the single source of
+ * The complete 32-setting registry (§11.1). This is the single source of
  * truth for defaults and allowed values — the Appearance/Motion admin
  * screens, the theme-vars cache, and the settings-registry unit test all
  * read from here so nothing can drift out of sync.
@@ -41,6 +41,7 @@ final class ThemeSettings {
 			'font_overrides'      => array(), // headings, body, nav, buttons, hero, accents => {fontId, colorHex}.
 			'heading_color_hex'   => null,
 			'body_color_hex'      => null,
+			'background_tone'     => Backgrounds::DEFAULT_TONE,
 			'radius'              => 'subtle',
 			'density'             => 'comfortable',
 			'grain'               => false,
@@ -89,6 +90,7 @@ final class ThemeSettings {
 			'accent_id'           => Accents::ids(),
 			'pattern_id'          => Patterns::ids(),
 			'font_pair_id'        => Fonts::ids(),
+			'background_tone'     => Backgrounds::ids(),
 			'radius'              => array_keys( Fonts::RADIUS_SCALE ),
 			'density'             => array_keys( Fonts::DENSITY_SCALE ),
 			'hero_style'          => array( 'full-bleed', 'contained', 'split', 'minimal' ),

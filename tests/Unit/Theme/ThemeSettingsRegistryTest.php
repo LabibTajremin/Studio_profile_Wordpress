@@ -5,33 +5,43 @@ namespace Maapkathi\Core\Tests\Unit\Theme;
 
 use Maapkathi\Core\Theme\ThemeSettings;
 use Maapkathi\Core\Theme\Accents;
+use Maapkathi\Core\Theme\Backgrounds;
 use Maapkathi\Core\Theme\Patterns;
 use Maapkathi\Core\Theme\Fonts;
 use Maapkathi\Core\Theme\Motion;
 use PHPUnit\Framework\TestCase;
 
 /**
- * §11.4: the registry must contain exactly 31 keys, and the exact option
+ * §11.4: the registry must contain exactly 32 keys, and the exact option
  * ID lists must match the source registries. Fails loudly if a setting is
  * ever dropped.
  */
 final class ThemeSettingsRegistryTest extends TestCase {
 
-	public function test_exactly_31_settings(): void {
-		$this->assertCount( 31, ThemeSettings::keys() );
+	public function test_exactly_32_settings(): void {
+		$this->assertCount( 32, ThemeSettings::keys() );
 	}
 
 	public function test_expected_keys_present(): void {
 		$expected = array(
 			'mode', 'accent_id', 'custom_accent_hex', 'pattern_id', 'pattern_opacity',
 			'font_pair_id', 'font_overrides', 'heading_color_hex', 'body_color_hex',
-			'radius', 'density', 'grain', 'glass', 'hero_style',
+			'background_tone', 'radius', 'density', 'grain', 'glass', 'hero_style',
 			'motion_preset', 'motion_level', 'scroll_reveal_style', 'hero_animation',
 			'image_hover_style', 'card_hover_style', 'text_reveal_style', 'page_transition',
 			'cursor_style', 'loader_style', 'scroll_progress', 'smooth_scroll',
 			'parallax_intensity', 'motion_speed', 'stagger_ms', 'animate_once', 'motion_on_mobile',
 		);
 		$this->assertSame( $expected, ThemeSettings::keys() );
+	}
+
+	public function test_2_background_tones_never_plain_white(): void {
+		$this->assertSame( array( 'warm', 'cool' ), Backgrounds::ids() );
+		$this->assertSame( 'warm', Backgrounds::DEFAULT_TONE );
+		foreach ( Backgrounds::all() as $tone ) {
+			$this->assertNotSame( '#ffffff', strtolower( $tone['light']['background'] ) );
+			$this->assertNotSame( '#fff', strtolower( $tone['light']['background'] ) );
+		}
 	}
 
 	public function test_24_accents(): void {

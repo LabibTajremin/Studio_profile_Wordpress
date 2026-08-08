@@ -28,7 +28,7 @@
 /* ---------- Hero ---------- */
 .mk-hero {
 	position: relative;
-	min-height: clamp(480px, 78vh, 900px);
+	min-height: clamp(560px, 100svh, 1100px);
 	display: grid;
 	isolation: isolate;
 	background: var(--accent);
@@ -187,7 +187,7 @@ html[data-hero-style="split"] .mk-hero { background: var(--background); }
 .mk-clients__item {
 	display: inline-flex;
 	align-items: center;
-	opacity: 0.65;
+	opacity: 0.75;
 	filter: grayscale(1);
 	transition: opacity var(--motion-duration) var(--motion-ease), filter var(--motion-duration) var(--motion-ease);
 	color: inherit;
@@ -195,7 +195,12 @@ html[data-hero-style="split"] .mk-hero { background: var(--background); }
 	font-weight: 600;
 }
 .mk-clients__item:hover { opacity: 1; filter: grayscale(0); }
-.mk-clients__item img { height: clamp(28px, 5vw, 44px); width: auto; display: block; }
+.mk-clients__item img { height: clamp(32px, 6vw, 44px); width: auto; display: block; }
+
+@media (max-width: 767px) {
+	.mk-clients__wall { gap: 2rem 2.5rem; }
+	.mk-clients__item img { height: 36px; }
+}
 
 /* ---------- Cards & grids ---------- */
 .mk-grid--categories { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }

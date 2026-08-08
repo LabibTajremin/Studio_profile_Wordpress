@@ -17,9 +17,9 @@ unstyled/wrong theme.
 registries change, re-copy from
 `LabibTajremin/MapKathi_Web_App/src/presentation/theme/`.
 
-## The 31 settings
+## The 32 settings
 
-`Theme\ThemeSettings::defaults()` is the single source of truth for all 31
+`Theme\ThemeSettings::defaults()` is the single source of truth for all 32
 `theme_settings` columns (§11.1). The Appearance admin screen
 (`Admin/views/appearance.php`) renders all 30 visible controls from this
 same registry, so the admin UI can never drift out of sync with what the
