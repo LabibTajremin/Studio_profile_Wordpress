@@ -210,7 +210,8 @@ final class AdminSkin {
 			.mk-admin .button-primary,
 			#wpbody-content .button,
 			#wpbody-content .button-primary {
-				border-radius: var( --radius, 6px );
+				/* Fixed, not var(--radius): admin chrome shouldn't go full-pill just because someone picked "Pill" for the public site's appearance — matches the reference admin's own fixed rounded-lg nav buttons (AdminNav.tsx). */
+				border-radius: 8px;
 				transition: transform 0.15s ease, box-shadow 0.15s ease;
 			}
 			.mk-admin .button-primary,

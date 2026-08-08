@@ -54,17 +54,32 @@ $faqs         = mk_setting( 'section_faq_enabled', true ) ? mk_content( 'faqs' )
 			<?php foreach ( $clients as $client ) : ?>
 				<?php
 				$website = mk_meta( $client->ID, 'mk_website' );
-				$logo    = get_the_post_thumbnail( $client, 'medium', array( 'loading' => 'lazy' ) );
+				$name    = get_the_title( $client );
+				$logo    = get_the_post_thumbnail(
+					$client,
+					'medium',
+					array(
+						'loading' => 'lazy',
+						'class'   => 'mk-clients__logo',
+					)
+				);
 				?>
-				<?php if ( $website ) : ?>
-					<a class="mk-clients__item" href="<?php echo esc_url( $website ); ?>" rel="noopener noreferrer" target="_blank">
-						<?php echo $logo ? $logo : esc_html( get_the_title( $client ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
-					</a>
-				<?php else : ?>
-					<span class="mk-clients__item">
-						<?php echo $logo ? $logo : esc_html( get_the_title( $client ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
-					</span>
-				<?php endif; ?>
+				<div class="mk-clients__item" title="<?php echo esc_attr( $name ); ?>">
+					<?php if ( $website ) : ?>
+						<a href="<?php echo esc_url( $website ); ?>" rel="noopener noreferrer" target="_blank" class="mk-clients__link">
+					<?php endif; ?>
+
+					<?php if ( $logo ) : ?>
+						<?php echo $logo; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+					<?php else : ?>
+						<span class="mk-clients__mark" style="<?php echo esc_attr( 'background-color:' . mk_client_mark_color( $name ) ); ?>"><?php echo esc_html( mk_client_initials( $name ) ); ?></span>
+						<span class="mk-clients__name"><?php echo esc_html( $name ); ?></span>
+					<?php endif; ?>
+
+					<?php if ( $website ) : ?>
+						</a>
+					<?php endif; ?>
+				</div>
 			<?php endforeach; ?>
 		</div>
 	</div>

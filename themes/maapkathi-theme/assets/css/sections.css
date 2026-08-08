@@ -176,30 +176,65 @@ html[data-hero-style="split"] .mk-hero { background: var(--background); }
 	text-wrap: balance;
 }
 
-/* ---------- Client wall ---------- */
+/* ---------- Client wall ----------
+ * Reference (sections.tsx ClientLogoWall/ClientLetterMark): a proper grid
+ * of bordered boxes, 2 cols mobile / 3 cols tablet / 6 cols desktop — not
+ * loose flex-wrapped images dimmed by opacity+grayscale, which is what
+ * made small placeholder logos read as illegible gray boxes on mobile.
+ * A client with no logo gets a coloured initials mark + name instead of
+ * a bare title string. */
 .mk-clients__wall {
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	gap: 1.25rem;
+}
+@media (min-width: 640px) {
+	.mk-clients__wall { grid-template-columns: repeat(3, 1fr); }
+}
+@media (min-width: 900px) {
+	.mk-clients__wall { grid-template-columns: repeat(6, 1fr); }
+}
+
+.mk-clients__item {
 	display: flex;
-	flex-wrap: wrap;
-	gap: clamp(1.5rem, 4vw, 3rem);
 	align-items: center;
 	justify-content: center;
+	gap: 0.5rem;
+	height: 56px;
+	padding-inline: 0.75rem;
+	border-radius: var(--radius);
+	border: 1px solid color-mix(in srgb, var(--foreground) 12%, transparent);
+	overflow: hidden;
 }
-.mk-clients__item {
-	display: inline-flex;
+.mk-clients__link {
+	display: flex;
 	align-items: center;
-	opacity: 0.75;
-	filter: grayscale(1);
-	transition: opacity var(--motion-duration) var(--motion-ease), filter var(--motion-duration) var(--motion-ease);
+	justify-content: center;
+	gap: 0.5rem;
+	width: 100%;
+	height: 100%;
 	color: inherit;
 	text-decoration: none;
-	font-weight: 600;
 }
-.mk-clients__item:hover { opacity: 1; filter: grayscale(0); }
-.mk-clients__item img { height: clamp(32px, 6vw, 44px); width: auto; display: block; }
-
-@media (max-width: 767px) {
-	.mk-clients__wall { gap: 2rem 2.5rem; }
-	.mk-clients__item img { height: 36px; }
+.mk-clients__logo { max-height: 32px; width: auto; display: block; }
+.mk-clients__mark {
+	display: inline-flex;
+	flex-shrink: 0;
+	align-items: center;
+	justify-content: center;
+	width: 28px;
+	height: 28px;
+	border-radius: 999px;
+	font-size: 0.7rem;
+	font-weight: 700;
+	color: #fff;
+}
+.mk-clients__name {
+	font-size: 0.9rem;
+	font-weight: 600;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
 }
 
 /* ---------- Cards & grids ---------- */
@@ -359,7 +394,7 @@ html[data-hero-style="split"] .mk-hero { background: var(--background); }
 .mk-copy-login {
 	background: none;
 	border: 1px solid currentColor;
-	border-radius: var(--radius);
+	border-radius: 999px;
 	cursor: pointer;
 	font-size: 0.75rem;
 	padding: 0.25rem 0.5rem;
@@ -390,7 +425,7 @@ html[data-hero-style="split"] .mk-hero { background: var(--background); }
 	cursor: pointer;
 	min-width: 44px;
 	min-height: 44px;
-	border-radius: var(--radius);
+	border-radius: 999px;
 }
 .mk-lightbox__close { top: 1rem; right: 1rem; }
 .mk-lightbox__prev { left: 1rem; top: 50%; transform: translateY(-50%); }
