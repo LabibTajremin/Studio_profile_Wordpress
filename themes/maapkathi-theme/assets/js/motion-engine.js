@@ -227,6 +227,69 @@
 		} );
 	}
 
+	/**
+	 * Counts each stats-band number up from 0 the first time it scrolls
+	 * into view, instead of just appearing as static text. The suffix
+	 * (+, %, ...) lives in its own span and is never touched — only the
+	 * number span's text is animated, so it always lands on exactly the
+	 * value the server rendered.
+	 */
+	function initStatCounters() {
+		var targets = document.querySelectorAll( '.mk-stat__value[data-count-to]' );
+
+		if ( ! targets.length || motionDisabled() || ! ( 'IntersectionObserver' in window ) ) {
+			return;
+		}
+
+		var durationMs = Math.max( 800, cssTimeToMs( getComputedStyle( root ).getPropertyValue( '--motion-duration' ) ) * 3 );
+
+		function animate( el ) {
+			var numberEl = el.querySelector( '.mk-stat__value-number' );
+			var target = parseFloat( el.getAttribute( 'data-count-to' ) ) || 0;
+			var isWhole = Math.round( target ) === target;
+			var start = null;
+
+			if ( ! numberEl ) {
+				return;
+			}
+
+			function step( now ) {
+				if ( null === start ) {
+					start = now;
+				}
+				var progress = Math.min( 1, ( now - start ) / durationMs );
+				var eased = 1 - Math.pow( 1 - progress, 3 );
+				var current = target * eased;
+				numberEl.textContent = isWhole ? String( Math.round( current ) ) : current.toFixed( 1 );
+
+				if ( progress < 1 ) {
+					window.requestAnimationFrame( step );
+				} else {
+					numberEl.textContent = isWhole ? String( target ) : target.toFixed( 1 );
+				}
+			}
+
+			numberEl.textContent = isWhole ? '0' : '0.0';
+			window.requestAnimationFrame( step );
+		}
+
+		var observer = new IntersectionObserver(
+			function ( entries ) {
+				entries.forEach( function ( entry ) {
+					if ( entry.isIntersecting ) {
+						animate( entry.target );
+						observer.unobserve( entry.target );
+					}
+				} );
+			},
+			{ threshold: 0.4 }
+		);
+
+		targets.forEach( function ( el ) {
+			observer.observe( el );
+		} );
+	}
+
 	function initScrollProgress() {
 		if ( '1' !== root.getAttribute( 'data-scroll-progress' ) ) {
 			return;
@@ -303,6 +366,7 @@
 		initScrollReveal();
 		initHeroCarousel();
 		initReducedMotionGifs();
+		initStatCounters();
 		initScrollProgress();
 		initCursor();
 		initLoader();
