@@ -5,6 +5,16 @@
 }
 .mk-section__heading--on-accent { color: var(--accent-foreground); }
 .mk-section__more { margin-top: 2rem; }
+/* Reference's "View all" / "Meet the team" links are plain underlined
+   text (text-sm underline underline-offset-4), never a bordered ghost
+   button — .mk-btn--ghost is reserved for actual buttons elsewhere. */
+.mk-link-more {
+	font-size: 0.9rem;
+	text-decoration: underline;
+	text-underline-offset: 4px;
+	color: inherit;
+}
+.mk-link-more:hover { color: var(--accent); }
 .mk-page-title { font-size: clamp(2rem, 5vw, 3.2rem); }
 .mk-lede {
 	font-size: clamp(1.05rem, 2vw, 1.3rem);
