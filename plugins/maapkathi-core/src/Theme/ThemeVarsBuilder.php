@@ -45,6 +45,10 @@ final class ThemeVarsBuilder {
 			$css .= "  {$name}: {$value};\n";
 		}
 		$css .= "}\n";
+		// --background/--foreground swap to their dark-mode pair here rather
+		// than via a plain var() default, since the light/dark pair is a
+		// per-tenant admin choice (Backgrounds), not a fixed fallback.
+		$css .= ':root[data-theme="dark"]{ --background: var(--background-dark); --foreground: var(--foreground-dark); }' . "\n";
 		// A CSS custom property cannot hold a full declaration for var()
 		// substitution, so the pattern's `background-image`/`background-size`
 		// declarations are emitted here as a real rule instead of a var.
@@ -70,11 +74,16 @@ final class ThemeVarsBuilder {
 
 		$pattern = Patterns::by_id( $settings['pattern_id'] ) ?? Patterns::by_id( 'none' );
 		$fonts   = Fonts::by_id( $settings['font_pair_id'] ) ?? Fonts::by_id( 'fraunces-manrope' );
+		$tone    = Backgrounds::by_id( $settings['background_tone'] ) ?? Backgrounds::by_id( Backgrounds::DEFAULT_TONE );
 
 		$vars = array(
 			'--accent'            => $accent_light,
 			'--accent-dark'       => $accent_dark,
 			'--accent-foreground' => Accents::on_accent( $accent_light ),
+			'--background'        => $tone['light']['background'],
+			'--foreground'        => $tone['light']['foreground'],
+			'--background-dark'   => $tone['dark']['background'],
+			'--foreground-dark'   => $tone['dark']['foreground'],
 			'--pattern-css'       => rtrim( $pattern['css'], ';' ) . ';',
 			'--pattern-opacity'   => (string) ( (int) $settings['pattern_opacity'] / 100 ),
 			'--font-headings'     => self::area_font( $settings, 'headings', $fonts['display'] ),

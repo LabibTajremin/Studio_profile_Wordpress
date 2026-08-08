@@ -16,7 +16,7 @@ must never write to the database, register post types, or define fields.
 - `Approval/` — `ContentVisibilityPolicy` (pure decision logic) +
   `ApprovalService` (mk_revisions queue, audit log) — §8.
 - `Theme/` — `Accents`, `Patterns`, `Fonts`, `Motion` registries ported
-  verbatim from the source app, plus `ThemeSettings` (the 31-setting
+  verbatim from the source app, plus `ThemeSettings` (the 32-setting
   registry) and `ThemeVarsBuilder` (CSS custom-property + data-* output).
 - `Admin/` — the custom "Maapkathi" top-level menu (§9).
 - `Inquiries/` — contact form handling (§3.2, §12).

@@ -8,6 +8,7 @@
 declare( strict_types = 1 );
 
 use Maapkathi\Core\Theme\Accents;
+use Maapkathi\Core\Theme\Backgrounds;
 use Maapkathi\Core\Theme\Patterns;
 use Maapkathi\Core\Theme\Fonts;
 use Maapkathi\Core\Theme\Motion;
@@ -17,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Appearance → Theme + Motion. Renders all 31 theme_settings (§11.1) as
+ * Appearance → Theme + Motion. Renders all 32 theme_settings (§11.1) as
  * working, posting controls. Simple markup by design — the requirement is
  * that every control demonstrably changes the rendered site, not that this
  * screen wins a design award.
@@ -116,6 +117,20 @@ $is_custom_preset = 'custom' === $settings['motion_preset'];
 			<tr>
 				<th><?php esc_html_e( '9. Body colour', 'maapkathi' ); ?></th>
 				<td><input type="text" name="mk_theme_settings[body_color_hex]" value="<?php echo esc_attr( (string) ( $settings['body_color_hex'] ?? '' ) ); ?>" placeholder="#RRGGBB" /></td>
+			</tr>
+			<tr>
+				<th><?php esc_html_e( '9a. Background tone', 'maapkathi' ); ?></th>
+				<td>
+					<div class="mk-swatch-grid mk-swatch-grid--tone">
+						<?php foreach ( Backgrounds::all() as $mk_tone_id => $tone ) : ?>
+							<label class="mk-swatch" style="background:<?php echo esc_attr( $tone['light']['background'] ); ?>">
+								<input type="radio" name="mk_theme_settings[background_tone]" value="<?php echo esc_attr( $mk_tone_id ); ?>" <?php checked( $settings['background_tone'], $mk_tone_id ); ?> />
+								<span class="screen-reader-text"><?php echo esc_html( $tone['name'] ); ?></span>
+							</label>
+						<?php endforeach; ?>
+					</div>
+					<p class="description"><?php esc_html_e( 'Never solid white — a warm cream (default) or a cooler off-white/grey base for the whole site.', 'maapkathi' ); ?></p>
+				</td>
 			</tr>
 			<tr>
 				<th><?php esc_html_e( '10. Radius', 'maapkathi' ); ?></th>
