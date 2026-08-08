@@ -48,7 +48,7 @@ final class ThemeVarsBuilder {
 		// --background/--foreground swap to their dark-mode pair here rather
 		// than via a plain var() default, since the light/dark pair is a
 		// per-tenant admin choice (Backgrounds), not a fixed fallback.
-		$css .= ':root[data-theme="dark"]{ --background: var(--background-dark); --foreground: var(--foreground-dark); }' . "\n";
+		$css .= ':root[data-theme="dark"]{ --background: var(--background-dark); --foreground: var(--foreground-dark); --accent-readable: var(--accent-readable-dark); }' . "\n";
 		// A CSS custom property cannot hold a full declaration for var()
 		// substitution, so the pattern's `background-image`/`background-size`
 		// declarations are emitted here as a real rule instead of a var.
@@ -77,27 +77,32 @@ final class ThemeVarsBuilder {
 		$tone    = Backgrounds::by_id( $settings['background_tone'] ) ?? Backgrounds::by_id( Backgrounds::DEFAULT_TONE );
 
 		$vars = array(
-			'--accent'            => $accent_light,
-			'--accent-dark'       => $accent_dark,
-			'--accent-foreground' => Accents::on_accent( $accent_light ),
-			'--background'        => $tone['light']['background'],
-			'--foreground'        => $tone['light']['foreground'],
-			'--background-dark'   => $tone['dark']['background'],
-			'--foreground-dark'   => $tone['dark']['foreground'],
-			'--pattern-css'       => rtrim( $pattern['css'], ';' ) . ';',
-			'--pattern-opacity'   => (string) ( (int) $settings['pattern_opacity'] / 100 ),
-			'--font-headings'     => self::area_font( $settings, 'headings', $fonts['display'] ),
-			'--font-body'         => self::area_font( $settings, 'body', $fonts['body'] ),
-			'--font-nav'          => self::area_font( $settings, 'nav', $fonts['body'] ),
-			'--font-buttons'      => self::area_font( $settings, 'buttons', $fonts['body'] ),
-			'--font-hero'         => self::area_font( $settings, 'hero', $fonts['display'] ),
-			'--font-accents'      => self::area_font( $settings, 'accents', $fonts['body'] ),
-			'--heading-color'     => $settings['heading_color_hex'] ? $settings['heading_color_hex'] : 'inherit',
-			'--body-color'        => $settings['body_color_hex'] ? $settings['body_color_hex'] : 'inherit',
-			'--radius'            => Fonts::RADIUS_SCALE[ $settings['radius'] ] ?? Fonts::RADIUS_SCALE['subtle'],
-			'--density'           => Fonts::DENSITY_SCALE[ $settings['density'] ] ?? Fonts::DENSITY_SCALE['comfortable'],
-			'--grain-opacity'     => $settings['grain'] ? '0.06' : '0',
-			'--glass-blur'        => $settings['glass'] ? '12px' : '0px',
+			'--accent'               => $accent_light,
+			'--accent-dark'          => $accent_dark,
+			'--accent-foreground'    => Accents::on_accent( $accent_light ),
+			// Accent used as *text* on the page background. A pale accent
+			// (Sand, Champagne) is unreadable at 4.5:1 on cream, so this is
+			// stepped toward ink/cream until it passes — see readable_on().
+			'--accent-readable'      => Accents::readable_on( $accent_light, $tone['light']['background'] ),
+			'--accent-readable-dark' => Accents::readable_on( $accent_dark, $tone['dark']['background'] ),
+			'--background'           => $tone['light']['background'],
+			'--foreground'           => $tone['light']['foreground'],
+			'--background-dark'      => $tone['dark']['background'],
+			'--foreground-dark'      => $tone['dark']['foreground'],
+			'--pattern-css'          => rtrim( $pattern['css'], ';' ) . ';',
+			'--pattern-opacity'      => (string) ( (int) $settings['pattern_opacity'] / 100 ),
+			'--font-headings'        => self::area_font( $settings, 'headings', $fonts['display'] ),
+			'--font-body'            => self::area_font( $settings, 'body', $fonts['body'] ),
+			'--font-nav'             => self::area_font( $settings, 'nav', $fonts['body'] ),
+			'--font-buttons'         => self::area_font( $settings, 'buttons', $fonts['body'] ),
+			'--font-hero'            => self::area_font( $settings, 'hero', $fonts['display'] ),
+			'--font-accents'         => self::area_font( $settings, 'accents', $fonts['body'] ),
+			'--heading-color'        => $settings['heading_color_hex'] ? $settings['heading_color_hex'] : 'inherit',
+			'--body-color'           => $settings['body_color_hex'] ? $settings['body_color_hex'] : 'inherit',
+			'--radius'               => Fonts::RADIUS_SCALE[ $settings['radius'] ] ?? Fonts::RADIUS_SCALE['subtle'],
+			'--density'              => Fonts::DENSITY_SCALE[ $settings['density'] ] ?? Fonts::DENSITY_SCALE['comfortable'],
+			'--grain-opacity'        => $settings['grain'] ? '0.06' : '0',
+			'--glass-blur'           => $settings['glass'] ? '12px' : '0px',
 		);
 
 		$motion_vars = Motion::resolve_vars(

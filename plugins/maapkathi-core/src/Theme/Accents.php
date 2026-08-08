@@ -223,6 +223,62 @@ final class Accents {
 	}
 
 	/**
+	 * An accent shade guaranteed readable as *text* on a given surface.
+	 *
+	 * Note on_accent() solves the opposite problem (ink to place on top of
+	 * an accent fill). This one is for the accent used as a foreground colour
+	 * on the page background — role labels, icons, link hovers. A light
+	 * accent such as Sand or Champagne on the cream background falls far
+	 * below 4.5:1, so it is stepped toward ink (or toward cream on a dark
+	 * surface) until it passes.
+	 *
+	 * @param string $accent_hex  Accent colour, as a hex string.
+	 * @param string $surface_hex Surface the text sits on, as a hex string.
+	 * @return string Hex colour meeting at least 4.5:1 against the surface.
+	 */
+	public static function readable_on( string $accent_hex, string $surface_hex ): string {
+		if ( self::contrast_ratio( $accent_hex, $surface_hex ) >= 4.5 ) {
+			return $accent_hex;
+		}
+
+		// Darken against a light surface, lighten against a dark one.
+		$toward = self::relative_luminance( $surface_hex ) > 0.5 ? self::INK : self::CREAM;
+
+		for ( $step = 1; $step <= 20; $step++ ) {
+			$candidate = self::mix( $accent_hex, $toward, $step * 5 );
+			if ( self::contrast_ratio( $candidate, $surface_hex ) >= 4.5 ) {
+				return $candidate;
+			}
+		}
+
+		return $toward;
+	}
+
+	/**
+	 * Blends two hex colours by a percentage, in sRGB.
+	 *
+	 * @param string $hex_a   Base colour, as a hex string.
+	 * @param string $hex_b   Colour to mix in, as a hex string.
+	 * @param int    $percent How much of $hex_b to mix in, 0-100.
+	 * @return string Resulting hex colour.
+	 */
+	private static function mix( string $hex_a, string $hex_b, int $percent ): string {
+		$a     = ltrim( $hex_a, '#' );
+		$b     = ltrim( $hex_b, '#' );
+		$ratio = max( 0, min( 100, $percent ) ) / 100;
+		$out   = '#';
+
+		for ( $i = 0; $i < 3; $i++ ) {
+			$channel_a = (int) hexdec( substr( $a, $i * 2, 2 ) );
+			$channel_b = (int) hexdec( substr( $b, $i * 2, 2 ) );
+			$mixed     = (int) round( $channel_a + ( ( $channel_b - $channel_a ) * $ratio ) );
+			$out      .= str_pad( dechex( max( 0, min( 255, $mixed ) ) ), 2, '0', STR_PAD_LEFT );
+		}
+
+		return $out;
+	}
+
+	/**
 	 * WCAG contrast ratio between two hex colours.
 	 *
 	 * @param string $hex_a First colour, as a hex string.
@@ -243,7 +299,7 @@ final class Accents {
 	 * @param string $hex Colour, as a hex string.
 	 * @return float Relative luminance, from 0 (black) to 1 (white).
 	 */
-	private static function relative_luminance( string $hex ): float {
+	public static function relative_luminance( string $hex ): float {
 		$hex = ltrim( $hex, '#' );
 		$r   = hexdec( substr( $hex, 0, 2 ) ) / 255;
 		$g   = hexdec( substr( $hex, 2, 2 ) ) / 255;
