@@ -202,9 +202,25 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* Footer */
-.mk-site-footer { padding-block: 3rem; border-top: 1px solid color-mix(in srgb, var(--foreground) 12%, transparent); }
-.mk-site-footer__inner { max-width: 1200px; margin-inline: auto; padding-inline: clamp(1.25rem, 4vw, 3rem); display: flex; flex-wrap: wrap; gap: 2rem; justify-content: space-between; }
+.mk-site-footer { border-top: 1px solid color-mix(in srgb, var(--foreground) 12%, transparent); }
+.mk-site-footer__inner { max-width: 1200px; margin-inline: auto; padding-inline: clamp(1.25rem, 4vw, 3rem); padding-block: clamp(2.5rem, 6vw, 4rem); display: flex; flex-wrap: wrap; gap: 2rem; justify-content: space-between; }
 .mk-site-footer nav ul { list-style: none; display: flex; flex-wrap: wrap; gap: 1rem; padding: 0; }
+
+/* The copyright is its own full-width bar with a divider above it, like
+   the reference's footer — it previously sat outside .mk-site-footer__inner
+   with no styles at all, so it ran flush to the viewport edge while every
+   other footer element was aligned to the container. */
+.mk-site-footer__bottom { border-top: 1px solid color-mix(in srgb, var(--foreground) 12%, transparent); }
+.mk-copyright {
+	max-width: 1200px;
+	margin-inline: auto;
+	padding-inline: clamp(1.25rem, 4vw, 3rem);
+	padding-block: 1.5rem;
+	margin-block: 0;
+	text-align: center;
+	font-size: 0.8rem;
+	opacity: 0.6;
+}
 
 /* Contact form */
 .mk-contact__grid { display: grid; grid-template-columns: 1fr 1.4fr; gap: 3rem; }
