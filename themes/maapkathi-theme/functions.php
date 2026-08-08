@@ -16,6 +16,15 @@ use Maapkathi\Core\Theme\ThemeSettings;
 use Maapkathi\Core\Theme\Fonts;
 use Maapkathi\Core\Support\Branding;
 
+/**
+ * Last-resort asset version, used only if both filemtime() and the
+ * style.css Version header are unavailable. Never leave this empty — an
+ * empty version makes WordPress drop the ?ver= cache-buster completely.
+ */
+if ( ! defined( 'MK_THEME_VERSION' ) ) {
+	define( 'MK_THEME_VERSION', '0.1.0' );
+}
+
 require get_template_directory() . '/parts/nav.php';
 
 /**
@@ -59,9 +68,25 @@ add_action(
 
 		// File-mtime versioning busts browser caches on deploy without
 		// anyone having to remember to bump a version constant.
+		//
+		// Every branch must return a NON-EMPTY string. wp_enqueue_style()
+		// treats '' as "no version" and omits the ?ver= query entirely —
+		// and with a CDN/browser Cache-Control of a week on these files,
+		// a versionless URL is cached indefinitely and no deploy is ever
+		// picked up. That is exactly what was happening in production:
+		// every theme stylesheet was being served from
+		// /assets/css/*.css with no query string at all. filemtime() can
+		// legitimately fail (opcache/stat cache, restrictive open_basedir,
+		// a symlinked or synced deploy), so both fallbacks are guarded.
 		$ver = static function ( string $rel ) use ( $theme_dir ): string {
-			$path = $theme_dir . $rel;
-			return (string) ( file_exists( $path ) ? filemtime( $path ) : wp_get_theme()->get( 'Version' ) );
+			$path  = $theme_dir . $rel;
+			$stamp = file_exists( $path ) ? filemtime( $path ) : false;
+			if ( false !== $stamp ) {
+				return (string) $stamp;
+			}
+
+			$theme_version = (string) wp_get_theme()->get( 'Version' );
+			return '' !== $theme_version ? $theme_version : MK_THEME_VERSION;
 		};
 
 		wp_enqueue_style( 'maapkathi-tokens', $theme_uri . '/assets/css/tokens.css', array(), $ver( '/assets/css/tokens.css' ) );
