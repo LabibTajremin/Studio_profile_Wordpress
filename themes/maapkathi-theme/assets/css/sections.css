@@ -1,6 +1,16 @@
 /* ---------- Shared section furniture ---------- */
+/* Small uppercase label above each section heading, matching the
+   reference's SectionHeading eyebrow (sections.tsx). */
+.mk-section__eyebrow {
+	font-size: 0.75rem;
+	text-transform: uppercase;
+	letter-spacing: 0.2em;
+	opacity: 0.6;
+	margin: 0 0 0.5rem;
+}
 .mk-section__heading {
-	font-size: clamp(1.6rem, 3.5vw, 2.4rem);
+	font-size: clamp(1.8rem, 4vw, 3rem);
+	letter-spacing: -0.01em;
 	margin-bottom: calc(2rem * var(--density, 1));
 }
 .mk-section__heading--on-accent { color: var(--accent-foreground); }
@@ -250,17 +260,13 @@ html[data-hero-style="split"] .mk-hero { background: var(--background); }
 /* ---------- Cards & grids ---------- */
 .mk-grid--categories { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
 .mk-grid--services { grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
-.mk-grid--values { grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
 .mk-grid--team { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
-.mk-grid--testimonials { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
 .mk-grid--stats { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); text-align: center; }
 .mk-grid--halves { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
 
 .mk-card { padding: 0; }
 .mk-card--category,
 .mk-card--service,
-.mk-card--value,
-.mk-card--testimonial,
 .mk-card--member { padding: clamp(1.25rem, 2.5vw, 1.75rem); }
 .mk-card__title { font-size: 1.15rem; margin: 0.75rem 0 0.25rem; }
 .mk-card--project .mk-card__title,
@@ -291,17 +297,55 @@ html[data-hero-style="split"] .mk-hero { background: var(--background); }
 .mk-stats-band .mk-stat__value,
 .mk-stats-band .mk-stat__label { color: var(--accent-foreground); }
 
-/* ---------- Testimonials ---------- */
-.mk-card--testimonial { display: flex; flex-direction: column; gap: 0.75rem; margin: 0; }
-.mk-card--testimonial blockquote {
+/* ---------- Values ----------
+ * A plain numbered list, not cards — matches the reference's CoreValues
+ * (sections.tsx), which has no card surface and no icon. */
+.mk-values__list {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+	display: grid;
+	grid-template-columns: 1fr;
+	gap: 2rem 2.5rem;
+}
+@media (min-width: 640px) {
+	.mk-values__list { grid-template-columns: repeat(2, 1fr); }
+}
+.mk-value { display: flex; gap: 1rem; }
+.mk-value__number { font-size: 0.85rem; opacity: 0.4; padding-top: 0.35rem; }
+.mk-value__title { font-size: 1.1rem; font-weight: 500; margin: 0 0 0.25rem; }
+.mk-value__text { margin: 0; opacity: 0.7; }
+
+/* ---------- Testimonials ----------
+ * Centered plain blockquotes with a circular avatar, no card surface —
+ * matches the reference's Testimonials section. The stored mk_rating is
+ * intentionally not rendered here; the reference doesn't show it either. */
+.mk-testimonials { text-align: center; }
+.mk-testimonials .mk-container { max-width: 900px; }
+.mk-testimonials__list { display: flex; flex-direction: column; gap: 3rem; }
+.mk-testimonial { margin: 0; display: flex; flex-direction: column; align-items: center; gap: 1rem; }
+.mk-testimonial__quote {
 	margin: 0;
 	font-family: var(--font-headings);
-	font-size: 1.1rem;
-	line-height: 1.5;
+	font-size: clamp(1.3rem, 3vw, 2rem);
+	font-weight: 300;
+	line-height: 1.35;
 }
-.mk-card--testimonial figcaption { font-size: 0.9rem; display: flex; flex-direction: column; }
-.mk-card--testimonial figcaption span { opacity: 0.7; }
-.mk-rating { color: var(--accent); letter-spacing: 0.1em; }
+.mk-testimonial__cite {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.75rem;
+	font-size: 0.9rem;
+	opacity: 0.7;
+}
+.mk-testimonial__avatar {
+	width: 40px;
+	height: 40px;
+	border-radius: 999px;
+	object-fit: cover;
+	display: block;
+}
 
 /* ---------- Awards & process ---------- */
 .mk-awards__list, .mk-process__list { list-style: none; padding: 0; margin: 0; }
