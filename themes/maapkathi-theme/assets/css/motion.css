@@ -80,3 +80,47 @@ html[data-loader-style="bar"] .mk-loader {
 	html[data-motion-on-mobile="off"] .mk-reveal { opacity: 1 !important; transform: none !important; transition: none !important; }
 	html[data-motion-on-mobile="reduced"] { --motion-duration: calc(var(--motion-duration) * 0.6); }
 }
+
+/* ---------- Hero first-impression polish (§11.1 #18/#21) ----------
+ * Above the fold, so this runs as a plain CSS animation on load rather
+ * than the IntersectionObserver-driven scroll reveal above — no delay
+ * waiting for a scroll event, and --motion-duration already collapses
+ * to 0ms under reduced motion / motion_preset=off (tokens.css,
+ * Theme\Motion::resolve_vars), so `both` fill-mode just snaps content
+ * straight to its visible state with no extra guard needed here. */
+@keyframes mk-kenburns {
+	from { transform: scale(1); }
+	to { transform: scale(1.08); }
+}
+html[data-hero-animation="ken-burns-drift"] .mk-hero__slide.is-active > .mk-hero__media-wrap .mk-hero__media {
+	animation: mk-kenburns calc(var(--motion-duration) * 24) var(--motion-ease) both;
+}
+
+@keyframes mk-hero-reveal {
+	from { opacity: 0; transform: translateY(var(--motion-distance)); }
+	to { opacity: 1; transform: none; }
+}
+html:not([data-text-reveal-style="none"]) .mk-hero__eyebrow,
+html:not([data-text-reveal-style="none"]) .mk-hero__headline,
+html:not([data-text-reveal-style="none"]) .mk-hero__body,
+html:not([data-text-reveal-style="none"]) .mk-hero__copy > .mk-btn {
+	animation: mk-hero-reveal var(--motion-duration) var(--motion-ease) both;
+}
+html:not([data-text-reveal-style="none"]) .mk-hero__eyebrow { animation-delay: 0ms; }
+html:not([data-text-reveal-style="none"]) .mk-hero__headline { animation-delay: var(--motion-stagger); }
+html:not([data-text-reveal-style="none"]) .mk-hero__body { animation-delay: calc(var(--motion-stagger) * 2); }
+html:not([data-text-reveal-style="none"]) .mk-hero__copy > .mk-btn { animation-delay: calc(var(--motion-stagger) * 3); }
+
+/* ---------- Page transition (§11.1 #22) ----------
+ * A soft whole-page fade-in on load is the safe subset of "page
+ * transition" to do in pure CSS — intercepting link clicks to animate
+ * *out* before navigating needs JS restraint (skipping new tabs,
+ * modified clicks, hash links, external hosts) that isn't worth the
+ * risk for a first pass. */
+@keyframes mk-page-fade-in {
+	from { opacity: 0; }
+	to { opacity: 1; }
+}
+html[data-page-transition="fade"] body {
+	animation: mk-page-fade-in var(--motion-duration) var(--motion-ease) both;
+}
