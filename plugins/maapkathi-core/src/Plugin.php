@@ -28,6 +28,7 @@ use Maapkathi\Core\Cli\SeedCommand;
 use Maapkathi\Core\Setup\SetupWizard;
 use Maapkathi\Core\Users\EmailVerification;
 use Maapkathi\Core\Mail\Mailer;
+use Maapkathi\Core\Admin\AdminSkin;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -105,6 +106,7 @@ final class Plugin {
 		if ( is_admin() ) {
 			( new Menu() )->register_hooks();
 			( new SetupWizard() )->register_hooks();
+			( new AdminSkin() )->register_hooks();
 		}
 
 		if ( defined( 'WP_CLI' ) && WP_CLI && class_exists( '\WP_CLI' ) ) {

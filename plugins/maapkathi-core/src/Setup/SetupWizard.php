@@ -31,6 +31,13 @@ final class SetupWizard {
 	private const PAGE_SLUG = 'mk-setup';
 
 	/**
+	 * Validation errors from the most recent submit, for render() to display.
+	 *
+	 * @var string[]
+	 */
+	private array $errors = array();
+
+	/**
 	 * Registers every hook this class needs.
 	 *
 	 * @return void
@@ -45,10 +52,44 @@ final class SetupWizard {
 	 * not shown in any menu, matching how WordPress itself hides one-time
 	 * screens like the media-upload popup.
 	 *
+	 * The submit handler runs on this page's own `load-{hook}` action rather
+	 * than inside render() itself: admin.php always prints the page header
+	 * (doctype, admin nav) before invoking a page's render callback, so a
+	 * redirect attempted from inside render() only succeeds by the accident
+	 * of PHP's output buffer not yet having flushed — confirmed by testing
+	 * against a real WordPress instance, where it failed intermittently.
+	 * `load-{hook}` fires before any of that output starts, which is
+	 * WordPress's own documented pattern for exactly this case.
+	 *
 	 * @return void
 	 */
 	public function register_page(): void {
-		add_submenu_page( null, __( 'Maapkathi Setup', 'maapkathi' ), __( 'Maapkathi Setup', 'maapkathi' ), 'manage_options', self::PAGE_SLUG, array( $this, 'render' ) );
+		$hook = add_submenu_page( null, __( 'Maapkathi Setup', 'maapkathi' ), __( 'Maapkathi Setup', 'maapkathi' ), 'manage_options', self::PAGE_SLUG, array( $this, 'render' ) );
+
+		if ( $hook ) {
+			add_action( "load-{$hook}", array( $this, 'handle_submit' ) );
+		}
+	}
+
+	/**
+	 * Validates and applies a posted setup form, redirecting on success.
+	 * Runs before any page output has started (see register_page()).
+	 *
+	 * @return void
+	 */
+	public function handle_submit(): void {
+		if ( ! current_user_can( 'manage_options' ) || ! isset( $_POST['mk_setup_nonce'] ) ) {
+			return;
+		}
+
+		check_admin_referer( 'mk_run_setup', 'mk_setup_nonce' );
+
+		$this->errors = $this->save();
+
+		if ( empty( $this->errors ) ) {
+			wp_safe_redirect( admin_url( 'admin.php?page=maapkathi&mk_setup=1' ) );
+			exit;
+		}
 	}
 
 	/**
@@ -91,7 +132,7 @@ final class SetupWizard {
 	}
 
 	/**
-	 * Handles the form submission, then renders the screen.
+	 * Renders the screen: the form, plus any errors from handle_submit().
 	 *
 	 * @return void
 	 */
@@ -100,17 +141,8 @@ final class SetupWizard {
 			wp_die( esc_html__( 'You do not have permission to view this page.', 'maapkathi' ) );
 		}
 
-		$errors = array();
-
-		if ( isset( $_POST['mk_setup_nonce'] ) && check_admin_referer( 'mk_run_setup', 'mk_setup_nonce' ) ) {
-			$errors = $this->save();
-			if ( empty( $errors ) ) {
-				wp_safe_redirect( admin_url( 'admin.php?page=maapkathi&mk_setup=1' ) );
-				exit;
-			}
-		}
-
-		$user = wp_get_current_user();
+		$errors = $this->errors;
+		$user   = wp_get_current_user();
 
 		require MK_PLUGIN_DIR . 'src/Setup/view.php';
 	}
@@ -118,7 +150,7 @@ final class SetupWizard {
 	/**
 	 * Validates and applies the posted setup form.
 	 *
-	 * Called only from render(), which has already verified the
+	 * Called only from handle_submit(), which has already verified the
 	 * mk_run_setup nonce before invoking this method.
 	 *
 	 * @return string[] Human-readable validation errors; empty means success.
