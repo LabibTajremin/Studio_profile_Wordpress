@@ -66,11 +66,15 @@ $is_custom_preset = 'custom' === $settings['motion_preset'];
 			<tr>
 				<th><?php esc_html_e( '4. Pattern', 'maapkathi' ); ?></th>
 				<td>
-					<select name="mk_theme_settings[pattern_id]">
+					<div class="mk-pattern-grid">
 						<?php foreach ( Patterns::all() as $pattern ) : ?>
-							<option value="<?php echo esc_attr( $pattern['id'] ); ?>" <?php selected( $settings['pattern_id'], $pattern['id'] ); ?>><?php echo esc_html( $pattern['name'] ); ?></option>
+							<label class="mk-pattern-swatch">
+								<input type="radio" name="mk_theme_settings[pattern_id]" value="<?php echo esc_attr( $pattern['id'] ); ?>" <?php checked( $settings['pattern_id'], $pattern['id'] ); ?> />
+								<span class="mk-pattern-swatch__preview" style="<?php echo esc_attr( '--pattern-color:#8a8a8a;background:#f6f5f2;' . $pattern['css'] ); ?>" aria-hidden="true"></span>
+								<span class="mk-pattern-swatch__label"><?php echo esc_html( $pattern['name'] ); ?></span>
+							</label>
 						<?php endforeach; ?>
-					</select>
+					</div>
 				</td>
 			</tr>
 			<tr>

@@ -157,6 +157,73 @@ final class AdminSkin {
 			}
 			#adminmenu { display: flex; flex-direction: column; }
 			#adminmenu > #menu-highlight { display: none; }
+
+			/* Smoother, less "raw WordPress" content chrome. */
+			.mk-admin .wrap,
+			#wpbody-content > .wrap {
+				background: var( --background, #fff );
+				border-radius: var( --radius, 12px );
+				padding: clamp( 1rem, 2vw, 2rem );
+				margin-top: 1rem;
+			}
+			.mk-admin h1.wp-heading-inline,
+			#wpbody-content > .wrap > h1 {
+				font-family: var( --font-headings, inherit );
+				color: var( --heading-color, var( --foreground, inherit ) );
+			}
+			.mk-admin .form-table,
+			#wpbody-content .form-table {
+				background: color-mix( in srgb, var( --foreground, #000 ) 3%, transparent );
+				border-radius: var( --radius, 8px );
+				overflow: hidden;
+				border-collapse: separate;
+			}
+			.mk-admin .form-table > tbody > tr,
+			#wpbody-content .form-table > tbody > tr {
+				border-bottom: 1px solid color-mix( in srgb, var( --foreground, #000 ) 8%, transparent );
+			}
+			.mk-admin .form-table > tbody > tr:last-child,
+			#wpbody-content .form-table > tbody > tr:last-child {
+				border-bottom: 0;
+			}
+			.mk-admin input[type="text"],
+			.mk-admin input[type="email"],
+			.mk-admin input[type="url"],
+			.mk-admin input[type="password"],
+			.mk-admin input[type="number"],
+			.mk-admin select,
+			.mk-admin textarea {
+				border-radius: calc( var( --radius, 8px ) / 1.5 );
+				border-color: color-mix( in srgb, var( --foreground, #000 ) 20%, transparent );
+			}
+			.mk-admin input[type="text"]:focus,
+			.mk-admin input[type="email"]:focus,
+			.mk-admin input[type="url"]:focus,
+			.mk-admin input[type="password"]:focus,
+			.mk-admin input[type="number"]:focus,
+			.mk-admin select:focus,
+			.mk-admin textarea:focus {
+				border-color: var( --accent, #2271b1 );
+				box-shadow: 0 0 0 1px var( --accent, #2271b1 );
+			}
+			.mk-admin .button,
+			.mk-admin .button-primary,
+			#wpbody-content .button,
+			#wpbody-content .button-primary {
+				border-radius: var( --radius, 6px );
+				transition: transform 0.15s ease, box-shadow 0.15s ease;
+			}
+			.mk-admin .button-primary,
+			#wpbody-content .button-primary {
+				background: var( --accent, #2271b1 );
+				border-color: var( --accent, #2271b1 );
+				color: var( --accent-foreground, #fff );
+			}
+			.mk-admin .button-primary:hover,
+			#wpbody-content .button-primary:hover {
+				box-shadow: 0 2px 8px color-mix( in srgb, var( --accent, #2271b1 ) 45%, transparent );
+				transform: translateY( -1px );
+			}
 		</style>
 		<?php
 	}
