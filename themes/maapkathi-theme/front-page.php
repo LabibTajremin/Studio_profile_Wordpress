@@ -133,7 +133,7 @@ $faqs         = mk_setting( 'section_faq_enabled', true ) ? mk_content( 'faqs' )
 			<?php endforeach; ?>
 		</div>
 		<p class="mk-section__more">
-			<a class="mk-btn mk-btn--ghost" href="<?php echo esc_url( (string) get_post_type_archive_link( 'mk_project' ) ); ?>">
+			<a class="mk-link-more" href="<?php echo esc_url( (string) get_post_type_archive_link( 'mk_project' ) ); ?>">
 				<?php esc_html_e( 'View all work', 'maapkathi' ); ?>
 			</a>
 		</p>
@@ -219,7 +219,7 @@ $faqs         = mk_setting( 'section_faq_enabled', true ) ? mk_content( 'faqs' )
 			<?php endforeach; ?>
 		</div>
 		<p class="mk-section__more">
-			<a class="mk-btn mk-btn--ghost" href="<?php echo esc_url( home_url( '/team/' ) ); ?>"><?php esc_html_e( 'Meet the team', 'maapkathi' ); ?></a>
+			<a class="mk-link-more" href="<?php echo esc_url( home_url( '/team/' ) ); ?>"><?php esc_html_e( 'Meet the team', 'maapkathi' ); ?></a>
 		</p>
 	</div>
 </section>

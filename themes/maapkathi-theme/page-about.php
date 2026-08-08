@@ -136,7 +136,7 @@ $mk_steps   = mk_content( 'process_steps' );
 			<?php endforeach; ?>
 		</div>
 		<p class="mk-section__more">
-			<a class="mk-btn mk-btn--ghost" href="<?php echo esc_url( home_url( '/team/' ) ); ?>"><?php esc_html_e( 'Meet the team', 'maapkathi' ); ?></a>
+			<a class="mk-link-more" href="<?php echo esc_url( home_url( '/team/' ) ); ?>"><?php esc_html_e( 'Meet the team', 'maapkathi' ); ?></a>
 		</p>
 	</div>
 </section>
