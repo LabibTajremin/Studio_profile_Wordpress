@@ -263,8 +263,8 @@ final class Accents {
 	 * @return string Resulting hex colour.
 	 */
 	private static function mix( string $hex_a, string $hex_b, int $percent ): string {
-		$a     = ltrim( $hex_a, '#' );
-		$b     = ltrim( $hex_b, '#' );
+		$a     = self::expand( $hex_a );
+		$b     = self::expand( $hex_b );
 		$ratio = max( 0, min( 100, $percent ) ) / 100;
 		$out   = '#';
 
@@ -276,6 +276,28 @@ final class Accents {
 		}
 
 		return $out;
+	}
+
+	/**
+	 * Normalises a hex colour to its six-digit form.
+	 *
+	 * WordPress's sanitize_hex_color() — the validator every colour setting
+	 * here goes through — accepts the three-digit shorthand and passes it
+	 * straight back, so #abc is a stored value. Reading channels with
+	 * substr() off an unexpanded shorthand makes hexdec('') return 0 for
+	 * blue, which silently skews every luminance and contrast result.
+	 *
+	 * @param string $hex Colour, as a hex string, with or without a leading #.
+	 * @return string Six hex digits, no leading #.
+	 */
+	private static function expand( string $hex ): string {
+		$hex = ltrim( $hex, '#' );
+
+		if ( 3 === strlen( $hex ) ) {
+			return $hex[0] . $hex[0] . $hex[1] . $hex[1] . $hex[2] . $hex[2];
+		}
+
+		return $hex;
 	}
 
 	/**
@@ -300,7 +322,7 @@ final class Accents {
 	 * @return float Relative luminance, from 0 (black) to 1 (white).
 	 */
 	public static function relative_luminance( string $hex ): float {
-		$hex = ltrim( $hex, '#' );
+		$hex = self::expand( $hex );
 		$r   = hexdec( substr( $hex, 0, 2 ) ) / 255;
 		$g   = hexdec( substr( $hex, 2, 2 ) ) / 255;
 		$b   = hexdec( substr( $hex, 4, 2 ) ) / 255;
