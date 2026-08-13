@@ -151,19 +151,19 @@ h1, h2, h3, h4, h5, h6 {
 	background: color-mix(in srgb, var(--foreground) 10%, transparent);
 }
 
-/* One icon element, one glyph. The character is swapped on [data-theme]
-   rather than rendering both and hiding one. font-family is pinned to a
-   symbol-capable stack because the themeable body font (Manrope et al.)
-   does not ship these code points. */
+/* Sun/moon are two groups inside ONE inline SVG (parts/header.php); only
+   ever one is displayed. The moon ships with display="none" as an SVG
+   presentation attribute, which any rule here outranks — so a stale or
+   missing stylesheet degrades to "sun only", never to two icons or none.
+   Nothing here depends on font glyph coverage. */
 .mk-theme-toggle .mk-theme-toggle__icon {
 	display: block;
-	line-height: 1;
-	font-size: 1.05rem;
-	font-family: "Segoe UI Symbol", "Apple Symbols", "Noto Sans Symbols 2", sans-serif;
+	width: 18px;
+	height: 18px;
 	color: inherit;
 }
-.mk-theme-toggle .mk-theme-toggle__icon::before { content: "\2600"; }
-:root[data-theme="dark"] .mk-theme-toggle .mk-theme-toggle__icon::before { content: "\263D"; }
+:root[data-theme="dark"] .mk-theme-toggle .mk-theme-toggle__sun { display: none; }
+:root[data-theme="dark"] .mk-theme-toggle .mk-theme-toggle__moon { display: inline; }
 
 /* Three-bar hamburger drawn in CSS — no font dependency, no empty spans. */
 .mk-menu-toggle {

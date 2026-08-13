@@ -55,6 +55,7 @@ settings_errors( 'mk_hero' );
 ?>
 <div class="wrap mk-admin">
 	<h1><?php esc_html_e( 'Hero Carousel', 'maapkathi' ); ?></h1>
+	<p class="mk-admin-intro"><?php esc_html_e( 'The full-screen slideshow at the very top of the homepage. Each slide holds an eyebrow, headline, short body text, a button, and one image or video. Turn a slide off to hide it without deleting it.', 'maapkathi' ); ?></p>
 
 	<?php if ( $notice ) : ?>
 		<div class="notice notice-success is-dismissible">

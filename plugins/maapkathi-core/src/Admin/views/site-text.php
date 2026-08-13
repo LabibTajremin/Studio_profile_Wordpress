@@ -22,6 +22,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 ?>
 <div class="wrap mk-admin">
 	<h1><?php esc_html_e( 'Site Text', 'maapkathi' ); ?></h1>
+	<p class="mk-admin-intro"><?php esc_html_e( 'Every piece of wording on the public site, grouped by page. Editing a heading or label here updates it on the site straight away. This changes only the words — not which content appears.', 'maapkathi' ); ?></p>
 	<?php
 	if ( $notice ) :
 		?>

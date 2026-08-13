@@ -102,8 +102,12 @@ add_action(
 			wp_enqueue_script( 'maapkathi-lightbox', $theme_uri . '/assets/js/lightbox.js', array(), $ver( '/assets/js/lightbox.js' ), true );
 		}
 
-		// Dashicons power the optional service/value icons on the front end.
-		wp_enqueue_style( 'dashicons' );
+		// Dashicons power the optional service icons, and are a separate
+		// ~45KB render-blocking request — only load them on the two
+		// templates that can actually render one.
+		if ( is_front_page() || is_page_template( 'page-services.php' ) || is_singular( 'mk_service' ) ) {
+			wp_enqueue_style( 'dashicons' );
+		}
 
 		$fonts_url = mk_theme_google_fonts_url();
 		if ( $fonts_url ) {
@@ -111,6 +115,121 @@ add_action(
 		}
 	}
 );
+
+/**
+ * Whether the current request renders post/page content that may contain
+ * Gutenberg blocks. Only those templates need WordPress's block CSS.
+ *
+ * The homepage, archives and the hand-built templates render entirely from
+ * this theme's own markup and CPT fields — `the_content()` is never called
+ * — so the block stylesheets are pure dead weight there.
+ *
+ * @return bool
+ */
+function mk_theme_needs_block_styles(): bool {
+	return (bool) apply_filters( 'mk_needs_block_styles', is_singular( array( 'post', 'page' ) ) );
+}
+
+/**
+ * Drops core CSS/JS the rendered page provably does not use.
+ *
+ * Measured on the live homepage before this ran: 9.2KB of inline
+ * `global-styles` presets (the --wp--preset--* block, generated from core
+ * defaults this classic theme never references), plus the block-library
+ * stylesheets and the emoji script. All of it is render-blocking or
+ * parser-blocking on the LCP-critical page.
+ *
+ * Everything here is reversible through the `mk_needs_block_styles`
+ * filter, and block styles are still loaded wherever block content can
+ * actually appear.
+ */
+add_action(
+	'wp_enqueue_scripts',
+	static function (): void {
+		if ( is_admin() || mk_theme_needs_block_styles() ) {
+			return;
+		}
+
+		foreach ( array( 'wp-block-library', 'wp-block-library-theme', 'global-styles', 'classic-theme-styles' ) as $handle ) {
+			wp_dequeue_style( $handle );
+		}
+	},
+	100
+);
+
+// The emoji polyfill is a script, an inline blob and a DNS prefetch on every
+// page; this theme's content has no need for it.
+remove_action( 'wp_head', 'print_emoji_detection_script', 7 );
+remove_action( 'wp_print_styles', 'print_emoji_styles' );
+
+/**
+ * Resource hints and an LCP preload.
+ *
+ * Google Fonts costs a DNS lookup plus a TLS handshake to two hosts before
+ * a single glyph can render, which is worth several hundred ms on mobile.
+ * The hero image is almost always the LCP element, and the browser cannot
+ * discover it until it has parsed the stylesheet that positions it — so it
+ * is preloaded explicitly.
+ */
+add_action(
+	'wp_head',
+	static function (): void {
+		if ( mk_theme_google_fonts_url() ) {
+			echo "<link rel='preconnect' href='https://fonts.googleapis.com' />\n";
+			echo "<link rel='preconnect' href='https://fonts.gstatic.com' crossorigin />\n";
+		}
+
+		if ( ! is_front_page() ) {
+			return;
+		}
+
+		$lcp = mk_theme_hero_lcp_image();
+		if ( $lcp ) {
+			printf( "<link rel='preload' as='image' href='%s' fetchpriority='high' />\n", esc_url( $lcp ) );
+		}
+	},
+	0
+);
+
+/**
+ * URL of the first hero slide's image — the homepage's LCP candidate.
+ *
+ * Mirrors the resolution order parts/hero.php uses for the first slide, so
+ * the preload always points at the image actually rendered. Returns '' for
+ * a video-or-embed first slide, where the poster is what paints and the
+ * markup already carries fetchpriority.
+ *
+ * @return string
+ */
+function mk_theme_hero_lcp_image(): string {
+	if ( ! function_exists( 'mk_setting' ) ) {
+		return '';
+	}
+
+	$slides = (array) mk_setting( 'hero_slides', array() );
+	$slides = array_values(
+		array_filter(
+			$slides,
+			static fn( $slide ) => ! isset( $slide['is_active'] ) || $slide['is_active']
+		)
+	);
+
+	$first = $slides[0] ?? null;
+	if ( ! is_array( $first ) ) {
+		return '';
+	}
+
+	$kind = $first['media_kind'] ?? 'image';
+
+	if ( 'image' === $kind ) {
+		return (string) ( $first['image_url'] ?? '' );
+	}
+	if ( 'gif' === $kind ) {
+		return (string) ( $first['gif_url'] ?? '' );
+	}
+
+	return (string) ( $first['video_poster'] ?? '' );
+}
 
 /**
  * Google Fonts URL for the active pair only — never the whole registry.

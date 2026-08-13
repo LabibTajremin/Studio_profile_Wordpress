@@ -20,6 +20,15 @@
 }
 .mk-admin .mk-badge--new { background: #2271b1; }
 
+/* Per-screen "what is this page for" intro */
+.mk-admin .mk-admin-intro {
+	max-width: 70ch;
+	margin: 0.5em 0 1.5em;
+	font-size: 14px;
+	line-height: 1.6;
+	opacity: 0.8;
+}
+
 /* Accent swatch grid */
 .mk-admin .mk-swatch-grid {
 	display: grid;
