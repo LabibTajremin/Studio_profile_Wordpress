@@ -20,6 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 ?>
 <div class="wrap mk-admin">
 	<h1><?php esc_html_e( 'Approvals', 'maapkathi' ); ?></h1>
+	<p class="mk-admin-intro"><?php esc_html_e( 'Changes submitted by Editors wait here for review. Approve to publish a change, or reject to discard it — nothing an Editor edits goes live until it is approved on this screen.', 'maapkathi' ); ?></p>
 	<?php
 	if ( $notice ) :
 		?>

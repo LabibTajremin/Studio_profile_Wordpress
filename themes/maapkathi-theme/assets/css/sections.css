@@ -198,7 +198,9 @@ html[data-hero-style="split"] .mk-hero { background: var(--background); }
 
 /* ---------- Client wall ----------
  * Reference (sections.tsx ClientLogoWall/ClientLetterMark): a proper grid
- * of bordered boxes, 2 cols mobile / 3 cols tablet / 6 cols desktop — not
+ * of bordered boxes — 2 cols mobile / 3 tablet / 4 desktop (the
+ * reference uses 6, widened here because our tiles carry an initials
+ * mark plus the client name rather than a compact logo) — not
  * loose flex-wrapped images dimmed by opacity+grayscale, which is what
  * made small placeholder logos read as illegible gray boxes on mobile.
  * A client with no logo gets a coloured initials mark + name instead of
@@ -212,16 +214,16 @@ html[data-hero-style="split"] .mk-hero { background: var(--background); }
 	.mk-clients__wall { grid-template-columns: repeat(3, 1fr); }
 }
 @media (min-width: 900px) {
-	.mk-clients__wall { grid-template-columns: repeat(6, 1fr); }
+	.mk-clients__wall { grid-template-columns: repeat(4, 1fr); }
 }
 
 .mk-clients__item {
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	gap: 0.5rem;
-	height: 56px;
-	padding-inline: 0.75rem;
+	gap: 0.7rem;
+	height: 76px;
+	padding-inline: 1rem;
 	border-radius: var(--radius);
 	border: 1px solid color-mix(in srgb, var(--foreground) 12%, transparent);
 	overflow: hidden;
@@ -236,21 +238,21 @@ html[data-hero-style="split"] .mk-hero { background: var(--background); }
 	color: inherit;
 	text-decoration: none;
 }
-.mk-clients__logo { max-height: 32px; width: auto; display: block; }
+.mk-clients__logo { max-height: 48px; width: auto; display: block; }
 .mk-clients__mark {
 	display: inline-flex;
 	flex-shrink: 0;
 	align-items: center;
 	justify-content: center;
-	width: 28px;
-	height: 28px;
+	width: 40px;
+	height: 40px;
 	border-radius: 999px;
-	font-size: 0.7rem;
+	font-size: 0.9rem;
 	font-weight: 700;
 	color: #fff;
 }
 .mk-clients__name {
-	font-size: 0.9rem;
+	font-size: 1rem;
 	font-weight: 600;
 	overflow: hidden;
 	text-overflow: ellipsis;

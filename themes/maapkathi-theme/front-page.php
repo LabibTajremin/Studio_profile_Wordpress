@@ -123,7 +123,7 @@ $faqs         = mk_setting( 'section_faq_enabled', true ) ? mk_content( 'faqs' )
 						<?php if ( has_post_thumbnail( $project ) ) : ?>
 							<?php echo get_the_post_thumbnail( $project, 'large', array( 'loading' => 'lazy' ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 						<?php else : ?>
-							<img src="<?php echo esc_url( mk_placeholder_url( get_the_title( $project ), 1200, 1500 ) ); ?>" alt="" loading="lazy" />
+							<img src="<?php echo esc_url( mk_placeholder_url( get_the_title( $project ), 1200, 1500 ) ); ?>" width="1200" height="1500" alt="" loading="lazy" />
 						<?php endif; ?>
 					</div>
 					<h3 class="mk-card__title"><?php echo esc_html( get_the_title( $project ) ); ?></h3>
@@ -219,7 +219,7 @@ $faqs         = mk_setting( 'section_faq_enabled', true ) ? mk_content( 'faqs' )
 						<?php if ( has_post_thumbnail( $member ) ) : ?>
 							<?php echo get_the_post_thumbnail( $member, 'medium', array( 'loading' => 'lazy' ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 						<?php else : ?>
-							<img src="<?php echo esc_url( mk_placeholder_url( get_the_title( $member ), 600, 800 ) ); ?>" alt="" loading="lazy" />
+							<img src="<?php echo esc_url( mk_placeholder_url( get_the_title( $member ), 600, 800 ) ); ?>" width="600" height="800" alt="" loading="lazy" />
 						<?php endif; ?>
 					</div>
 					<h3 class="mk-card__title"><?php echo esc_html( get_the_title( $member ) ); ?></h3>

@@ -30,6 +30,7 @@ $is_custom_preset = 'custom' === $settings['motion_preset'];
 ?>
 <div class="wrap mk-admin">
 	<h1><?php esc_html_e( 'Appearance', 'maapkathi' ); ?></h1>
+	<p class="mk-admin-intro"><?php esc_html_e( 'How the whole public site looks: light/dark mode, brand accent colour, background tone, fonts, corner rounding, and every motion setting. Changes apply site-wide the moment you save.', 'maapkathi' ); ?></p>
 	<form method="post">
 		<?php wp_nonce_field( 'mk_save_appearance', 'mk_appearance_nonce' ); ?>
 

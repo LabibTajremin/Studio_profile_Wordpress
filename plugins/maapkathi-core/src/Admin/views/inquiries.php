@@ -32,6 +32,7 @@ $mk_base = admin_url( 'admin.php?page=maapkathi-inquiries' );
 			<span class="mk-badge"><?php echo esc_html( sprintf( /* translators: %d: unread count. */ __( '%d unread', 'maapkathi' ), $unread ) ); ?></span>
 		<?php endif; ?>
 	</h1>
+	<p class="mk-admin-intro"><?php esc_html_e( 'Messages people have sent through the site\'s contact form. You can read them, mark them as handled, and delete them — this is a record of what visitors sent, so nothing here changes the public site.', 'maapkathi' ); ?></p>
 
 	<?php if ( $notice ) : ?>
 		<div class="notice notice-success is-dismissible"><p><?php echo esc_html( $notice ); ?></p></div>

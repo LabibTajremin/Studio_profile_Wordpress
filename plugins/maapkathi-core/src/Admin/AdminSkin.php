@@ -18,14 +18,17 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * WordPress's own admin menu (Posts, Comments, Tools, Plugins, Themes, the
- * core Settings group, the core Users list) is confusing noise for a
- * non-technical client who only ever needs the "Maapkathi" section — every
- * one of those screens is still reachable by direct URL for anyone with the
- * capability, this only hides the nav links. On top of that, wp-admin is
- * re-skinned with the site's own brand colours (the exact same CSS custom
- * properties the public site uses) so it feels like part of the product
- * rather than a bolted-on WordPress dashboard.
+ * Re-skins wp-admin with the site's own brand colours (the exact same CSS
+ * custom properties the public site uses) so it feels like part of the
+ * product rather than a bolted-on WordPress dashboard, and sends users to
+ * the Maapkathi dashboard instead of WordPress's widget screen.
+ *
+ * This deliberately does NOT hide any of WordPress's own menu items. An
+ * earlier version removed Posts, Comments, Tools, Plugins, Themes, the core
+ * Settings group and the core Users list on the theory that they were noise
+ * for a non-technical client. That was the wrong call: it takes the whole
+ * of WordPress away from the site owner, who does need those screens. The
+ * Maapkathi menu sits alongside the standard menu rather than replacing it.
  */
 final class AdminSkin {
 
@@ -35,42 +38,9 @@ final class AdminSkin {
 	 * @return void
 	 */
 	public function register_hooks(): void {
-		add_action( 'admin_menu', array( $this, 'declutter_menu' ), 999 );
 		add_action( 'admin_init', array( $this, 'maybe_redirect_root' ) );
 		add_action( 'admin_head', array( $this, 'inject_styles' ), 20 );
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_skin_assets' ) );
-	}
-
-	/**
-	 * Hides default WordPress menu items that aren't relevant to running a
-	 * Maapkathi site, for Maapkathi users only.
-	 *
-	 * @return void
-	 */
-	public function declutter_menu(): void {
-		if ( ! current_user_can( Roles::CAP_EDIT_CONTENT ) ) {
-			return;
-		}
-
-		// Blog posts and Comments are already reachable as "Blog" inside the
-		// Maapkathi menu (Menu::register_menu()); the native top-level entries
-		// are just a confusing duplicate.
-		remove_menu_page( 'edit.php' );
-		remove_menu_page( 'edit-comments.php' );
-
-		// Not something a client needs to see; still reachable by direct URL.
-		remove_menu_page( 'tools.php' );
-		remove_menu_page( 'options-general.php' );
-
-		if ( ! current_user_can( 'manage_options' ) ) {
-			return;
-		}
-
-		// The Maapkathi menu already has its own Users screen
-		// (Roles::CAP_MANAGE_USERS-gated); the native one duplicates it.
-		remove_menu_page( 'users.php' );
-		remove_menu_page( 'plugins.php' );
-		remove_menu_page( 'themes.php' );
 	}
 
 	/**

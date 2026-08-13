@@ -22,6 +22,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 ?>
 <div class="wrap mk-admin">
 	<h1><?php esc_html_e( 'Users', 'maapkathi' ); ?></h1>
+	<p class="mk-admin-intro"><?php esc_html_e( 'The people who can sign in. Admins can change anything; Editors can edit content but their changes go to Approvals first.', 'maapkathi' ); ?></p>
 	<?php
 	if ( $notice ) :
 		?>

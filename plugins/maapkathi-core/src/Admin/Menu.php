@@ -157,6 +157,7 @@ final class Menu {
 		);
 
 		echo '<div class="wrap mk-admin"><h1>' . esc_html__( 'Maapkathi Dashboard', 'maapkathi' ) . '</h1>';
+		echo '<p class="mk-admin-intro">' . esc_html__( 'An overview of your site: how much file storage is in use, and anything waiting for your approval. Use the menu on the left to edit content — Hero for the homepage slideshow, Site Text for wording, Settings for studio details, Appearance for colours and fonts.', 'maapkathi' ) . '</p>';
 		echo '<p><a href="' . esc_url( home_url( '/' ) ) . '" target="_blank" rel="noopener">' . esc_html__( 'View public site ↗', 'maapkathi' ) . '</a></p>';
 
 		echo '<div class="mk-card"><h2>' . esc_html__( 'Storage', 'maapkathi' ) . '</h2>';

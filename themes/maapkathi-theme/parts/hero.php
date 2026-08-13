@@ -63,6 +63,7 @@ $mk_resolver      = class_exists( VideoResolver::class ) ? new VideoResolver() :
 				<?php if ( 'image' === $mk_kind ) : ?>
 					<?php $mk_src = $mk_slide['image_url'] ?? ''; ?>
 					<img class="mk-hero__media"
+						width="2400" height="1350"
 						src="<?php echo esc_url( $mk_src ? $mk_src : mk_placeholder_url( $mk_alt, 2400, 1350 ) ); ?>"
 						alt="<?php echo esc_attr( $mk_alt ); ?>"
 						loading="<?php echo esc_attr( $mk_eager ); ?>"
@@ -74,6 +75,7 @@ $mk_resolver      = class_exists( VideoResolver::class ) ? new VideoResolver() :
 					$mk_frame = $mk_slide['gif_first_frame_url'] ?? '';
 					?>
 					<img class="mk-hero__media mk-hero__media--gif"
+						width="2400" height="1350"
 						src="<?php echo esc_url( $mk_gif ? $mk_gif : mk_placeholder_url( $mk_alt, 2400, 1350 ) ); ?>"
 						<?php
 						if ( $mk_frame ) :
@@ -110,7 +112,7 @@ $mk_resolver      = class_exists( VideoResolver::class ) ? new VideoResolver() :
 							poster="<?php echo esc_url( $mk_poster ); ?>">
 							<source src="<?php echo esc_url( $mk_video->src ); ?>" />
 						</video>
-						<img class="mk-hero__media mk-hero__media--reduced" src="<?php echo esc_url( $mk_poster ); ?>" alt="<?php echo esc_attr( $mk_alt ); ?>" />
+						<img class="mk-hero__media mk-hero__media--reduced" width="2400" height="1350" src="<?php echo esc_url( $mk_poster ); ?>" alt="<?php echo esc_attr( $mk_alt ); ?>" />
 
 					<?php elseif ( $mk_video ) : ?>
 						<div class="mk-hero__embed" style="background-image:url('<?php echo esc_url( $mk_poster ); ?>')">
@@ -123,10 +125,10 @@ $mk_resolver      = class_exists( VideoResolver::class ) ? new VideoResolver() :
 								frameborder="0"
 								allowfullscreen></iframe>
 						</div>
-						<img class="mk-hero__media mk-hero__media--reduced" src="<?php echo esc_url( $mk_poster ); ?>" alt="<?php echo esc_attr( $mk_alt ); ?>" />
+						<img class="mk-hero__media mk-hero__media--reduced" width="2400" height="1350" src="<?php echo esc_url( $mk_poster ); ?>" alt="<?php echo esc_attr( $mk_alt ); ?>" />
 
 					<?php else : ?>
-						<img class="mk-hero__media" src="<?php echo esc_url( $mk_poster ); ?>" alt="<?php echo esc_attr( $mk_alt ); ?>" loading="<?php echo esc_attr( $mk_eager ); ?>" />
+						<img class="mk-hero__media" width="2400" height="1350" src="<?php echo esc_url( $mk_poster ); ?>" alt="<?php echo esc_attr( $mk_alt ); ?>" loading="<?php echo esc_attr( $mk_eager ); ?>" />
 					<?php endif; ?>
 				<?php endif; ?>
 				</div>

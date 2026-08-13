@@ -22,6 +22,7 @@ $socials = $settings['socials'] ?? array();
 ?>
 <div class="wrap mk-admin">
 	<h1><?php esc_html_e( 'Settings', 'maapkathi' ); ?></h1>
+	<p class="mk-admin-intro"><?php esc_html_e( 'Your studio\'s core information: name, logo, favicon, contact details, social links, SEO defaults, and which homepage sections are shown.', 'maapkathi' ); ?></p>
 	<?php
 	if ( $notice ) :
 		?>
