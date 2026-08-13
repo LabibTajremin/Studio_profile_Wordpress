@@ -89,7 +89,6 @@ $faqs         = mk_setting( 'section_faq_enabled', true ) ? mk_content( 'faqs' )
 <?php if ( $categories ) : ?>
 <section class="mk-section mk-categories" data-scroll-reveal>
 	<div class="mk-container">
-		<p class="mk-section__eyebrow"><?php mk_the_text( 'home_categories_eyebrow' ); ?></p>
 		<h2 class="mk-section__heading"><?php mk_the_text( 'home_categories_heading' ); ?></h2>
 		<div class="mk-grid mk-grid--categories">
 			<?php foreach ( $categories as $category_term ) : ?>
@@ -114,7 +113,6 @@ $faqs         = mk_setting( 'section_faq_enabled', true ) ? mk_content( 'faqs' )
 <?php if ( $projects ) : ?>
 <section class="mk-section mk-projects" data-scroll-reveal>
 	<div class="mk-container">
-		<p class="mk-section__eyebrow"><?php mk_the_text( 'home_projects_eyebrow' ); ?></p>
 		<h2 class="mk-section__heading"><?php mk_the_text( 'home_projects_heading' ); ?></h2>
 		<div class="mk-grid mk-grid--projects">
 			<?php foreach ( $projects as $project ) : ?>
@@ -146,7 +144,6 @@ $faqs         = mk_setting( 'section_faq_enabled', true ) ? mk_content( 'faqs' )
 <?php if ( $services ) : ?>
 <section class="mk-section mk-services" data-scroll-reveal>
 	<div class="mk-container">
-		<p class="mk-section__eyebrow"><?php mk_the_text( 'home_services_eyebrow' ); ?></p>
 		<h2 class="mk-section__heading"><?php mk_the_text( 'home_services_heading' ); ?></h2>
 		<div class="mk-grid mk-grid--services">
 			<?php foreach ( $services as $service ) : ?>
@@ -190,19 +187,19 @@ $faqs         = mk_setting( 'section_faq_enabled', true ) ? mk_content( 'faqs' )
 <?php if ( $values ) : ?>
 <section class="mk-section mk-values" data-scroll-reveal>
 	<div class="mk-container">
-		<p class="mk-section__eyebrow"><?php mk_the_text( 'home_values_eyebrow' ); ?></p>
 		<h2 class="mk-section__heading"><?php mk_the_text( 'home_values_heading' ); ?></h2>
-		<ol class="mk-values__list">
-			<?php foreach ( $values as $mk_value_index => $value ) : ?>
-				<li class="mk-value">
-					<span class="mk-value__number"><?php echo esc_html( str_pad( (string) ( $mk_value_index + 1 ), 2, '0', STR_PAD_LEFT ) ); ?></span>
-					<div class="mk-value__body">
-						<h3 class="mk-value__title"><?php echo esc_html( get_the_title( $value ) ); ?></h3>
-						<p class="mk-value__text"><?php echo esc_html( wp_strip_all_tags( $value->post_content ) ); ?></p>
-					</div>
-				</li>
+		<div class="mk-grid mk-grid--values">
+			<?php foreach ( $values as $value ) : ?>
+				<div class="mk-card mk-card--value">
+					<?php $icon = mk_meta( $value->ID, 'mk_icon' ); ?>
+					<?php if ( $icon ) : ?>
+						<span class="mk-card__icon dashicons <?php echo esc_attr( $icon ); ?>" aria-hidden="true"></span>
+					<?php endif; ?>
+					<h3 class="mk-card__title"><?php echo esc_html( get_the_title( $value ) ); ?></h3>
+					<p><?php echo esc_html( wp_strip_all_tags( $value->post_content ) ); ?></p>
+				</div>
 			<?php endforeach; ?>
-		</ol>
+		</div>
 	</div>
 </section>
 <?php endif; ?>
@@ -210,7 +207,6 @@ $faqs         = mk_setting( 'section_faq_enabled', true ) ? mk_content( 'faqs' )
 <?php if ( $members ) : ?>
 <section class="mk-section mk-team-preview" data-scroll-reveal>
 	<div class="mk-container">
-		<p class="mk-section__eyebrow"><?php mk_the_text( 'home_team_eyebrow' ); ?></p>
 		<h2 class="mk-section__heading"><?php mk_the_text( 'home_team_heading' ); ?></h2>
 		<div class="mk-grid mk-grid--team">
 			<?php foreach ( $members as $member ) : ?>
@@ -237,36 +233,27 @@ $faqs         = mk_setting( 'section_faq_enabled', true ) ? mk_content( 'faqs' )
 <?php if ( $testimonials ) : ?>
 <section class="mk-section mk-testimonials" data-scroll-reveal>
 	<div class="mk-container">
-		<p class="mk-section__eyebrow"><?php mk_the_text( 'home_testimonials_eyebrow' ); ?></p>
 		<h2 class="mk-section__heading"><?php mk_the_text( 'home_testimonials_heading' ); ?></h2>
-		<div class="mk-testimonials__list">
+		<div class="mk-grid mk-grid--testimonials">
 			<?php foreach ( $testimonials as $testimonial ) : ?>
 				<?php
-				// mk_rating is stored and editable (spec §3.3, and the reference
-				// app's own schema keeps it too) but deliberately not rendered
-				// here — the reference's testimonials section shows the quote
-				// and attribution only.
+				$rating      = (int) mk_meta( $testimonial->ID, 'mk_rating', '0' );
 				$author      = mk_meta( $testimonial->ID, 'mk_author_name', get_the_title( $testimonial ) );
 				$author_role = mk_meta( $testimonial->ID, 'mk_author_role' );
 				$firm        = mk_meta( $testimonial->ID, 'mk_company' );
-				$attribution = trim( $author_role . ( $author_role && $firm ? ', ' : '' ) . $firm );
 				?>
-				<figure class="mk-testimonial">
-					<blockquote class="mk-testimonial__quote">&ldquo;<?php echo esc_html( mk_meta( $testimonial->ID, 'mk_quote' ) ); ?>&rdquo;</blockquote>
-					<figcaption class="mk-testimonial__cite">
-						<?php if ( has_post_thumbnail( $testimonial ) ) : ?>
-							<?php
-							echo get_the_post_thumbnail( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-								$testimonial,
-								'thumbnail',
-								array(
-									'loading' => 'lazy',
-									'class'   => 'mk-testimonial__avatar',
-								)
-							);
-							?>
+				<figure class="mk-card mk-card--testimonial">
+					<?php if ( $rating > 0 ) : ?>
+						<div class="mk-rating" role="img" aria-label="<?php echo esc_attr( sprintf( /* translators: %d: star rating out of five. */ __( '%d out of 5 stars', 'maapkathi' ), $rating ) ); ?>">
+							<?php echo esc_html( str_repeat( '★', min( 5, $rating ) ) . str_repeat( '☆', max( 0, 5 - $rating ) ) ); ?>
+						</div>
+					<?php endif; ?>
+					<blockquote><?php echo esc_html( mk_meta( $testimonial->ID, 'mk_quote' ) ); ?></blockquote>
+					<figcaption>
+						<strong><?php echo esc_html( $author ); ?></strong>
+						<?php if ( $author_role || $firm ) : ?>
+							<span><?php echo esc_html( trim( $author_role . ( $author_role && $firm ? ', ' : '' ) . $firm ) ); ?></span>
 						<?php endif; ?>
-						<span><?php echo esc_html( $attribution ? $author . ', ' . $attribution : $author ); ?></span>
 					</figcaption>
 				</figure>
 			<?php endforeach; ?>
@@ -278,7 +265,6 @@ $faqs         = mk_setting( 'section_faq_enabled', true ) ? mk_content( 'faqs' )
 <?php if ( $awards ) : ?>
 <section class="mk-section mk-awards" data-scroll-reveal>
 	<div class="mk-container">
-		<p class="mk-section__eyebrow"><?php mk_the_text( 'home_awards_eyebrow' ); ?></p>
 		<h2 class="mk-section__heading"><?php mk_the_text( 'home_awards_heading' ); ?></h2>
 		<ul class="mk-awards__list">
 			<?php foreach ( $awards as $award ) : ?>

@@ -14,7 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * The 36 editable copy strings from §3.3 #15 ("Site Text"), grouped by
+ * The 29 editable copy strings from §3.3 #15 ("Site Text"), grouped by
  * page/section. Stored as a flat option keyed by field id.
  */
 final class SiteText {
@@ -42,24 +42,12 @@ final class SiteText {
 					'label' => __( 'Client wall heading', 'maapkathi' ),
 				),
 				array(
-					'key'   => 'home_categories_eyebrow',
-					'label' => __( 'Portfolio categories eyebrow', 'maapkathi' ),
-				),
-				array(
 					'key'   => 'home_categories_heading',
 					'label' => __( 'Portfolio categories heading', 'maapkathi' ),
 				),
 				array(
-					'key'   => 'home_projects_eyebrow',
-					'label' => __( 'Featured projects eyebrow', 'maapkathi' ),
-				),
-				array(
 					'key'   => 'home_projects_heading',
 					'label' => __( 'Featured projects heading', 'maapkathi' ),
-				),
-				array(
-					'key'   => 'home_services_eyebrow',
-					'label' => __( 'Services eyebrow', 'maapkathi' ),
 				),
 				array(
 					'key'   => 'home_services_heading',
@@ -70,32 +58,16 @@ final class SiteText {
 					'label' => __( 'Stats band heading', 'maapkathi' ),
 				),
 				array(
-					'key'   => 'home_values_eyebrow',
-					'label' => __( 'Values eyebrow', 'maapkathi' ),
-				),
-				array(
 					'key'   => 'home_values_heading',
 					'label' => __( 'Values heading', 'maapkathi' ),
-				),
-				array(
-					'key'   => 'home_team_eyebrow',
-					'label' => __( 'Team preview eyebrow', 'maapkathi' ),
 				),
 				array(
 					'key'   => 'home_team_heading',
 					'label' => __( 'Team preview heading', 'maapkathi' ),
 				),
 				array(
-					'key'   => 'home_testimonials_eyebrow',
-					'label' => __( 'Testimonials eyebrow', 'maapkathi' ),
-				),
-				array(
 					'key'   => 'home_testimonials_heading',
 					'label' => __( 'Testimonials heading', 'maapkathi' ),
-				),
-				array(
-					'key'   => 'home_awards_eyebrow',
-					'label' => __( 'Awards eyebrow', 'maapkathi' ),
 				),
 				array(
 					'key'   => 'home_awards_heading',
@@ -215,21 +187,14 @@ final class SiteText {
 			'home_hero_eyebrow'         => __( 'Maapkathi Studio', 'maapkathi' ),
 			'home_tagline_note'         => __( 'A design practice built on restraint, craft, and the long view.', 'maapkathi' ),
 			'home_clients_heading'      => __( 'Trusted by', 'maapkathi' ),
-			'home_categories_eyebrow'   => __( 'Explore', 'maapkathi' ),
 			'home_categories_heading'   => __( 'What we do', 'maapkathi' ),
-			'home_projects_eyebrow'     => __( 'Selected work', 'maapkathi' ),
 			'home_projects_heading'     => __( 'Featured work', 'maapkathi' ),
-			'home_services_eyebrow'     => __( 'What we do', 'maapkathi' ),
 			'home_services_heading'     => __( 'Services', 'maapkathi' ),
 			'home_stats_heading'        => __( 'By the numbers', 'maapkathi' ),
-			'home_values_eyebrow'       => __( 'How we work', 'maapkathi' ),
 			'home_values_heading'       => __( 'What we stand for', 'maapkathi' ),
-			'home_team_eyebrow'         => __( 'The people', 'maapkathi' ),
 			'home_team_heading'         => __( 'The people behind the work', 'maapkathi' ),
-			'home_testimonials_eyebrow' => __( 'Kind words', 'maapkathi' ),
 			'home_testimonials_heading' => __( 'What our clients say', 'maapkathi' ),
-			'home_awards_eyebrow'       => __( 'Recognition', 'maapkathi' ),
-			'home_awards_heading'       => __( 'Awards & press', 'maapkathi' ),
+			'home_awards_heading'       => __( 'Recognition', 'maapkathi' ),
 			'home_faq_heading'          => __( 'Frequently asked questions', 'maapkathi' ),
 			'home_cta_heading'          => __( "Let's build something considered.", 'maapkathi' ),
 			'home_cta_button_label'     => __( 'Start a conversation', 'maapkathi' ),
