@@ -101,6 +101,50 @@ final class ThemeSettingsRegistryTest extends TestCase {
 	 * WP runtime is available (ThemeVarsBuilder::vars_for is exercised
 	 * indirectly here via the pure parts it doesn't need WP for).
 	 */
+	public function test_readable_accent_meets_wcag_aa_on_every_background_tone(): void {
+		foreach ( Backgrounds::all() as $tone ) {
+			foreach ( Accents::all() as $accent ) {
+				foreach ( array( 'light', 'dark' ) as $mode ) {
+					$surface  = $tone[ $mode ]['background'];
+					$readable = Accents::readable_on( $accent[ $mode ], $surface );
+
+					$this->assertGreaterThanOrEqual(
+						4.5,
+						Accents::contrast_ratio( $readable, $surface ),
+						sprintf( 'Accent "%s" (%s) is unreadable on %s', $accent['id'], $mode, $surface )
+					);
+				}
+			}
+		}
+	}
+
+	public function test_shorthand_hex_is_expanded_before_measuring(): void {
+		// sanitize_hex_color() accepts the 3-digit shorthand and stores it
+		// verbatim, so #abc is a real stored value for custom_accent_hex.
+		// Without expansion, substr() reads blue as hexdec('') === 0.
+		$this->assertSame(
+			Accents::relative_luminance( '#aabbcc' ),
+			Accents::relative_luminance( '#abc' )
+		);
+		$this->assertSame(
+			Accents::contrast_ratio( '#aabbcc', '#f9f0e4' ),
+			Accents::contrast_ratio( '#abc', '#f9f0e4' )
+		);
+	}
+
+	public function test_shorthand_and_longhand_resolve_to_the_same_readable_colour(): void {
+		$shorthand = Accents::readable_on( '#abc', '#f9f0e4' );
+		$longhand  = Accents::readable_on( '#aabbcc', '#f9f0e4' );
+
+		$this->assertSame( $longhand, $shorthand );
+		$this->assertGreaterThanOrEqual( 4.5, Accents::contrast_ratio( $shorthand, '#f9f0e4' ) );
+	}
+
+	public function test_readable_accent_leaves_already_readable_accents_untouched(): void {
+		// Oxblood on cream is already ~9.8:1 — it must not be shifted.
+		$this->assertSame( '#6e1f2a', Accents::readable_on( '#6e1f2a', '#f9f0e4' ) );
+	}
+
 	public function test_radius_scale_has_distinct_pixel_values(): void {
 		$values = array_values( Fonts::RADIUS_SCALE );
 		$this->assertSame( $values, array_unique( $values ) );

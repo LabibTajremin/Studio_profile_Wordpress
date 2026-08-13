@@ -130,56 +130,102 @@ h1, h2, h3, h4, h5, h6 {
 	font-size: 0.9rem;
 	font-weight: 500;
 }
-.mk-call-btn--mobile { display: none; }
 
 .mk-theme-toggle {
 	background: transparent;
-	border: 1px solid color-mix(in srgb, var(--foreground) 15%, transparent);
+	border: 1px solid color-mix(in srgb, var(--foreground) 20%, transparent);
+	/* Always the page's own foreground, so it is ink on the cream light
+	   background and cream on the dark background — never a dark glyph on
+	   a dark bar. */
 	color: var(--foreground);
 	border-radius: 999px;
-	min-width: 44px;
-	min-height: 44px;
+	width: 44px;
+	height: 44px;
+	padding: 0;
 	cursor: pointer;
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
 }
 .mk-theme-toggle:hover {
-	background: color-mix(in srgb, var(--foreground) 8%, transparent);
+	background: color-mix(in srgb, var(--foreground) 10%, transparent);
 }
 
-/* Sun/moon glyph as real text nodes (not CSS generated content) — a custom
-   @font-face like Manrope doesn't ship these glyphs, and generated-content
-   glyphs are less reliable at triggering the browser's symbol-font fallback
-   than an actual text node is. Both render; [data-theme] shows/hides one,
-   same swap technique as the light/dark logo above. */
-.mk-theme-toggle__icon--dark { display: none; }
-:root[data-theme="dark"] .mk-theme-toggle__icon--light { display: none; }
-:root[data-theme="dark"] .mk-theme-toggle__icon--dark { display: inline; }
+/* One icon element, one glyph. The character is swapped on [data-theme]
+   rather than rendering both and hiding one. font-family is pinned to a
+   symbol-capable stack because the themeable body font (Manrope et al.)
+   does not ship these code points. */
+.mk-theme-toggle .mk-theme-toggle__icon {
+	display: block;
+	line-height: 1;
+	font-size: 1.05rem;
+	font-family: "Segoe UI Symbol", "Apple Symbols", "Noto Sans Symbols 2", sans-serif;
+	color: inherit;
+}
+.mk-theme-toggle .mk-theme-toggle__icon::before { content: "\2600"; }
+:root[data-theme="dark"] .mk-theme-toggle .mk-theme-toggle__icon::before { content: "\263D"; }
 
+/* Three-bar hamburger drawn in CSS — no font dependency, no empty spans. */
 .mk-menu-toggle {
 	background: transparent;
 	border: 0;
 	color: var(--foreground);
-	min-width: 44px;
-	min-height: 44px;
+	width: 44px;
+	height: 44px;
+	padding: 0;
 	cursor: pointer;
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
-	font-size: 1.2rem;
 }
+.mk-menu-toggle__bars,
+.mk-menu-toggle__bars::before,
+.mk-menu-toggle__bars::after {
+	display: block;
+	width: 20px;
+	height: 2px;
+	background: currentColor;
+	border-radius: 2px;
+}
+.mk-menu-toggle__bars { position: relative; }
+.mk-menu-toggle__bars::before,
+.mk-menu-toggle__bars::after {
+	content: "";
+	position: absolute;
+	left: 0;
+}
+.mk-menu-toggle__bars::before { top: -6px; }
+.mk-menu-toggle__bars::after { top: 6px; }
 
+/* Accent-filled overlay. Text uses --accent-foreground, which the plugin
+   picks per accent by WCAG contrast (Accents::on_accent) — so a pale
+   accent like Sand or Champagne gets dark ink and a deep one gets cream,
+   automatically, with no per-accent CSS. */
 .mk-mobile-menu {
 	position: fixed;
 	inset: 0;
-	background: var(--background);
+	background: var(--accent);
+	color: var(--accent-foreground);
 	z-index: 200;
 	display: none;
 	flex-direction: column;
 	justify-content: center;
 	align-items: center;
 	gap: 2rem;
+}
+.mk-mobile-menu a { color: var(--accent-foreground); text-decoration: none; }
+.mk-mobile-menu__close {
+	position: absolute;
+	top: 1rem;
+	right: 1rem;
+	width: 44px;
+	height: 44px;
+	background: transparent;
+	border: 0;
+	color: var(--accent-foreground);
+	font-size: 1.75rem;
+	line-height: 1;
+	cursor: pointer;
 }
 /* Visibility is driven by this class, not the [hidden] attribute alone —
    an author stylesheet display rule always wins the cascade over the
@@ -194,8 +240,11 @@ h1, h2, h3, h4, h5, h6 {
 .mk-mobile-menu.is-open li { opacity: 1; transform: none; }
 
 @media (max-width: 767px) {
-	.mk-nav--desktop, .mk-call-btn:not(.mk-call-btn--mobile) { display: none; }
-	.mk-call-btn--mobile { display: inline-flex; margin-top: 1rem; }
+	.mk-nav--desktop { display: none; }
+	/* The call button stays in the header's top-right action row at every
+	   width — it used to be hidden here and re-rendered centred inside the
+	   overlay instead, which is what made it float mid-page. */
+	.mk-call-btn { padding: 0.5em 0.9em; font-size: 0.85rem; }
 }
 @media (min-width: 768px) {
 	.mk-menu-toggle, .mk-mobile-menu { display: none; }

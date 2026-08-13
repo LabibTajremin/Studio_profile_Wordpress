@@ -1,6 +1,16 @@
 /* ---------- Shared section furniture ---------- */
+/* Small uppercase label above each section heading, matching the
+   reference's SectionHeading eyebrow (sections.tsx). */
+.mk-section__eyebrow {
+	font-size: 0.75rem;
+	text-transform: uppercase;
+	letter-spacing: 0.2em;
+	opacity: 0.6;
+	margin: 0 0 0.5rem;
+}
 .mk-section__heading {
-	font-size: clamp(1.6rem, 3.5vw, 2.4rem);
+	font-size: clamp(1.8rem, 4vw, 3rem);
+	letter-spacing: -0.01em;
 	margin-bottom: calc(2rem * var(--density, 1));
 }
 .mk-section__heading--on-accent { color: var(--accent-foreground); }
@@ -14,7 +24,7 @@
 	text-underline-offset: 4px;
 	color: inherit;
 }
-.mk-link-more:hover { color: var(--accent); }
+.mk-link-more:hover { color: var(--accent-readable, var(--accent)); }
 .mk-page-title { font-size: clamp(2rem, 5vw, 3.2rem); }
 .mk-lede {
 	font-size: clamp(1.05rem, 2vw, 1.3rem);
@@ -29,7 +39,7 @@
 	border-color: color-mix(in srgb, var(--foreground) 30%, transparent);
 	color: var(--foreground);
 }
-.mk-btn--ghost:hover { border-color: var(--accent); color: var(--accent); }
+.mk-btn--ghost:hover { border-color: var(--accent); color: var(--accent-readable, var(--accent)); }
 .mk-btn--on-accent {
 	background: var(--accent-foreground);
 	color: var(--accent);
@@ -250,17 +260,13 @@ html[data-hero-style="split"] .mk-hero { background: var(--background); }
 /* ---------- Cards & grids ---------- */
 .mk-grid--categories { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
 .mk-grid--services { grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
-.mk-grid--values { grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
 .mk-grid--team { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
-.mk-grid--testimonials { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
 .mk-grid--stats { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); text-align: center; }
 .mk-grid--halves { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
 
 .mk-card { padding: 0; }
 .mk-card--category,
 .mk-card--service,
-.mk-card--value,
-.mk-card--testimonial,
 .mk-card--member { padding: clamp(1.25rem, 2.5vw, 1.75rem); }
 .mk-card__title { font-size: 1.15rem; margin: 0.75rem 0 0.25rem; }
 .mk-card--project .mk-card__title,
@@ -268,10 +274,10 @@ html[data-hero-style="split"] .mk-hero { background: var(--background); }
 .mk-card--project .mk-card__excerpt { padding: 0 1rem 1rem; opacity: 0.8; font-size: 0.95rem; }
 .mk-card__excerpt { opacity: 0.8; font-size: 0.95rem; margin: 0; }
 .mk-card__count { opacity: 0.7; font-size: 0.9rem; }
-.mk-card__role { color: var(--accent); font-weight: 600; margin: 0 0 0.5rem; padding-inline: 1rem; }
+.mk-card__role { color: var(--accent-readable, var(--accent)); font-weight: 600; margin: 0 0 0.5rem; padding-inline: 1rem; }
 .mk-card--member .mk-card__bio { padding: 0 1rem 1rem; font-size: 0.92rem; opacity: 0.8; }
 .mk-card__socials { padding: 0 1rem 1rem; display: flex; gap: 0.75rem; font-size: 0.9rem; }
-.mk-card__icon { font-size: 28px; width: 28px; height: 28px; color: var(--accent); }
+.mk-card__icon { font-size: 28px; width: 28px; height: 28px; color: var(--accent-readable, var(--accent)); }
 .mk-card__media { overflow: hidden; }
 .mk-card__media img { width: 100%; height: auto; display: block; aspect-ratio: 4 / 5; object-fit: cover; }
 .mk-card--member .mk-card__media img { aspect-ratio: 3 / 4; }
@@ -291,17 +297,55 @@ html[data-hero-style="split"] .mk-hero { background: var(--background); }
 .mk-stats-band .mk-stat__value,
 .mk-stats-band .mk-stat__label { color: var(--accent-foreground); }
 
-/* ---------- Testimonials ---------- */
-.mk-card--testimonial { display: flex; flex-direction: column; gap: 0.75rem; margin: 0; }
-.mk-card--testimonial blockquote {
+/* ---------- Values ----------
+ * A plain numbered list, not cards — matches the reference's CoreValues
+ * (sections.tsx), which has no card surface and no icon. */
+.mk-values__list {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+	display: grid;
+	grid-template-columns: 1fr;
+	gap: 2rem 2.5rem;
+}
+@media (min-width: 640px) {
+	.mk-values__list { grid-template-columns: repeat(2, 1fr); }
+}
+.mk-value { display: flex; gap: 1rem; }
+.mk-value__number { font-size: 0.85rem; opacity: 0.4; padding-top: 0.35rem; }
+.mk-value__title { font-size: 1.1rem; font-weight: 500; margin: 0 0 0.25rem; }
+.mk-value__text { margin: 0; opacity: 0.7; }
+
+/* ---------- Testimonials ----------
+ * Centered plain blockquotes with a circular avatar, no card surface —
+ * matches the reference's Testimonials section. The stored mk_rating is
+ * intentionally not rendered here; the reference doesn't show it either. */
+.mk-testimonials { text-align: center; }
+.mk-testimonials .mk-container { max-width: 900px; }
+.mk-testimonials__list { display: flex; flex-direction: column; gap: 3rem; }
+.mk-testimonial { margin: 0; display: flex; flex-direction: column; align-items: center; gap: 1rem; }
+.mk-testimonial__quote {
 	margin: 0;
 	font-family: var(--font-headings);
-	font-size: 1.1rem;
-	line-height: 1.5;
+	font-size: clamp(1.3rem, 3vw, 2rem);
+	font-weight: 300;
+	line-height: 1.35;
 }
-.mk-card--testimonial figcaption { font-size: 0.9rem; display: flex; flex-direction: column; }
-.mk-card--testimonial figcaption span { opacity: 0.7; }
-.mk-rating { color: var(--accent); letter-spacing: 0.1em; }
+.mk-testimonial__cite {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.75rem;
+	font-size: 0.9rem;
+	opacity: 0.7;
+}
+.mk-testimonial__avatar {
+	width: 40px;
+	height: 40px;
+	border-radius: 999px;
+	object-fit: cover;
+	display: block;
+}
 
 /* ---------- Awards & process ---------- */
 .mk-awards__list, .mk-process__list { list-style: none; padding: 0; margin: 0; }
@@ -319,7 +363,7 @@ html[data-hero-style="split"] .mk-hero { background: var(--background); }
 .mk-process__no {
 	font-family: var(--font-headings);
 	font-size: 1.75rem;
-	color: var(--accent);
+	color: var(--accent-readable, var(--accent));
 	line-height: 1;
 	min-width: 2ch;
 }
@@ -341,7 +385,7 @@ html[data-hero-style="split"] .mk-hero { background: var(--background); }
 	align-items: center;
 }
 .mk-accordion__item summary::-webkit-details-marker { display: none; }
-.mk-accordion__item summary::after { content: "+"; color: var(--accent); font-size: 1.4rem; }
+.mk-accordion__item summary::after { content: "+"; color: var(--accent-readable, var(--accent)); font-size: 1.4rem; }
 .mk-accordion__item[open] summary::after { content: "−"; }
 .mk-accordion__body { padding-top: 0.75rem; opacity: 0.85; max-width: 70ch; }
 
@@ -359,7 +403,7 @@ html[data-hero-style="split"] .mk-hero { background: var(--background); }
 .mk-project-hero__media img { width: 100%; height: clamp(320px, 60vh, 720px); object-fit: cover; display: block; }
 .mk-project-detail { display: grid; grid-template-columns: minmax(0, 2fr) minmax(220px, 1fr); gap: clamp(2rem, 5vw, 4rem); }
 .mk-project-detail__spec dl { display: grid; grid-template-columns: auto 1fr; gap: 0.5rem 1rem; margin: 0; }
-.mk-project-detail__spec dt { font-weight: 600; color: var(--accent); }
+.mk-project-detail__spec dt { font-weight: 600; color: var(--accent-readable, var(--accent)); }
 .mk-project-detail__spec dd { margin: 0; }
 .mk-gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1rem; margin-top: 2.5rem; }
 .mk-gallery img { width: 100%; height: auto; border-radius: var(--radius); display: block; aspect-ratio: 4 / 5; object-fit: cover; }

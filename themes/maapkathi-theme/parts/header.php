@@ -53,8 +53,7 @@ $mk_studio_name = mk_setting( 'studio_name', get_bloginfo( 'name' ) );
 
 		<div class="mk-header-actions">
 			<button type="button" class="mk-theme-toggle" aria-label="<?php esc_attr_e( 'Toggle light and dark mode', 'maapkathi' ); ?>">
-				<span class="mk-theme-toggle__icon mk-theme-toggle__icon--light" aria-hidden="true">&#9728;</span>
-				<span class="mk-theme-toggle__icon mk-theme-toggle__icon--dark" aria-hidden="true">&#9790;</span>
+				<span class="mk-theme-toggle__icon" aria-hidden="true"></span>
 			</button>
 
 			<?php if ( $mk_phone ) : ?>
@@ -62,7 +61,7 @@ $mk_studio_name = mk_setting( 'studio_name', get_bloginfo( 'name' ) );
 			<?php endif; ?>
 
 			<button type="button" class="mk-menu-toggle" aria-label="<?php esc_attr_e( 'Open menu', 'maapkathi' ); ?>" aria-expanded="false" aria-controls="mk-mobile-menu">
-				<span aria-hidden="true">&#9776;</span>
+				<span class="mk-menu-toggle__bars" aria-hidden="true"></span>
 			</button>
 		</div>
 	</div>
@@ -76,9 +75,6 @@ $mk_studio_name = mk_setting( 'studio_name', get_bloginfo( 'name' ) );
 				</li>
 			<?php endforeach; ?>
 		</ul>
-		<?php if ( $mk_phone ) : ?>
-			<a class="mk-call-btn mk-call-btn--mobile" href="<?php echo esc_attr( mk_tel_href( $mk_phone ) ); ?>"><?php esc_html_e( 'Call us', 'maapkathi' ); ?></a>
-		<?php endif; ?>
 	</div>
 
 	<?php if ( $mk_show_shield ) : ?>
