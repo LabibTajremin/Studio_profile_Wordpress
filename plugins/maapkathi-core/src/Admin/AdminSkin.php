@@ -11,6 +11,7 @@ namespace Maapkathi\Core\Admin;
 
 use Maapkathi\Core\Roles\Roles;
 use Maapkathi\Core\Theme\ThemeVarsBuilder;
+use Maapkathi\Core\Theme\ThemeSettings;
 use Maapkathi\Core\Setup\SetupWizard;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -76,7 +77,7 @@ final class AdminSkin {
 			return;
 		}
 
-		echo '<style id="mk-admin-skin-vars">' . ThemeVarsBuilder::build() . "</style>\n"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- generated CSS, values validated against the registry.
+		echo '<style id="mk-admin-skin-vars">' . self::accent_vars_css() . "</style>\n"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- generated CSS, hex values from the accent registry.
 		?>
 		<style id="mk-admin-skin">
 			#adminmenuback, #adminmenuwrap, #adminmenu, #adminmenu .wp-submenu { background: transparent; }
@@ -85,7 +86,7 @@ final class AdminSkin {
 			}
 			#adminmenu {
 				background: var( --accent, #1d2327 );
-				border-radius: var( --radius, 12px );
+				border-radius: 12px;
 				overflow: hidden;
 			}
 			#adminmenu a { color: var( --accent-foreground, #f0f0f1 ); }
@@ -98,8 +99,8 @@ final class AdminSkin {
 			}
 			#adminmenu .wp-submenu { background: color-mix( in srgb, var( --accent, #1d2327 ) 92%, black ); }
 			#wpbody-content {
-				background: var( --background, #f0f0f1 );
-				border-radius: var( --radius, 12px );
+				background: #f0f0f1;
+				border-radius: 12px;
 				padding: 1px 20px 20px;
 			}
 			#wpcontent { padding-left: 0; }
@@ -119,7 +120,7 @@ final class AdminSkin {
 				margin: 10px 10px 4px;
 				padding: 8px 10px;
 				border: 1px solid color-mix( in srgb, var( --accent-foreground, #fff ) 30%, transparent );
-				border-radius: var( --radius, 8px );
+				border-radius: 8px;
 				color: var( --accent-foreground, #f0f0f1 ) !important;
 				text-decoration: none;
 				text-align: center;
@@ -131,26 +132,21 @@ final class AdminSkin {
 			/* Smoother, less "raw WordPress" content chrome. */
 			.mk-admin .wrap,
 			#wpbody-content > .wrap {
-				background: var( --background, #fff );
-				border-radius: var( --radius, 12px );
+				background: #fff;
+				border-radius: 12px;
 				padding: clamp( 1rem, 2vw, 2rem );
 				margin-top: 1rem;
 			}
-			.mk-admin h1.wp-heading-inline,
-			#wpbody-content > .wrap > h1 {
-				font-family: var( --font-headings, inherit );
-				color: var( --heading-color, var( --foreground, inherit ) );
-			}
 			.mk-admin .form-table,
 			#wpbody-content .form-table {
-				background: color-mix( in srgb, var( --foreground, #000 ) 3%, transparent );
-				border-radius: var( --radius, 8px );
+				background: rgba( 0, 0, 0, 0.03 );
+				border-radius: 8px;
 				overflow: hidden;
 				border-collapse: separate;
 			}
 			.mk-admin .form-table > tbody > tr,
 			#wpbody-content .form-table > tbody > tr {
-				border-bottom: 1px solid color-mix( in srgb, var( --foreground, #000 ) 8%, transparent );
+				border-bottom: 1px solid rgba( 0, 0, 0, 0.08 );
 			}
 			.mk-admin .form-table > tbody > tr:last-child,
 			#wpbody-content .form-table > tbody > tr:last-child {
@@ -163,8 +159,8 @@ final class AdminSkin {
 			.mk-admin input[type="number"],
 			.mk-admin select,
 			.mk-admin textarea {
-				border-radius: calc( var( --radius, 8px ) / 1.5 );
-				border-color: color-mix( in srgb, var( --foreground, #000 ) 20%, transparent );
+				border-radius: 5px;
+				border-color: rgba( 0, 0, 0, 0.2 );
 			}
 			.mk-admin input[type="text"]:focus,
 			.mk-admin input[type="email"]:focus,
@@ -197,6 +193,38 @@ final class AdminSkin {
 			}
 		</style>
 		<?php
+	}
+
+	/**
+	 * The accent custom properties, and nothing else.
+	 *
+	 * Deliberately NOT ThemeVarsBuilder::build(). That emits the site's full
+	 * theme — including --background/--foreground, the
+	 * :root[data-theme="dark"] override, and a `body::before` rule carrying
+	 * the background pattern. Applied to wp-admin that meant the editing
+	 * screens took on the public site's background tone, flipped to a dark
+	 * canvas whenever the site was in dark mode, and had the decorative
+	 * pattern painted over them — which makes admin work harder to read,
+	 * not nicer.
+	 *
+	 * Only the accent travels into wp-admin, so the menu stays branded while
+	 * the content area keeps WordPress's own familiar light chrome. The skin's
+	 * surfaces, hairlines and corner radii are hard-coded rather than read
+	 * from vars, so re-adding a property here can't silently drag the site's
+	 * background, dark mode or pattern back into the editing screens.
+	 *
+	 * @return string
+	 */
+	private static function accent_vars_css(): string {
+		$vars = ThemeVarsBuilder::vars_for( ThemeSettings::get() );
+
+		$css = ':root{';
+		foreach ( array( '--accent', '--accent-dark', '--accent-foreground' ) as $name ) {
+			if ( isset( $vars[ $name ] ) ) {
+				$css .= $name . ': ' . $vars[ $name ] . ';';
+			}
+		}
+		return $css . '}';
 	}
 
 	/**
