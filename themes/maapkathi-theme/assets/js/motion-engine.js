@@ -104,7 +104,7 @@
 		var timer = null;
 		var paused = false;
 
-		function show( next ) {
+		function swap( next ) {
 			slides[ index ].classList.remove( 'is-active' );
 			if ( dots[ index ] ) {
 				dots[ index ].classList.remove( 'is-active' );
@@ -120,6 +120,26 @@
 			}
 
 			restartVideo( slides[ index ] );
+		}
+
+		/**
+		 * Slides change by washing the hero through to light and back, rather
+		 * than a plain crossfade. The swap happens at the peak of the wash, so
+		 * the two photographs are never visible over each other.
+		 */
+		function show( next ) {
+			if ( motionDisabled() ) {
+				swap( next );
+				return;
+			}
+
+			var half = Math.max( 150, cssTimeToMs( getComputedStyle( root ).getPropertyValue( '--motion-duration' ) ) * 0.5 );
+
+			hero.classList.add( 'is-transitioning' );
+			window.setTimeout( function () {
+				swap( next );
+				hero.classList.remove( 'is-transitioning' );
+			}, half );
 		}
 
 		function restartVideo( slide ) {
@@ -290,6 +310,42 @@
 		} );
 	}
 
+	/**
+	 * Solidifies the floating homepage header once the hero has scrolled
+	 * past. Runs regardless of the motion settings — this is a legibility
+	 * concern, not decoration: past the hero there is no longer an image
+	 * behind the bar to carry its contrast.
+	 */
+	function initHeaderScrollState() {
+		var header = document.querySelector( '.mk-site-header' );
+		if ( ! header || ! document.body.classList.contains( 'home' ) ) {
+			return;
+		}
+
+		var ticking = false;
+
+		function update() {
+			// Switch a little before the hero fully clears, so the bar is
+			// already opaque by the time the image is gone from behind it.
+			var hero = document.querySelector( '.mk-hero' );
+			var threshold = hero ? hero.offsetHeight - header.offsetHeight : 120;
+			header.classList.toggle( 'is-scrolled', window.scrollY > threshold );
+			ticking = false;
+		}
+
+		window.addEventListener(
+			'scroll',
+			function () {
+				if ( ! ticking ) {
+					window.requestAnimationFrame( update );
+					ticking = true;
+				}
+			},
+			{ passive: true }
+		);
+		update();
+	}
+
 	function initScrollProgress() {
 		if ( '1' !== root.getAttribute( 'data-scroll-progress' ) ) {
 			return;
@@ -367,6 +423,7 @@
 		initHeroCarousel();
 		initReducedMotionGifs();
 		initStatCounters();
+		initHeaderScrollState();
 		initScrollProgress();
 		initCursor();
 		initLoader();

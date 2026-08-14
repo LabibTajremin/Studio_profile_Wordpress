@@ -74,6 +74,21 @@
 	display: block;
 }
 .mk-hero__embed { background-size: cover; background-position: center; }
+
+/* Slide changes wash the hero through to light and back (motion-engine.js
+   toggles .is-transitioning and swaps the slide at the peak), so the two
+   photographs are never seen layered over one another. Sits above the
+   slides and the dots, below the site header. */
+.mk-hero::after {
+	content: "";
+	grid-area: 1 / 1;
+	z-index: 4;
+	background: #fff;
+	opacity: 0;
+	pointer-events: none;
+	transition: opacity calc(var(--motion-duration) * 0.5) var(--motion-ease);
+}
+.mk-hero.is-transitioning::after { opacity: 0.9; }
 /* The reduced-motion still is only shown when motion is suppressed. */
 .mk-hero__media--reduced { display: none; }
 
