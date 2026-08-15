@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Appearance → Theme + Motion. Renders all 32 theme_settings (§11.1) as
+ * Appearance → Theme + Motion. Renders all 33 theme_settings (§11.1) as
  * working, posting controls. Simple markup by design — the requirement is
  * that every control demonstrably changes the rendered site, not that this
  * screen wins a design award.
@@ -131,6 +131,14 @@ $is_custom_preset = 'custom' === $settings['motion_preset'];
 						<?php endforeach; ?>
 					</div>
 					<p class="description"><?php esc_html_e( 'Never solid white — a warm cream (default) or a cooler off-white/grey base for the whole site.', 'maapkathi' ); ?></p>
+				</td>
+			</tr>
+			<tr>
+				<th><?php esc_html_e( '9b. Header transparency', 'maapkathi' ); ?></th>
+				<td>
+					<input type="range" min="0" max="100" name="mk_theme_settings[header_opacity]" value="<?php echo esc_attr( (string) $settings['header_opacity'] ); ?>" oninput="this.nextElementSibling.textContent=this.value+'%'" />
+					<output><?php echo esc_html( (string) $settings['header_opacity'] ); ?>%</output>
+					<p class="description"><?php esc_html_e( 'How strongly the accent colour tints the menu bar floating over the homepage hero. 0% is fully see-through, 100% is solid accent. Once you scroll past the hero the bar thickens automatically so the links stay readable.', 'maapkathi' ); ?></p>
 				</td>
 			</tr>
 			<tr>
