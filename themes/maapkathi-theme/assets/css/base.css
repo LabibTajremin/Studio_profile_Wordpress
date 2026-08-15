@@ -84,16 +84,18 @@ h1, h2, h3, h4, h5, h6 {
 .mk-skip-link:focus { left: 1rem; top: 1rem; }
 
 /* Site header.
-   Inner pages keep a solid sticky bar. The homepage floats the header
-   over the hero instead, tinted with a translucent accent so the image
-   reads through it, then solidifies once scrolled past the hero. */
+   The bar always carries an accent wash, in light and dark mode alike —
+   --accent swaps to --accent-dark under [data-theme="dark"], so the tint
+   follows the mode without a second rule. On the homepage it floats over
+   the hero at a very low opacity so the photograph reads through it, and
+   thickens once the hero has scrolled past. */
 .mk-site-header {
 	position: sticky;
 	top: 0;
 	z-index: 100;
 	backdrop-filter: blur(var(--glass-blur));
-	background: color-mix(in srgb, var(--background) 80%, transparent);
-	border-bottom: 1px solid color-mix(in srgb, var(--foreground) 10%, transparent);
+	background: color-mix(in srgb, var(--accent) 12%, color-mix(in srgb, var(--background) 82%, transparent));
+	border-bottom: 1px solid color-mix(in srgb, var(--accent) 22%, transparent);
 	transition: background var(--motion-duration) var(--motion-ease),
 		border-color var(--motion-duration) var(--motion-ease);
 }
@@ -103,13 +105,13 @@ h1, h2, h3, h4, h5, h6 {
 body.home .mk-site-header {
 	position: fixed;
 	inset-inline: 0;
-	background: color-mix(in srgb, var(--accent) 28%, transparent);
-	backdrop-filter: blur(14px) saturate(1.15);
-	border-bottom-color: rgba(255, 255, 255, 0.14);
+	background: color-mix(in srgb, var(--accent) 14%, transparent);
+	backdrop-filter: blur(10px) saturate(1.2);
+	border-bottom-color: rgba(255, 255, 255, 0.12);
 }
 /* The hero carries a dark scrim, so white reads cleanly here whatever the
    accent is — safer than --accent-foreground, which is measured against
-   solid accent rather than a 28% wash over a photograph. */
+   solid accent rather than a thin wash over a photograph. */
 body.home .mk-site-header,
 body.home .mk-site-header a,
 body.home .mk-logo__title,
@@ -124,9 +126,10 @@ body.home .mk-theme-toggle:hover { background: rgba(255, 255, 255, 0.14); }
 body.home .mk-call-btn { color: var(--accent-foreground); }
 
 /* Past the hero there is no longer an image behind the bar, so it has to
-   carry its own contrast. */
+   carry its own contrast — still short of opaque, so the accent reads as
+   a tint rather than a slab. */
 body.home .mk-site-header.is-scrolled {
-	background: color-mix(in srgb, var(--accent) 92%, transparent);
+	background: color-mix(in srgb, var(--accent) 78%, transparent);
 	border-bottom-color: rgba(255, 255, 255, 0.18);
 }
 .mk-site-header__inner {
@@ -199,6 +202,19 @@ body.home .mk-site-header.is-scrolled {
 	height: 18px;
 	color: inherit;
 }
+/* Stated literally rather than inherited: the icon must be cream in dark
+   mode even if --foreground has not resolved as expected. */
+:root[data-theme="dark"] .mk-theme-toggle,
+:root[data-theme="dark"] .mk-menu-toggle {
+	color: #faf6f1;
+}
+:root[data-theme="dark"] .mk-theme-toggle {
+	border-color: rgba(250, 246, 241, 0.3);
+}
+:root[data-theme="dark"] .mk-theme-toggle:hover {
+	background: rgba(250, 246, 241, 0.12);
+}
+
 :root[data-theme="dark"] .mk-theme-toggle .mk-theme-toggle__sun { display: none; }
 :root[data-theme="dark"] .mk-theme-toggle .mk-theme-toggle__moon { display: inline; }
 

@@ -35,7 +35,7 @@
 }
 
 :root[data-theme="dark"] {
-	--background: #1c150e;
+	--background: #161b28;
 	--foreground: #faf6f1;
 	--accent: var(--accent-dark);
 	--accent-readable: #d99aa3;
