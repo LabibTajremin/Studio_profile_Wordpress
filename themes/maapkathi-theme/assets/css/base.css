@@ -87,14 +87,15 @@ h1, h2, h3, h4, h5, h6 {
    The bar always carries an accent wash, in light and dark mode alike —
    --accent swaps to --accent-dark under [data-theme="dark"], so the tint
    follows the mode without a second rule. On the homepage it floats over
-   the hero at a very low opacity so the photograph reads through it, and
-   thickens once the hero has scrolled past. */
+   the hero at the admin-set opacity (Appearance -> Header transparency)
+   so the photograph reads through it, and thickens once the hero has
+   scrolled past. */
 .mk-site-header {
 	position: sticky;
 	top: 0;
 	z-index: 100;
 	backdrop-filter: blur(var(--glass-blur));
-	background: color-mix(in srgb, var(--accent) 12%, color-mix(in srgb, var(--background) 82%, transparent));
+	background: color-mix(in srgb, var(--accent) var(--header-opacity, 14%), color-mix(in srgb, var(--background) 82%, transparent));
 	border-bottom: 1px solid color-mix(in srgb, var(--accent) 22%, transparent);
 	transition: background var(--motion-duration) var(--motion-ease),
 		border-color var(--motion-duration) var(--motion-ease);
@@ -105,7 +106,7 @@ h1, h2, h3, h4, h5, h6 {
 body.home .mk-site-header {
 	position: fixed;
 	inset-inline: 0;
-	background: color-mix(in srgb, var(--accent) 14%, transparent);
+	background: color-mix(in srgb, var(--accent) var(--header-opacity, 14%), transparent);
 	backdrop-filter: blur(10px) saturate(1.2);
 	border-bottom-color: rgba(255, 255, 255, 0.12);
 }
@@ -129,7 +130,7 @@ body.home .mk-call-btn { color: var(--accent-foreground); }
    carry its own contrast — still short of opaque, so the accent reads as
    a tint rather than a slab. */
 body.home .mk-site-header.is-scrolled {
-	background: color-mix(in srgb, var(--accent) 78%, transparent);
+	background: color-mix(in srgb, var(--accent) var(--header-opacity-solid, 74%), transparent);
 	border-bottom-color: rgba(255, 255, 255, 0.18);
 }
 .mk-site-header__inner {

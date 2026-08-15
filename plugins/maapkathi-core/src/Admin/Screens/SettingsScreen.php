@@ -73,6 +73,7 @@ final class SettingsScreen {
 			$settings[ $section_key ] = ! empty( $_POST[ $section_key ] );
 		}
 
+		$settings['clients_show_name']            = ! empty( $_POST['clients_show_name'] );
 		$settings['blog_enabled']                 = ! empty( $_POST['blog_enabled'] );
 		$settings['vision_mission_enabled']       = ! empty( $_POST['vision_mission_enabled'] );
 		$settings['vision_text']                  = sanitize_textarea_field( wp_unslash( $_POST['vision_text'] ?? '' ) );

@@ -36,6 +36,9 @@ $members      = mk_setting( 'section_team_enabled', true ) ? mk_content( 'member
 $testimonials = mk_setting( 'section_testimonials_enabled', true ) ? mk_content( 'testimonials' ) : array();
 $awards       = mk_setting( 'section_awards_enabled', true ) ? mk_content( 'awards' ) : array();
 $faqs         = mk_setting( 'section_faq_enabled', true ) ? mk_content( 'faqs' ) : array();
+
+// Whether the "Trusted by" tiles carry the client's name beside the logo.
+$show_client_names = (bool) mk_setting( 'clients_show_name', true );
 ?>
 
 <?php if ( $tagline_note ) : ?>
@@ -73,6 +76,14 @@ $faqs         = mk_setting( 'section_faq_enabled', true ) ? mk_content( 'faqs' )
 						<?php echo $logo; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 					<?php else : ?>
 						<span class="mk-clients__mark" style="<?php echo esc_attr( 'background-color:' . mk_client_mark_color( $name ) ); ?>"><?php echo esc_html( mk_client_initials( $name ) ); ?></span>
+					<?php endif; ?>
+
+					<?php
+					// The name always accompanies a bare initials mark, whatever
+					// the setting — otherwise a client with no logo uploaded
+					// would render as an unidentifiable coloured square.
+					if ( ! $logo || $show_client_names ) :
+						?>
 						<span class="mk-clients__name"><?php echo esc_html( $name ); ?></span>
 					<?php endif; ?>
 

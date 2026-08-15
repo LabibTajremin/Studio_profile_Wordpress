@@ -14,7 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * The complete 32-setting registry (§11.1). This is the single source of
+ * The complete 33-setting registry (§11.1). This is the single source of
  * truth for defaults and allowed values — the Appearance/Motion admin
  * screens, the theme-vars cache, and the settings-registry unit test all
  * read from here so nothing can drift out of sync.
@@ -42,6 +42,7 @@ final class ThemeSettings {
 			'heading_color_hex'   => null,
 			'body_color_hex'      => null,
 			'background_tone'     => Backgrounds::DEFAULT_TONE,
+			'header_opacity'      => 14,
 			'radius'              => 'subtle',
 			'density'             => 'comfortable',
 			'grain'               => false,
@@ -167,6 +168,7 @@ final class ThemeSettings {
 				'custom_accent_hex', 'heading_color_hex', 'body_color_hex' =>
 					( is_string( $value ) && '' !== $value ) ? sanitize_hex_color( $value ) : null,
 				'pattern_opacity'   => max( 0, min( 100, absint( $value ) ) ),
+				'header_opacity'    => max( 0, min( 100, absint( $value ) ) ),
 				'parallax_intensity' => max( 0, min( 100, absint( $value ) ) ),
 				'motion_speed'      => max( 50, min( 150, absint( $value ) ) ),
 				'stagger_ms'        => max( 0, min( 300, absint( $value ) ) ),

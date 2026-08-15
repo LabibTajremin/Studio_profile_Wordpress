@@ -85,6 +85,13 @@ final class ThemeVarsBuilder {
 			// stepped toward ink/cream until it passes — see readable_on().
 			'--accent-readable'      => Accents::readable_on( $accent_light, $tone['light']['background'] ),
 			'--accent-readable-dark' => Accents::readable_on( $accent_dark, $tone['dark']['background'] ),
+			// How much accent tints the header floating over the hero, as an
+			// admin-set percentage. The scrolled/inner-page state is derived
+			// rather than exposed: past the hero there is no photograph behind
+			// the bar, so it has to stay opaque enough to read against the page
+			// no matter how sheer the overlay is set.
+			'--header-opacity'       => (int) $settings['header_opacity'] . '%',
+			'--header-opacity-solid' => max( 55, min( 92, (int) $settings['header_opacity'] + 60 ) ) . '%',
 			'--background'           => $tone['light']['background'],
 			'--foreground'           => $tone['light']['foreground'],
 			'--background-dark'      => $tone['dark']['background'],

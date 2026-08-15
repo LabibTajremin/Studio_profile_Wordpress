@@ -12,21 +12,21 @@ use Maapkathi\Core\Theme\Motion;
 use PHPUnit\Framework\TestCase;
 
 /**
- * §11.4: the registry must contain exactly 32 keys, and the exact option
+ * §11.4: the registry must contain exactly 33 keys, and the exact option
  * ID lists must match the source registries. Fails loudly if a setting is
  * ever dropped.
  */
 final class ThemeSettingsRegistryTest extends TestCase {
 
-	public function test_exactly_32_settings(): void {
-		$this->assertCount( 32, ThemeSettings::keys() );
+	public function test_exactly_33_settings(): void {
+		$this->assertCount( 33, ThemeSettings::keys() );
 	}
 
 	public function test_expected_keys_present(): void {
 		$expected = array(
 			'mode', 'accent_id', 'custom_accent_hex', 'pattern_id', 'pattern_opacity',
 			'font_pair_id', 'font_overrides', 'heading_color_hex', 'body_color_hex',
-			'background_tone', 'radius', 'density', 'grain', 'glass', 'hero_style',
+			'background_tone', 'header_opacity', 'radius', 'density', 'grain', 'glass', 'hero_style',
 			'motion_preset', 'motion_level', 'scroll_reveal_style', 'hero_animation',
 			'image_hover_style', 'card_hover_style', 'text_reveal_style', 'page_transition',
 			'cursor_style', 'loader_style', 'scroll_progress', 'smooth_scroll',
