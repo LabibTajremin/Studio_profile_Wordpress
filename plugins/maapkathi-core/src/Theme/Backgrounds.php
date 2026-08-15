@@ -17,6 +17,9 @@ if ( ! defined( 'ABSPATH' ) ) {
  * The site's base --background/--foreground pair is never plain white —
  * only the temperature is a client-facing choice, between a warm cream
  * (the default, matching the reference app) and a cooler off-white/grey.
+ *
+ * Dark mode is a blackish midnight blue rather than a flat near-black —
+ * warm keeps a touch more neutrality, cool leans bluer.
  */
 final class Backgrounds {
 
@@ -36,7 +39,7 @@ final class Backgrounds {
 					'foreground' => '#171310',
 				),
 				'dark'  => array(
-					'background' => '#1c150e',
+					'background' => '#161b28',
 					'foreground' => '#faf6f1',
 				),
 			),
@@ -47,7 +50,7 @@ final class Backgrounds {
 					'foreground' => '#12161a',
 				),
 				'dark'  => array(
-					'background' => '#12161c',
+					'background' => '#101728',
 					'foreground' => '#f4f7f9',
 				),
 			),
