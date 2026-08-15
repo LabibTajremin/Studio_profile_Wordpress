@@ -227,8 +227,8 @@ html[data-hero-style="split"] .mk-hero { background: var(--background); }
 	align-items: center;
 	justify-content: center;
 	gap: 0.7rem;
-	height: 76px;
-	padding-inline: 1rem;
+	height: 112px;
+	padding-inline: 1.15rem;
 	border-radius: var(--radius);
 	border: 1px solid color-mix(in srgb, var(--foreground) 12%, transparent);
 	overflow: hidden;
@@ -243,19 +243,41 @@ html[data-hero-style="split"] .mk-hero { background: var(--background); }
 	color: inherit;
 	text-decoration: none;
 }
-.mk-clients__logo { max-height: 48px; width: auto; display: block; }
+.mk-clients__logo {
+	max-height: 72px;
+	max-width: 100%;
+	width: auto;
+	display: block;
+	transition: transform var(--motion-duration) var(--motion-ease);
+}
 .mk-clients__mark {
 	display: inline-flex;
 	flex-shrink: 0;
 	align-items: center;
 	justify-content: center;
-	width: 40px;
-	height: 40px;
+	width: 56px;
+	height: 56px;
 	border-radius: 999px;
-	font-size: 0.9rem;
+	font-size: 1.15rem;
 	font-weight: 700;
 	color: #fff;
 }
+/* Hover: the tile lifts onto an accent-tinted border with a soft shadow
+   and the logo eases up slightly. Timed from --motion-duration, so it
+   follows the site's motion speed and collapses to nothing under
+   prefers-reduced-motion like every other transition here. */
+.mk-clients__item {
+	transition: transform var(--motion-duration) var(--motion-ease),
+		border-color var(--motion-duration) var(--motion-ease),
+		box-shadow var(--motion-duration) var(--motion-ease);
+}
+.mk-clients__item:hover {
+	transform: translateY(-4px);
+	border-color: color-mix(in srgb, var(--accent) 55%, transparent);
+	box-shadow: 0 10px 24px color-mix(in srgb, var(--foreground) 12%, transparent);
+}
+.mk-clients__item:hover .mk-clients__logo { transform: scale(1.06); }
+
 .mk-clients__name {
 	font-size: 1rem;
 	font-weight: 600;

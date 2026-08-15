@@ -102,6 +102,13 @@ $socials = $settings['socials'] ?? array();
 					<td><label><input type="checkbox" name="<?php echo esc_attr( $mk_key ); ?>" value="1" <?php checked( ! isset( $settings[ $mk_key ] ) || $settings[ $mk_key ] ); ?> /> <?php esc_html_e( 'On', 'maapkathi' ); ?></label></td>
 				</tr>
 			<?php endforeach; ?>
+			<tr>
+				<th><?php esc_html_e( 'Show client names', 'maapkathi' ); ?></th>
+				<td>
+					<label><input type="hidden" name="clients_show_name" value="0" /><input type="checkbox" name="clients_show_name" value="1" <?php checked( ! isset( $settings['clients_show_name'] ) || $settings['clients_show_name'] ); ?> /> <?php esc_html_e( 'On', 'maapkathi' ); ?></label>
+					<p class="description"><?php esc_html_e( 'Show each client\'s name next to their logo in the "Trusted by" row. Turn this off for a logos-only wall. Clients with no logo uploaded always show their name, so the row never becomes a line of blank tiles.', 'maapkathi' ); ?></p>
+				</td>
+			</tr>
 			<tr><td colspan="2"><p class="description"><?php esc_html_e( 'A section with no content underneath already hides itself — these switches are for hiding a section on purpose even when it has content.', 'maapkathi' ); ?></p></td></tr>
 		</table>
 
