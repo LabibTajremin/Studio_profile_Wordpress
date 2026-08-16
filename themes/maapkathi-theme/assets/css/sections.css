@@ -210,22 +210,35 @@ html[data-hero-style="split"] .mk-hero { background: var(--background); }
  * made small placeholder logos read as illegible gray boxes on mobile.
  * A client with no logo gets a coloured initials mark + name instead of
  * a bare title string. */
+/* Flex rather than grid so a part-full last row centres under the rows
+   above it instead of hanging off to the left. --mk-clients-gap has to be
+   a real length (not a rem in the calc alone) because every tile's width
+   is derived from it. */
 .mk-clients__wall {
-	display: grid;
-	grid-template-columns: repeat(2, 1fr);
-	gap: 1.25rem;
+	--mk-clients-gap: 1.25rem;
+	--mk-clients-per-row: 2;
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	gap: var(--mk-clients-gap);
 }
 @media (min-width: 640px) {
-	.mk-clients__wall { grid-template-columns: repeat(3, 1fr); }
+	.mk-clients__wall { --mk-clients-per-row: 3; }
 }
 @media (min-width: 900px) {
-	.mk-clients__wall { grid-template-columns: repeat(4, 1fr); }
+	.mk-clients__wall { --mk-clients-per-row: 4; }
 }
 
+/* Every tile is the same width and the same height in both layouts, so
+   the wall stays a clean rectangle whether names are on, off, or mixed
+   (a client with no logo always carries its name). */
 .mk-clients__item {
+	flex: 0 0 calc(
+		(100% - (var(--mk-clients-per-row) - 1) * var(--mk-clients-gap)) /
+		var(--mk-clients-per-row)
+	);
 	display: flex;
 	align-items: center;
-	justify-content: center;
 	gap: 0.7rem;
 	height: 112px;
 	padding-inline: 1.15rem;
@@ -236,19 +249,61 @@ html[data-hero-style="split"] .mk-hero { background: var(--background); }
 .mk-clients__link {
 	display: flex;
 	align-items: center;
-	justify-content: center;
-	gap: 0.5rem;
+	gap: 0.7rem;
 	width: 100%;
 	height: 100%;
 	color: inherit;
 	text-decoration: none;
 }
 .mk-clients__logo {
-	max-height: 72px;
 	max-width: 100%;
 	width: auto;
 	display: block;
 	transition: transform var(--motion-duration) var(--motion-ease);
+}
+
+/* Logo-only: centred, and as large as the tile allows. */
+.mk-clients__item--logo,
+.mk-clients__item--logo .mk-clients__link {
+	justify-content: center;
+}
+.mk-clients__item--logo .mk-clients__logo {
+	max-height: 88px;
+}
+
+/* With a name: the logo shrinks and sits left, leaving the rest of the
+   tile to the text so the full name fits without truncation. */
+.mk-clients__item--named,
+.mk-clients__item--named .mk-clients__link {
+	justify-content: flex-start;
+}
+.mk-clients__item--named .mk-clients__logo {
+	max-height: 44px;
+	max-width: 38%;
+	flex-shrink: 0;
+}
+
+/* Two tiles to a row on phones leaves a named tile too narrow to hold a
+   logo and text side by side — 38% of it is an unreadable stamp. Below
+   the 3-up breakpoint the named layout stacks instead, which gives the
+   logo the full tile width back. Tile height is untouched, so the wall
+   stays uniform either way. */
+@media (max-width: 639px) {
+	.mk-clients__item--named,
+	.mk-clients__item--named .mk-clients__link {
+		flex-direction: column;
+		justify-content: center;
+		gap: 0.45rem;
+	}
+	.mk-clients__item--named .mk-clients__logo {
+		max-height: 34px;
+		max-width: 84%;
+	}
+	.mk-clients__item--named .mk-clients__name {
+		text-align: center;
+		font-size: 0.8rem;
+		-webkit-line-clamp: 4;
+	}
 }
 .mk-clients__mark {
 	display: inline-flex;
@@ -278,12 +333,20 @@ html[data-hero-style="split"] .mk-hero { background: var(--background); }
 }
 .mk-clients__item:hover .mk-clients__logo { transform: scale(1.06); }
 
+/* Wraps instead of truncating — a client's name reading "Harbour Gr…" is
+   worse than one sitting on two lines. min-width:0 lets the flex item
+   actually shrink to its column, and the line clamp keeps a very long
+   name from pushing itself out of a fixed-height tile. */
 .mk-clients__name {
-	font-size: 1rem;
+	font-size: 0.95rem;
 	font-weight: 600;
+	line-height: 1.25;
+	min-width: 0;
+	overflow-wrap: break-word;
+	display: -webkit-box;
+	-webkit-line-clamp: 3;
+	-webkit-box-orient: vertical;
 	overflow: hidden;
-	text-overflow: ellipsis;
-	white-space: nowrap;
 }
 
 /* ---------- Cards & grids ---------- */

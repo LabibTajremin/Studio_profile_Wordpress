@@ -66,8 +66,17 @@ $show_client_names = (bool) mk_setting( 'clients_show_name', true );
 						'class'   => 'mk-clients__logo',
 					)
 				);
+				// The name always accompanies a bare initials mark, whatever
+				// the setting — otherwise a client with no logo uploaded
+				// would render as an unidentifiable coloured square.
+				$with_name = ( ! $logo || $show_client_names );
+				// Named tiles lay the logo out small and left, ahead of the
+				// text; logo-only tiles centre a much larger logo. The class
+				// rides the tile rather than the wall so a logo-less client
+				// still gets the named layout inside a logos-only wall.
+				$item_class = $with_name ? 'mk-clients__item mk-clients__item--named' : 'mk-clients__item mk-clients__item--logo';
 				?>
-				<div class="mk-clients__item" title="<?php echo esc_attr( $name ); ?>">
+				<div class="<?php echo esc_attr( $item_class ); ?>" title="<?php echo esc_attr( $name ); ?>">
 					<?php if ( $website ) : ?>
 						<a href="<?php echo esc_url( $website ); ?>" rel="noopener noreferrer" target="_blank" class="mk-clients__link">
 					<?php endif; ?>
@@ -78,12 +87,7 @@ $show_client_names = (bool) mk_setting( 'clients_show_name', true );
 						<span class="mk-clients__mark" style="<?php echo esc_attr( 'background-color:' . mk_client_mark_color( $name ) ); ?>"><?php echo esc_html( mk_client_initials( $name ) ); ?></span>
 					<?php endif; ?>
 
-					<?php
-					// The name always accompanies a bare initials mark, whatever
-					// the setting — otherwise a client with no logo uploaded
-					// would render as an unidentifiable coloured square.
-					if ( ! $logo || $show_client_names ) :
-						?>
+					<?php if ( $with_name ) : ?>
 						<span class="mk-clients__name"><?php echo esc_html( $name ); ?></span>
 					<?php endif; ?>
 
