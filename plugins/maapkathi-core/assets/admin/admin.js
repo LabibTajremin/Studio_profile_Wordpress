@@ -194,3 +194,43 @@
 		} );
 	}
 } )();
+
+/**
+ * Header colour controls (FR-01.3).
+ *
+ * The palette and hex inputs are never removed from the page — ticking
+ * "follows accent colour" only disables them, so the admin's previous
+ * custom choice is still there when they untick it again.
+ */
+( function () {
+	var follow = document.getElementById( 'mk-header-follow-accent' );
+	if ( ! follow ) {
+		return;
+	}
+
+	var fieldset = document.querySelector( '.mk-header-colour' );
+	var hint = document.querySelector( '.mk-header-colour__hint' );
+	if ( ! fieldset ) {
+		return;
+	}
+
+	var sync = function () {
+		fieldset.disabled = follow.checked;
+		if ( hint ) {
+			hint.hidden = ! follow.checked;
+		}
+	};
+
+	follow.addEventListener( 'change', sync );
+	sync();
+
+	// Live preview chip beside the hex field.
+	var hex = fieldset.querySelector( 'input[name="mk_theme_settings[header_hex]"]' );
+	var chip = fieldset.querySelector( '.mk-colour-chip' );
+	if ( hex && chip ) {
+		hex.addEventListener( 'input', function () {
+			var value = hex.value.trim().replace( /^#/, '' );
+			chip.style.background = /^([0-9a-f]{3}|[0-9a-f]{6})$/i.test( value ) ? '#' + value : 'transparent';
+		} );
+	}
+} )();

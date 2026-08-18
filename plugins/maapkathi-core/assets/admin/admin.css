@@ -158,3 +158,26 @@
 	.mk-admin .wp-list-table td,
 	.mk-admin .wp-list-table th { word-break: break-word; }
 }
+
+/* Header colour controls (FR-01). */
+.mk-header-colour { border: 0; padding: 0; margin: 0.75rem 0 0; }
+.mk-header-colour[disabled] { opacity: 0.5; }
+.mk-swatch--none {
+	background:
+		linear-gradient(45deg, transparent 45%, #c00 45%, #c00 55%, transparent 55%),
+		#fff;
+	border: 1px solid rgba(0, 0, 0, 0.2);
+}
+.mk-colour-chip {
+	display: inline-block;
+	width: 28px;
+	height: 28px;
+	vertical-align: middle;
+	border: 1px solid rgba(0, 0, 0, 0.2);
+	border-radius: 4px;
+}
+.mk-field-error {
+	color: #b32d2e;
+	font-weight: 600;
+	margin: 0.35rem 0 0;
+}

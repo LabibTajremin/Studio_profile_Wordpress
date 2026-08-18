@@ -14,6 +14,10 @@
 	/* Header tint over the hero; admin-controlled via Appearance. */
 	--header-opacity: 14%;
 	--header-opacity-solid: 74%;
+	/* Header's own colour (FR-01). Defaults to the accent so an untouched
+	   site renders exactly as it did before the setting existed. */
+	--header-bg: #6e1f2a;
+	--header-fg: #faf6f1;
 	--background: #f9f0e4;
 	--foreground: #171310;
 	--pattern-css: background: none;
@@ -42,6 +46,7 @@
 	--foreground: #faf6f1;
 	--accent: var(--accent-dark);
 	--accent-readable: #d99aa3;
+	--header-bg: #8f2d3b;
 }
 
 @media (prefers-reduced-motion: reduce) {

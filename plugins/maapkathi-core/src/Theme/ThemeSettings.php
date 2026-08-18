@@ -32,40 +32,46 @@ final class ThemeSettings {
 	public static function defaults(): array {
 		return array(
 			// Appearance group (#1–14).
-			'mode'                => 'system',
-			'accent_id'           => Accents::default_id(),
-			'custom_accent_hex'   => null,
-			'pattern_id'          => 'none',
-			'pattern_opacity'     => 6,
-			'font_pair_id'        => 'fraunces-manrope',
-			'font_overrides'      => array(), // headings, body, nav, buttons, hero, accents => {fontId, colorHex}.
-			'heading_color_hex'   => null,
-			'body_color_hex'      => null,
-			'background_tone'     => Backgrounds::DEFAULT_TONE,
-			'header_opacity'      => 14,
-			'radius'              => 'subtle',
-			'density'             => 'comfortable',
-			'grain'               => false,
-			'glass'               => true,
-			'hero_style'          => 'full-bleed',
+			'mode'                 => 'system',
+			'accent_id'            => Accents::default_id(),
+			'custom_accent_hex'    => null,
+			'pattern_id'           => 'none',
+			'pattern_opacity'      => 6,
+			'font_pair_id'         => 'fraunces-manrope',
+			'font_overrides'       => array(), // headings, body, nav, buttons, hero, accents => {fontId, colorHex}.
+			'heading_color_hex'    => null,
+			'body_color_hex'       => null,
+			'background_tone'      => Backgrounds::DEFAULT_TONE,
+			'header_opacity'       => 14,
+			// FR-01: header colour. Following the accent is the default so
+			// an existing site looks identical after the update (GR-03).
+			'header_follow_accent' => true,
+			'header_palette_id'    => '',
+			'header_hex'           => null,
+			'header_logo_mode'     => 'auto',
+			'radius'               => 'subtle',
+			'density'              => 'comfortable',
+			'grain'                => false,
+			'glass'                => true,
+			'hero_style'           => 'full-bleed',
 			// Motion group (#15–31).
-			'motion_preset'       => 'refined',
-			'motion_level'        => 'refined',
-			'scroll_reveal_style' => 'fade-up-soft',
-			'hero_animation'      => 'ken-burns-drift',
-			'image_hover_style'   => 'zoom',
-			'card_hover_style'    => 'lift-shadow',
-			'text_reveal_style'   => 'mask-slide-up',
-			'page_transition'     => 'fade',
-			'cursor_style'        => 'none',
-			'loader_style'        => 'none',
-			'scroll_progress'     => false,
-			'smooth_scroll'       => false,
-			'parallax_intensity'  => 20,
-			'motion_speed'        => 100,
-			'stagger_ms'          => 70,
-			'animate_once'        => true,
-			'motion_on_mobile'    => 'reduced',
+			'motion_preset'        => 'refined',
+			'motion_level'         => 'refined',
+			'scroll_reveal_style'  => 'fade-up-soft',
+			'hero_animation'       => 'ken-burns-drift',
+			'image_hover_style'    => 'zoom',
+			'card_hover_style'     => 'lift-shadow',
+			'text_reveal_style'    => 'mask-slide-up',
+			'page_transition'      => 'fade',
+			'cursor_style'         => 'none',
+			'loader_style'         => 'none',
+			'scroll_progress'      => false,
+			'smooth_scroll'        => false,
+			'parallax_intensity'   => 20,
+			'motion_speed'         => 100,
+			'stagger_ms'           => 70,
+			'animate_once'         => true,
+			'motion_on_mobile'     => 'reduced',
 		);
 	}
 
@@ -106,6 +112,7 @@ final class ThemeSettings {
 			'cursor_style'        => array( 'none', 'dot', 'ring', 'accent-blend' ),
 			'loader_style'        => array( 'none', 'bar', 'logo-fade' ),
 			'motion_on_mobile'    => array( 'full', 'reduced', 'off' ),
+			'header_logo_mode'    => array( 'auto', 'light', 'dark' ),
 		);
 	}
 
@@ -172,7 +179,13 @@ final class ThemeSettings {
 				'parallax_intensity' => max( 0, min( 100, absint( $value ) ) ),
 				'motion_speed'      => max( 50, min( 150, absint( $value ) ) ),
 				'stagger_ms'        => max( 0, min( 300, absint( $value ) ) ),
-				'grain', 'glass', 'scroll_progress', 'smooth_scroll', 'animate_once' => (bool) $value,
+				// FR-01.6: accepts #rgb/#rrggbb with or without the leading
+				// hash, in any case. An unparseable value normalises to null,
+				// which the priority rule treats as "not set" rather than
+				// writing a broken colour to the database.
+				'header_hex'        => HexColor::normalize( $value ),
+				'header_palette_id' => ( is_string( $value ) && null !== Accents::by_id( $value ) ) ? $value : '',
+				'grain', 'glass', 'scroll_progress', 'smooth_scroll', 'animate_once', 'header_follow_accent' => (bool) $value,
 				'font_overrides'    => is_array( $value ) ? self::sanitize_font_overrides( $value ) : array(),
 				default             => $value,
 			};

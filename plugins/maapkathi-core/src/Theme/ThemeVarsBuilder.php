@@ -48,7 +48,7 @@ final class ThemeVarsBuilder {
 		// --background/--foreground swap to their dark-mode pair here rather
 		// than via a plain var() default, since the light/dark pair is a
 		// per-tenant admin choice (Backgrounds), not a fixed fallback.
-		$css .= ':root[data-theme="dark"]{ --background: var(--background-dark); --foreground: var(--foreground-dark); --accent-readable: var(--accent-readable-dark); }' . "\n";
+		$css .= ':root[data-theme="dark"]{ --background: var(--background-dark); --foreground: var(--foreground-dark); --accent-readable: var(--accent-readable-dark); --header-bg: var(--header-bg-dark); --header-fg: var(--header-fg-dark); }' . "\n";
 		// A CSS custom property cannot hold a full declaration for var()
 		// substitution, so the pattern's `background-image`/`background-size`
 		// declarations are emitted here as a real rule instead of a var.
@@ -76,6 +76,11 @@ final class ThemeVarsBuilder {
 		$fonts   = Fonts::by_id( $settings['font_pair_id'] ) ?? Fonts::by_id( 'fraunces-manrope' );
 		$tone    = Backgrounds::by_id( $settings['background_tone'] ) ?? Backgrounds::by_id( Backgrounds::DEFAULT_TONE );
 
+		// Resolved per mode, because a palette swatch carries a light and a
+		// dark variant just as the accent does.
+		$header_light = HeaderColor::resolve( $settings, $accent_light, false );
+		$header_dark  = HeaderColor::resolve( $settings, $accent_dark, true );
+
 		$vars = array(
 			'--accent'               => $accent_light,
 			'--accent-dark'          => $accent_dark,
@@ -92,6 +97,14 @@ final class ThemeVarsBuilder {
 			// no matter how sheer the overlay is set.
 			'--header-opacity'       => (int) $settings['header_opacity'] . '%',
 			'--header-opacity-solid' => max( 55, min( 92, (int) $settings['header_opacity'] + 60 ) ) . '%',
+			// FR-01: the single output point for the header's own colour.
+			// Every header surface reads --header-bg, so changing the setting
+			// never means touching more than this (FR-01.9), and the sticky
+			// and over-hero states cannot drift apart (FR-01.8).
+			'--header-bg'            => $header_light['bg'],
+			'--header-bg-dark'       => $header_dark['bg'],
+			'--header-fg'            => $header_light['fg'],
+			'--header-fg-dark'       => $header_dark['fg'],
 			'--background'           => $tone['light']['background'],
 			'--foreground'           => $tone['light']['foreground'],
 			'--background-dark'      => $tone['dark']['background'],

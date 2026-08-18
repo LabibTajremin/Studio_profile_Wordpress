@@ -95,8 +95,8 @@ h1, h2, h3, h4, h5, h6 {
 	top: 0;
 	z-index: 100;
 	backdrop-filter: blur(var(--glass-blur));
-	background: color-mix(in srgb, var(--accent) var(--header-opacity, 14%), color-mix(in srgb, var(--background) 82%, transparent));
-	border-bottom: 1px solid color-mix(in srgb, var(--accent) 22%, transparent);
+	background: color-mix(in srgb, var(--header-bg, var(--accent)) var(--header-opacity, 14%), color-mix(in srgb, var(--background) 82%, transparent));
+	border-bottom: 1px solid color-mix(in srgb, var(--header-bg, var(--accent)) 22%, transparent);
 	transition: background var(--motion-duration) var(--motion-ease),
 		border-color var(--motion-duration) var(--motion-ease);
 }
@@ -106,7 +106,7 @@ h1, h2, h3, h4, h5, h6 {
 body.home .mk-site-header {
 	position: fixed;
 	inset-inline: 0;
-	background: color-mix(in srgb, var(--accent) var(--header-opacity, 14%), transparent);
+	background: color-mix(in srgb, var(--header-bg, var(--accent)) var(--header-opacity, 14%), transparent);
 	backdrop-filter: blur(10px) saturate(1.2);
 	border-bottom-color: rgba(255, 255, 255, 0.12);
 }
@@ -130,9 +130,54 @@ body.home .mk-call-btn { color: var(--accent-foreground); }
    carry its own contrast — still short of opaque, so the accent reads as
    a tint rather than a slab. */
 body.home .mk-site-header.is-scrolled {
-	background: color-mix(in srgb, var(--accent) var(--header-opacity-solid, 74%), transparent);
+	background: color-mix(in srgb, var(--header-bg, var(--accent)) var(--header-opacity-solid, 74%), transparent);
 	border-bottom-color: rgba(255, 255, 255, 0.18);
 }
+/* FR-01: once the admin gives the header a colour of its own it stops
+   being a wash over the hero and becomes a surface in its own right, so it
+   is painted solid and its ink is the auto-contrast --header-fg. Both the
+   over-hero and scrolled states read the same token, which is what stops
+   the two drifting apart (FR-01.8). The white-on-hero rules above are
+   overridden here rather than duplicated, so there is still exactly one
+   place that decides the header colour. */
+.mk-site-header--custom,
+body.home .mk-site-header--custom,
+body.home .mk-site-header--custom.is-scrolled {
+	background: var(--header-bg);
+	border-bottom-color: color-mix(in srgb, var(--header-fg) 18%, transparent);
+}
+.mk-site-header--custom,
+.mk-site-header--custom a,
+body.home .mk-site-header--custom,
+body.home .mk-site-header--custom a,
+body.home .mk-site-header--custom .mk-logo__title,
+body.home .mk-site-header--custom .mk-theme-toggle,
+body.home .mk-site-header--custom .mk-menu-toggle {
+	color: var(--header-fg);
+}
+.mk-site-header--custom .mk-theme-toggle {
+	border-color: color-mix(in srgb, var(--header-fg) 35%, transparent);
+}
+.mk-site-header--custom .mk-theme-toggle:hover {
+	background: color-mix(in srgb, var(--header-fg) 14%, transparent);
+}
+/* A sticky bar whose colour matches the section beneath it would vanish at
+   the seam, so it carries a shadow token rather than a hardcoded line. */
+.mk-site-header--custom.is-scrolled {
+	box-shadow: 0 1px 16px color-mix(in srgb, var(--header-fg) 16%, transparent);
+}
+
+/* Forced header logo variant. Presentation stays in CSS so there is still
+   no flash of the wrong logo before scripts run. */
+.mk-site-header[data-logo-mode="light"] .mk-logo__img--light,
+.mk-site-header[data-logo-mode="dark"] .mk-logo__img--dark {
+	display: block;
+}
+.mk-site-header[data-logo-mode="light"] .mk-logo__img--dark,
+.mk-site-header[data-logo-mode="dark"] .mk-logo__img--light {
+	display: none;
+}
+
 .mk-site-header__inner {
 	max-width: 1200px;
 	margin-inline: auto;

@@ -176,3 +176,52 @@ if ( ! function_exists( 'mk_placeholder_url' ) ) {
 		return \Maapkathi\Core\Rest\PlaceholderController::url( $label, $width, $height );
 	}
 }
+
+if ( ! function_exists( 'mk_header_is_custom' ) ) {
+	/**
+	 * Whether the header is painted with a colour of its own (FR-01).
+	 *
+	 * The theme paints a solid, auto-contrasted bar when this is true and
+	 * keeps its translucent accent wash when it is false, so a site that
+	 * never opened the setting looks exactly as it did before (GR-03).
+	 *
+	 * @return bool
+	 */
+	function mk_header_is_custom(): bool {
+		return \Maapkathi\Core\Theme\HeaderColor::is_custom( \Maapkathi\Core\Theme\ThemeSettings::get() );
+	}
+}
+
+if ( ! function_exists( 'mk_header_logo_mode' ) ) {
+	/**
+	 * Which logo variant the header should show (FR-01 edge case).
+	 *
+	 * Once the header can be any colour, "follow the site's light/dark mode"
+	 * stops being enough — a dark logo on a dark custom header disappears.
+	 * "auto" therefore resolves against the header's own luminance rather
+	 * than the page mode whenever a custom colour is set.
+	 *
+	 * @return string One of 'auto', 'light' or 'dark'.
+	 */
+	function mk_header_logo_mode(): string {
+		$settings = \Maapkathi\Core\Theme\ThemeSettings::get();
+		$mode     = (string) ( $settings['header_logo_mode'] ?? 'auto' );
+
+		if ( 'auto' !== $mode ) {
+			return $mode;
+		}
+
+		if ( ! \Maapkathi\Core\Theme\HeaderColor::is_custom( $settings ) ) {
+			return 'auto';
+		}
+
+		// on_accent() returns the ink that reads on the bar; a cream ink
+		// means the bar is dark, which is where the light logo belongs.
+		$resolved = \Maapkathi\Core\Theme\HeaderColor::resolve(
+			$settings,
+			\Maapkathi\Core\Theme\Accents::by_id( $settings['accent_id'] )['light'] ?? '#6e1f2a'
+		);
+
+		return \Maapkathi\Core\Theme\Accents::CREAM === $resolved['fg'] ? 'light' : 'dark';
+	}
+}

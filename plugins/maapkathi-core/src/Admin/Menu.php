@@ -10,6 +10,7 @@ declare( strict_types = 1 );
 namespace Maapkathi\Core\Admin;
 
 use Maapkathi\Core\Roles\Roles;
+use Maapkathi\Core\Theme\HexColor;
 use Maapkathi\Core\Theme\ThemeSettings;
 use Maapkathi\Core\Storage\Adapters\LocalStorageAdapter;
 use Maapkathi\Core\Admin\Screens\HeroScreen;
@@ -245,11 +246,35 @@ final class Menu {
 			wp_die( esc_html__( 'You do not have permission to view this page.', 'maapkathi' ) );
 		}
 
+		$field_errors = array();
+
 		if ( isset( $_POST['mk_appearance_nonce'] ) && check_admin_referer( 'mk_save_appearance', 'mk_appearance_nonce' ) ) {
-			$raw       = wp_unslash( $_POST['mk_theme_settings'] ?? array() );
-			$sanitized = ThemeSettings::sanitize( is_array( $raw ) ? $raw : array() );
+			$raw = wp_unslash( $_POST['mk_theme_settings'] ?? array() );
+			$raw = is_array( $raw ) ? $raw : array();
+
+			// FR-01.6: a hex that will not parse is reported inline and the
+			// previously saved value is put back, so a typo cannot quietly
+			// blank the header colour. An empty field is not an error — it
+			// means "no custom hex", which hands the header to the swatch.
+			$posted_hex = isset( $raw['header_hex'] ) ? trim( (string) $raw['header_hex'] ) : '';
+			if ( '' !== $posted_hex && ! HexColor::is_valid( $posted_hex ) ) {
+				$current                    = ThemeSettings::get();
+				$raw['header_hex']          = $current['header_hex'];
+				$field_errors['header_hex'] = sprintf(
+					/* translators: %s: the rejected value the admin typed. */
+					__( '"%s" is not a colour. Use #rgb or #rrggbb — the previous value has been kept.', 'maapkathi' ),
+					$posted_hex
+				);
+			}
+
+			$sanitized = ThemeSettings::sanitize( $raw );
 			update_option( ThemeSettings::OPTION, $sanitized );
-			echo '<div class="notice notice-success"><p>' . esc_html__( 'Saved.', 'maapkathi' ) . ' <a href="' . esc_url( home_url( '/' ) ) . '" target="_blank">' . esc_html__( 'View site ↗', 'maapkathi' ) . '</a></p></div>';
+
+			if ( $field_errors ) {
+				echo '<div class="notice notice-error"><p>' . esc_html__( 'Saved, but one field was rejected — see the error below.', 'maapkathi' ) . '</p></div>';
+			} else {
+				echo '<div class="notice notice-success"><p>' . esc_html__( 'Saved.', 'maapkathi' ) . ' <a href="' . esc_url( home_url( '/' ) ) . '" target="_blank">' . esc_html__( 'View site ↗', 'maapkathi' ) . '</a></p></div>';
+			}
 		}
 
 		$settings = ThemeSettings::get();
