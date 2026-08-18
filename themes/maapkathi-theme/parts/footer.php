@@ -18,6 +18,13 @@ $mk_address     = mk_setting( 'address' );
 $mk_socials     = (array) mk_setting( 'socials', array() );
 $mk_footer_note = mk_text( 'footer_note' );
 
+// FR-08/FR-09: which footer layout renders, and whether the copyright bar
+// keeps a divider above it (off by default, so footer and copyright read as
+// one continuous block).
+$mk_footer       = mk_footer_settings();
+$mk_footer_style = (string) $mk_footer['style'];
+$mk_show_divider = ! empty( $mk_footer['show_divider'] );
+
 // Organization JSON-LD (§12). NAP details are included only when set, so
 // we never publish an incomplete/misleading business record.
 $mk_org = array(
@@ -58,47 +65,20 @@ if ( $mk_socials ) {
 	$mk_org['sameAs'] = array_values( array_filter( $mk_socials ) );
 }
 ?>
-<footer class="mk-site-footer">
-	<div class="mk-site-footer__inner">
-		<div class="mk-site-footer__brand">
-			<p class="mk-site-footer__name"><?php echo esc_html( $mk_studio_name ); ?></p>
-			<?php if ( $mk_footer_note ) : ?>
-				<p class="mk-site-footer__note"><?php echo esc_html( $mk_footer_note ); ?></p>
-			<?php endif; ?>
-		</div>
+<footer class="mk-site-footer mk-site-footer--<?php echo esc_attr( $mk_footer_style ); ?>" data-logo-mode="<?php echo esc_attr( (string) $mk_footer['logo_mode'] ); ?>">
+	<?php
+	// require rather than get_template_part() so the partial keeps this
+	// file's local scope; get_theme_file_path() still lets a child theme
+	// override either layout.
+	require get_theme_file_path( 'modern' === $mk_footer_style ? 'parts/footer-modern.php' : 'parts/footer-classic.php' );
+	?>
 
-		<nav class="mk-site-footer__nav" aria-label="<?php esc_attr_e( 'Footer', 'maapkathi' ); ?>">
-			<ul>
-				<?php foreach ( mk_nav_items() as $mk_item ) : ?>
-					<li><a href="<?php echo esc_url( $mk_item['href'] ); ?>"><?php echo esc_html( $mk_item['label'] ); ?></a></li>
-				<?php endforeach; ?>
-			</ul>
-		</nav>
-
-		<address class="mk-site-footer__contact">
-			<?php if ( $mk_email ) : ?>
-				<a href="mailto:<?php echo esc_attr( $mk_email ); ?>"><?php echo esc_html( $mk_email ); ?></a>
-			<?php endif; ?>
-			<?php if ( $mk_phone ) : ?>
-				<a href="<?php echo esc_attr( mk_tel_href( $mk_phone ) ); ?>"><?php echo esc_html( $mk_phone ); ?></a>
-			<?php endif; ?>
-			<?php if ( $mk_address ) : ?>
-				<span><?php echo nl2br( esc_html( $mk_address ) ); ?></span>
-			<?php endif; ?>
-
-			<?php if ( $mk_socials ) : ?>
-				<span class="mk-site-footer__socials">
-					<?php foreach ( $mk_socials as $mk_platform => $mk_url ) : ?>
-						<?php if ( $mk_url ) : ?>
-							<a href="<?php echo esc_url( $mk_url ); ?>" rel="noopener noreferrer me" target="_blank"><?php echo esc_html( ucfirst( (string) $mk_platform ) ); ?></a>
-						<?php endif; ?>
-					<?php endforeach; ?>
-				</span>
-			<?php endif; ?>
-		</address>
-	</div>
-
-	<div class="mk-site-footer__bottom">
+	<?php
+	// FR-09: the copyright bar keeps its existing content and markup. The
+	// only change is that it now sits on the same --footer-bg as the footer
+	// above it, with no divider, so the two read as one block.
+	?>
+	<div class="mk-site-footer__bottom<?php echo $mk_show_divider ? ' mk-site-footer__bottom--divided' : ''; ?>">
 		<p class="mk-copyright">
 			&copy; <?php echo esc_html( gmdate( 'Y' ) ); ?> <?php echo esc_html( $mk_studio_name ); ?>
 		</p>

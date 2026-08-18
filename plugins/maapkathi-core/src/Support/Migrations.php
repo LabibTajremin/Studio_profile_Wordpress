@@ -9,6 +9,8 @@ declare( strict_types = 1 );
 
 namespace Maapkathi\Core\Support;
 
+use Maapkathi\Core\Footer\FooterSettings;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -60,6 +62,7 @@ final class Migrations {
 	private static function steps(): array {
 		return array(
 			'1.0.0' => array( self::class, 'migrate_1_0_0' ),
+			'1.1.0' => array( self::class, 'migrate_1_1_0' ),
 		);
 	}
 
@@ -175,5 +178,48 @@ final class Migrations {
 		}
 
 		return true;
+	}
+	/**
+	 * 1.1.0 — footer settings and the newsletter subscribers table (FR-08).
+	 *
+	 * The footer style is the only setting here that cannot simply take its
+	 * shipped default: a fresh install wants the new Modern footer, but a
+	 * site that is already live must keep the Classic one until its owner
+	 * opts in, or its footer silently changes shape under it (FR-08.1,
+	 * GR-03). "Already live" is read as "the site settings option exists",
+	 * which is written the first time anyone saves settings or runs setup.
+	 */
+	private static function migrate_1_1_0(): void {
+		global $wpdb;
+
+		if ( false === get_option( FooterSettings::OPTION, false ) ) {
+			$footer = FooterSettings::defaults();
+
+			if ( false !== get_option( 'mk_site_settings', false ) ) {
+				$footer['style'] = 'classic';
+			}
+
+			add_option( FooterSettings::OPTION, $footer );
+		}
+
+		require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+
+		$charset_collate = $wpdb->get_charset_collate();
+		$prefix          = $wpdb->prefix;
+
+		// Unique index on email so a double submit cannot create a second
+		// row for the same subscriber (spec section 13).
+		$subscribers = "CREATE TABLE {$prefix}mk_subscribers (
+  id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  email VARCHAR(191) NOT NULL,
+  source VARCHAR(191) NULL,
+  ip_hash VARCHAR(64) NULL,
+  created_at DATETIME NOT NULL,
+  PRIMARY KEY  (id),
+  UNIQUE KEY email (email),
+  KEY created_at (created_at)
+) {$charset_collate};";
+
+		dbDelta( $subscribers );
 	}
 }

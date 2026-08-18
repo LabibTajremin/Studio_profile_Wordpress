@@ -133,6 +133,19 @@ final class ThemeSettings {
 	 * @return void
 	 */
 	public function bust_cache(): void {
+		self::flush_cache();
+	}
+
+	/**
+	 * Drops the cached CSS variable block.
+	 *
+	 * Static so the other screens that feed those variables — the footer
+	 * settings, the section builder — can invalidate the cache without
+	 * instantiating a settings object just to call a hook callback.
+	 *
+	 * @return void
+	 */
+	public static function flush_cache(): void {
 		delete_transient( self::CACHE_KEY );
 		delete_transient( self::CACHE_KEY . '_rm' );
 	}

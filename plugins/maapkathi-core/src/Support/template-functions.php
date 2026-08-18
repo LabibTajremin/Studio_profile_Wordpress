@@ -225,3 +225,122 @@ if ( ! function_exists( 'mk_header_logo_mode' ) ) {
 		return \Maapkathi\Core\Theme\Accents::CREAM === $resolved['fg'] ? 'light' : 'dark';
 	}
 }
+
+if ( ! function_exists( 'mk_footer_settings' ) ) {
+	/**
+	 * The sanitized footer configuration (FR-08).
+	 *
+	 * @return array<string,mixed>
+	 */
+	function mk_footer_settings(): array {
+		return \Maapkathi\Core\Footer\FooterSettings::get();
+	}
+}
+
+if ( ! function_exists( 'mk_footer_social_icon' ) ) {
+	/**
+	 * Inline SVG mark for one social platform (FR-08.6).
+	 *
+	 * @param string $platform Platform slug.
+	 * @return string SVG markup, already safe to echo.
+	 */
+	function mk_footer_social_icon( string $platform ): string {
+		return \Maapkathi\Core\Footer\SocialIcons::svg( $platform );
+	}
+}
+
+if ( ! function_exists( 'mk_footer_platform_label' ) ) {
+	/**
+	 * Human-readable name for a social platform, used as the icon's
+	 * accessible label since the link itself shows no text.
+	 *
+	 * @param string $platform Platform slug.
+	 * @return string
+	 */
+	function mk_footer_platform_label( string $platform ): string {
+		$platforms = \Maapkathi\Core\Footer\FooterSettings::platforms();
+		return (string) ( $platforms[ $platform ] ?? $platform );
+	}
+}
+
+if ( ! function_exists( 'mk_footer_column_links' ) ) {
+	/**
+	 * Resolves a footer link column to a flat list of {label, url} rows
+	 * (FR-08.11).
+	 *
+	 * @param string                                    $source One of menu, services, projects, custom.
+	 * @param int                                       $limit  Maximum rows to return.
+	 * @param array<int,array{label:string,url:string}> $custom Custom rows, used when $source is 'custom'.
+	 * @return array<int,array{label:string,url:string}>
+	 */
+	function mk_footer_column_links( string $source, int $limit, array $custom = array() ): array {
+		$rows = array();
+
+		switch ( $source ) {
+			case 'custom':
+				$rows = $custom;
+				break;
+
+			case 'services':
+			case 'projects':
+				$posts = get_posts(
+					array(
+						'post_type'        => 'services' === $source ? 'mk_service' : 'mk_project',
+						'posts_per_page'   => $limit,
+						'orderby'          => 'menu_order title',
+						'order'            => 'ASC',
+						'suppress_filters' => false,
+					)
+				);
+				foreach ( $posts as $post ) {
+					$rows[] = array(
+						'label' => get_the_title( $post ),
+						'url'   => (string) get_permalink( $post ),
+					);
+				}
+				break;
+
+			default:
+				foreach ( mk_nav_items() as $item ) {
+					$rows[] = array(
+						'label' => (string) $item['label'],
+						'url'   => (string) $item['href'],
+					);
+				}
+				break;
+		}
+
+		return array_slice( $rows, 0, $limit );
+	}
+}
+
+if ( ! function_exists( 'mk_icon' ) ) {
+	/**
+	 * Inline SVG from the bundled icon library (FR-06/07/08).
+	 *
+	 * @param string $id        Icon id.
+	 * @param int    $size      Rendered size in pixels.
+	 * @param string $css_class Optional CSS class.
+	 * @return string SVG markup, already safe to echo.
+	 */
+	function mk_icon( string $id, int $size = 24, string $css_class = '' ): string {
+		return \Maapkathi\Core\Icons\IconLibrary::svg( $id, $size, $css_class );
+	}
+}
+
+if ( ! function_exists( 'mk_contact_icon' ) ) {
+	/**
+	 * The icon that belongs beside a footer contact row of this type.
+	 *
+	 * @param string $type Contact row type.
+	 * @param int    $size Rendered size in pixels.
+	 * @return string SVG markup, already safe to echo.
+	 */
+	function mk_contact_icon( string $type, int $size = 18 ): string {
+		return \Maapkathi\Core\Icons\IconLibrary::svg(
+			\Maapkathi\Core\Icons\IconLibrary::for_contact_type( $type ),
+			$size,
+			'mk-footer__contact-icon'
+		);
+	}
+}

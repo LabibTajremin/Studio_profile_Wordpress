@@ -17,6 +17,7 @@ use Maapkathi\Core\Admin\Screens\HeroScreen;
 use Maapkathi\Core\Admin\Screens\ApprovalsScreen;
 use Maapkathi\Core\Admin\Screens\UsersScreen;
 use Maapkathi\Core\Admin\Screens\SiteTextScreen;
+use Maapkathi\Core\Admin\Screens\FooterScreen;
 use Maapkathi\Core\Admin\Screens\SettingsScreen;
 use Maapkathi\Core\Admin\Screens\InquiriesScreen;
 
@@ -97,6 +98,8 @@ final class Menu {
 		add_submenu_page( 'maapkathi', __( 'Appearance', 'maapkathi' ), __( 'Appearance', 'maapkathi' ), Roles::CAP_MANAGE_APPEARANCE, 'maapkathi-appearance', array( $this, 'render_appearance' ) );
 
 		// #15 Site Text.
+		add_submenu_page( 'maapkathi', __( 'Footer', 'maapkathi' ), __( 'Footer', 'maapkathi' ), Roles::CAP_MANAGE_APPEARANCE, 'maapkathi-footer', array( $this, 'render_footer' ) );
+
 		add_submenu_page( 'maapkathi', __( 'Site Text', 'maapkathi' ), __( 'Site Text', 'maapkathi' ), Roles::CAP_MANAGE_SETTINGS, 'maapkathi-site-text', array( $this, 'render_site_text' ) );
 
 		// #16 Settings.
@@ -225,6 +228,15 @@ final class Menu {
 	 */
 	public function render_site_text(): void {
 		( new SiteTextScreen() )->render();
+	}
+
+	/**
+	 * Renders and saves the Footer screen (FR-08, FR-09).
+	 *
+	 * @return void
+	 */
+	public function render_footer(): void {
+		( new FooterScreen() )->render();
 	}
 
 	/**

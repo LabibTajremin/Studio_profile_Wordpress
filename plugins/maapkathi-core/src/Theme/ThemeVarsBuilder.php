@@ -9,6 +9,9 @@ declare( strict_types = 1 );
 
 namespace Maapkathi\Core\Theme;
 
+use Maapkathi\Core\Footer\FooterColor;
+use Maapkathi\Core\Footer\FooterSettings;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -48,7 +51,7 @@ final class ThemeVarsBuilder {
 		// --background/--foreground swap to their dark-mode pair here rather
 		// than via a plain var() default, since the light/dark pair is a
 		// per-tenant admin choice (Backgrounds), not a fixed fallback.
-		$css .= ':root[data-theme="dark"]{ --background: var(--background-dark); --foreground: var(--foreground-dark); --accent-readable: var(--accent-readable-dark); --header-bg: var(--header-bg-dark); --header-fg: var(--header-fg-dark); }' . "\n";
+		$css .= ':root[data-theme="dark"]{ --background: var(--background-dark); --foreground: var(--foreground-dark); --accent-readable: var(--accent-readable-dark); --header-bg: var(--header-bg-dark); --header-fg: var(--header-fg-dark); --footer-bg: var(--footer-bg-dark); --footer-fg: var(--footer-fg-dark); --footer-muted: var(--footer-muted-dark); }' . "\n";
 		// A CSS custom property cannot hold a full declaration for var()
 		// substitution, so the pattern's `background-image`/`background-size`
 		// declarations are emitted here as a real rule instead of a var.
@@ -81,6 +84,13 @@ final class ThemeVarsBuilder {
 		$header_light = HeaderColor::resolve( $settings, $accent_light, false );
 		$header_dark  = HeaderColor::resolve( $settings, $accent_dark, true );
 
+		// FR-08.2/FR-09.2: the footer and the copyright bar below it read
+		// the same two tokens, so they cannot end up as two colours that
+		// merely look alike.
+		$footer       = FooterSettings::get();
+		$footer_light = FooterColor::resolve( $footer, $accent_light, $tone['light']['background'], $tone['light']['foreground'] );
+		$footer_dark  = FooterColor::resolve( $footer, $accent_dark, $tone['dark']['background'], $tone['dark']['foreground'] );
+
 		$vars = array(
 			'--accent'               => $accent_light,
 			'--accent-dark'          => $accent_dark,
@@ -105,6 +115,13 @@ final class ThemeVarsBuilder {
 			'--header-bg-dark'       => $header_dark['bg'],
 			'--header-fg'            => $header_light['fg'],
 			'--header-fg-dark'       => $header_dark['fg'],
+			'--footer-bg'            => $footer_light['bg'],
+			'--footer-bg-dark'       => $footer_dark['bg'],
+			'--footer-fg'            => $footer_light['fg'],
+			'--footer-fg-dark'       => $footer_dark['fg'],
+			'--footer-muted'         => $footer_light['muted'],
+			'--footer-muted-dark'    => $footer_dark['muted'],
+			'--footer-logo-max-h'    => (int) $footer['logo_max_h'] . 'px',
 			'--background'           => $tone['light']['background'],
 			'--foreground'           => $tone['light']['foreground'],
 			'--background-dark'      => $tone['dark']['background'],

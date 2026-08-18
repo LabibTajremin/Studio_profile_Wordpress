@@ -157,6 +157,22 @@ final class SiteText {
 					'key'   => 'footer_note',
 					'label' => __( 'Footer note', 'maapkathi' ),
 				),
+				array(
+					'key'   => 'footer_contacts_heading',
+					'label' => __( 'Contacts column heading', 'maapkathi' ),
+				),
+				array(
+					'key'   => 'footer_links_heading',
+					'label' => __( 'Links column heading', 'maapkathi' ),
+				),
+				array(
+					'key'   => 'footer_subscribe_heading',
+					'label' => __( 'Subscribe column heading', 'maapkathi' ),
+				),
+				array(
+					'key'   => 'footer_subscribe_helper',
+					'label' => __( 'Subscribe helper text', 'maapkathi' ),
+				),
 			),
 		);
 	}
@@ -213,6 +229,10 @@ final class SiteText {
 			'contact_form_button_label' => __( 'Send message', 'maapkathi' ),
 			'contact_success_message'   => __( 'Thanks — we received your message and will be in touch shortly.', 'maapkathi' ),
 			'footer_note'               => __( 'Designed and built with care.', 'maapkathi' ),
+			'footer_contacts_heading'   => __( 'Contacts', 'maapkathi' ),
+			'footer_links_heading'      => __( 'Our Projects', 'maapkathi' ),
+			'footer_subscribe_heading'  => __( 'Subscribe', 'maapkathi' ),
+			'footer_subscribe_helper'   => __( 'Occasional notes on new work. No spam, unsubscribe any time.', 'maapkathi' ),
 		);
 	}
 

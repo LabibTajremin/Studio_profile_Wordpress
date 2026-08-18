@@ -18,6 +18,12 @@
 	   site renders exactly as it did before the setting existed. */
 	--header-bg: #6e1f2a;
 	--header-fg: #faf6f1;
+	/* Footer surface (FR-08.2). The copyright bar reads the same tokens,
+	   which is what keeps the two seamless (FR-09.2). */
+	--footer-bg: #14181f;
+	--footer-fg: #faf6f1;
+	--footer-muted: #b9bcc2;
+	--footer-logo-max-h: 64px;
 	--background: #f9f0e4;
 	--foreground: #171310;
 	--pattern-css: background: none;
