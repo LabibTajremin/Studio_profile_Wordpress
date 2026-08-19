@@ -515,7 +515,7 @@ function mk_theme_has_gallery_section(): bool {
 		return false;
 	}
 
-	return 'gallery' === mk_setting( 'projects_layout', 'grid' )
+	return 'gallery' === mk_setting( 'projects_layout', 'showcase' )
 		&& (bool) mk_setting( 'section_projects_enabled', true );
 }
 

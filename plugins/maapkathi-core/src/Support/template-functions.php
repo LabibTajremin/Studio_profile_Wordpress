@@ -438,3 +438,79 @@ if ( ! function_exists( 'mk_gallery_items' ) ) {
 		return \Maapkathi\Core\Gallery\GalleryRenderer::items( $projects, $options );
 	}
 }
+
+if ( ! function_exists( 'mk_section' ) ) {
+	/**
+	 * One section's title, subtitle, anchor and visibility (FR-02).
+	 *
+	 * @param string $id Section id from the registry.
+	 * @return array{title:string,subtitle:string,anchor:string,show_title:bool}
+	 */
+	function mk_section( string $id ): array {
+		$registry = \Maapkathi\Core\Sections\SectionRegistry::all();
+		$state    = \Maapkathi\Core\Sections\SectionRegistry::for_section( $id );
+		$text_key = (string) ( $registry[ $id ]['text_key'] ?? '' );
+
+		return array(
+			// Site Text already falls back to the shipped default when a
+			// field is cleared, so a blank title can never reach the page.
+			'title'      => '' !== $text_key ? mk_text( $text_key ) : '',
+			'subtitle'   => $state['subtitle'],
+			'anchor'     => $state['anchor'],
+			'show_title' => $state['show_title'],
+		);
+	}
+}
+
+if ( ! function_exists( 'mk_section_anchor' ) ) {
+	/**
+	 * A section's anchor, for the id attribute and for menu links.
+	 *
+	 * @param string $id Section id from the registry.
+	 * @return string
+	 */
+	function mk_section_anchor( string $id ): string {
+		return mk_section( $id )['anchor'];
+	}
+}
+
+if ( ! function_exists( 'mk_the_section_heading' ) ) {
+	/**
+	 * Renders a section's heading and subtitle (FR-02.3, FR-02.6, FR-02.8).
+	 *
+	 * Prints nothing at all when the heading is switched off, so the
+	 * section's spacing collapses cleanly rather than leaving the gap
+	 * where the heading used to be.
+	 *
+	 * @param string $id    Section id from the registry.
+	 * @param string $tag   Heading tag to use.
+	 * @param string $class Extra classes for the heading element.
+	 * @return void
+	 */
+	function mk_the_section_heading( string $id, string $tag = 'h2', string $class = '' ): void {
+		$section = mk_section( $id );
+
+		if ( ! $section['show_title'] || '' === trim( $section['title'] ) ) {
+			return;
+		}
+
+		$tag     = in_array( $tag, array( 'h1', 'h2', 'h3' ), true ) ? $tag : 'h2';
+		$classes = trim( 'mk-section__heading ' . $class );
+
+		printf(
+			'<%1$s class="%2$s">%3$s</%1$s>',
+			esc_attr( $tag ),
+			esc_attr( $classes ),
+			// Escaped, never rendered: pasted markup shows as text rather
+			// than executing (FR-02.8).
+			esc_html( $section['title'] )
+		);
+
+		if ( '' !== trim( $section['subtitle'] ) ) {
+			printf(
+				'<p class="mk-section__subtitle">%s</p>',
+				esc_html( $section['subtitle'] )
+			);
+		}
+	}
+}

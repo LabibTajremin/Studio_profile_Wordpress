@@ -177,14 +177,15 @@ $socials = $settings['socials'] ?? array();
 				<td>
 					<?php
 					$mk_project_layouts = array(
-						'grid'    => __( 'Grid — uniform cards', 'maapkathi' ),
-						'gallery' => __( 'Gallery — photos at their own shape', 'maapkathi' ),
+						'showcase' => __( 'Showcase — full-width photo wall (default)', 'maapkathi' ),
+						'grid'     => __( 'Classic — cards with titles and text', 'maapkathi' ),
+						'gallery'  => __( 'Gallery — photos at their own shape', 'maapkathi' ),
 					);
 					foreach ( $mk_project_layouts as $mk_project_layout_id => $mk_project_layout_label ) :
 						?>
-						<label style="margin-right:1.5em"><input type="radio" name="projects_layout" value="<?php echo esc_attr( $mk_project_layout_id ); ?>" <?php checked( (string) ( $settings['projects_layout'] ?? 'grid' ), $mk_project_layout_id ); ?> /> <?php echo esc_html( $mk_project_layout_label ); ?></label>
+						<label style="margin-right:1.5em"><input type="radio" name="projects_layout" value="<?php echo esc_attr( $mk_project_layout_id ); ?>" <?php checked( (string) ( $settings['projects_layout'] ?? 'showcase' ), $mk_project_layout_id ); ?> /> <?php echo esc_html( $mk_project_layout_label ); ?></label>
 					<?php endforeach; ?>
-					<p class="description"><?php esc_html_e( 'Gallery keeps every photo at its own shape and packs them together, so wide, tall and square shots can sit in one wall without any of them being cropped.', 'maapkathi' ); ?></p>
+					<p class="description"><?php esc_html_e( 'Showcase runs your photographs edge to edge with no gaps; hovering one dims it and slides up its title and category. Classic is the older card layout with a title and a line of text under each photo. Gallery keeps every photo at its own shape and packs them together, so wide, tall and square shots can sit in one wall without any of them being cropped.', 'maapkathi' ); ?></p>
 				</td>
 			</tr>
 			<tr>

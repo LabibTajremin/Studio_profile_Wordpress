@@ -889,3 +889,163 @@ html[data-hero-style="split"] .mk-hero { background: var(--background); }
 	row-gap: 0;
 	align-items: start;
 }
+
+/* ---------- Featured work: showcase layout ----------
+   The client's reference: full-bleed tiles running edge to edge with no
+   gaps at all, so the photographs read as one continuous wall. Hovering a
+   tile washes it back and lifts a caption carrying the project title and
+   its category. */
+/* Only the wall breaks out to the viewport edges. Zeroing the container's
+   padding instead would drag the section heading out with it, leaving the
+   title flush against the screen edge while every other section's heading
+   stays in the gutter.
+   overflow-x: clip on the section is not optional: 100vw counts the
+   scrollbar's width, so the breakout is a few pixels wider than the space
+   actually available and would otherwise put a horizontal scrollbar on
+   every page (GR-04). clip rather than hidden, because hidden would make
+   the section a scroll container and break sticky positioning inside it. */
+.mk-projects--showcase {
+	overflow-x: clip;
+}
+.mk-showcase {
+	list-style: none;
+	padding: 0;
+	display: grid;
+	grid-template-columns: 1fr;
+	/* Deliberately gapless — the tiles butt against each other, which is
+	   what makes the wall read as one surface rather than a set of cards. */
+	gap: 0;
+	/* The breakout has to live in the same rule as the margin reset: a
+	   later `margin: 0` would silently cancel a margin-inline set earlier. */
+	width: 100vw;
+	max-width: 100vw;
+	margin-block: 0;
+	margin-inline: calc(50% - 50vw);
+}
+@media (min-width: 600px) {
+	.mk-showcase { grid-template-columns: repeat(2, 1fr); }
+}
+@media (min-width: 992px) {
+	.mk-showcase { grid-template-columns: repeat(3, 1fr); }
+}
+
+.mk-showcase__item {
+	position: relative;
+	overflow: hidden;
+	/* One shared ratio across every tile, so the wall stays a clean grid
+	   whatever shape the uploaded photographs happen to be. */
+	aspect-ratio: 3 / 2;
+}
+.mk-showcase__link {
+	display: block;
+	width: 100%;
+	height: 100%;
+	position: relative;
+	color: #fff;
+	text-decoration: none;
+	line-height: 0;
+}
+.mk-showcase__image {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	display: block;
+	transform: scale(1.001);
+	transition: transform calc(var(--motion-duration) * 1.4) var(--motion-ease);
+}
+
+/* The veil is a separate element rather than a background on the link, so
+   it can fade independently of the caption's slide and the two do not
+   have to share one timing function. */
+.mk-showcase__veil {
+	position: absolute;
+	inset: 0;
+	background: linear-gradient(
+		to top,
+		color-mix(in srgb, #000 62%, transparent) 0%,
+		color-mix(in srgb, #000 28%, transparent) 45%,
+		color-mix(in srgb, #000 8%, transparent) 100%
+	);
+	opacity: 0;
+	transition: opacity var(--motion-duration) var(--motion-ease);
+}
+
+.mk-showcase__caption {
+	position: absolute;
+	inset-inline: 0;
+	bottom: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 0.35rem;
+	padding: clamp(1rem, 2.5vw, 1.75rem);
+	line-height: 1.3;
+	opacity: 0;
+	transform: translateY(0.9rem);
+	transition: opacity var(--motion-duration) var(--motion-ease),
+		transform var(--motion-duration) var(--motion-ease);
+}
+.mk-showcase__title {
+	font-family: var(--font-headings);
+	font-size: clamp(1rem, 1.6vw, 1.25rem);
+	text-wrap: balance;
+}
+.mk-showcase__meta {
+	font-size: 0.72rem;
+	letter-spacing: 0.16em;
+	text-transform: uppercase;
+	opacity: 0.85;
+	/* The reference brackets its category line with rules either side. */
+	display: inline-flex;
+	align-items: center;
+	gap: 0.6em;
+}
+.mk-showcase__meta::before,
+.mk-showcase__meta::after {
+	content: "";
+	width: 1.1em;
+	height: 1px;
+	background: currentColor;
+	opacity: 0.7;
+}
+
+/* Only where hovering is real. On a touch screen :hover latches after a
+   tap, which would leave one tile permanently washed. */
+@media (hover: hover) and (pointer: fine) {
+	.mk-showcase__item:hover .mk-showcase__image { transform: scale(1.06); }
+	.mk-showcase__item:hover .mk-showcase__veil { opacity: 1; }
+	.mk-showcase__item:hover .mk-showcase__caption {
+		opacity: 1;
+		transform: translateY(0);
+		/* The caption follows the veil rather than racing it, which is what
+		   makes the two read as one movement. */
+		transition-delay: calc(var(--motion-duration) * 0.15);
+	}
+}
+
+/* Without hover there is no way to reveal a caption, so it simply stays
+   visible — a wall of unlabelled photographs is worse than a permanent
+   caption. Keyboard users get the same reveal as a mouse. */
+@media not all and (hover: hover) {
+	.mk-showcase__veil,
+	.mk-showcase__caption {
+		opacity: 1;
+		transform: none;
+	}
+}
+.mk-showcase__link:focus-visible .mk-showcase__veil { opacity: 1; }
+.mk-showcase__link:focus-visible .mk-showcase__caption {
+	opacity: 1;
+	transform: translateY(0);
+}
+.mk-showcase__link:focus-visible {
+	outline: 3px solid var(--accent-foreground);
+	outline-offset: -6px;
+}
+
+/* Reduced motion keeps the reveal — it is information, not decoration —
+   but removes the travel and the zoom. */
+@media (prefers-reduced-motion: reduce) {
+	.mk-showcase__image { transition: none; }
+	.mk-showcase__item:hover .mk-showcase__image { transform: none; }
+	.mk-showcase__caption { transform: none; }
+}

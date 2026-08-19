@@ -41,7 +41,7 @@ $show_client_names = (bool) mk_setting( 'clients_show_name', true );
 
 // FR-04: the gallery layout shows the admin's configured page size and
 // offers "Load more"; the grid keeps its original fixed six.
-$projects_layout = (string) mk_setting( 'projects_layout', 'grid' );
+$projects_layout = (string) mk_setting( 'projects_layout', 'showcase' );
 $gallery_per     = (int) mk_setting( 'gallery_per_load', 12 );
 $projects        = mk_setting( 'section_projects_enabled', true )
 	? mk_content( 'featured_projects', 'gallery' === $projects_layout ? $gallery_per : 6 )
@@ -136,7 +136,9 @@ $projects        = mk_setting( 'section_projects_enabled', true )
 <section class="mk-section mk-projects mk-projects--<?php echo esc_attr( $projects_layout ); ?>" data-scroll-reveal>
 	<div class="mk-container">
 		<h2 class="mk-section__heading"><?php mk_the_text( 'home_projects_heading' ); ?></h2>
-		<?php if ( 'gallery' === $projects_layout ) : ?>
+		<?php if ( 'showcase' === $projects_layout ) : ?>
+			<?php require get_theme_file_path( 'parts/section-projects-showcase.php' ); ?>
+		<?php elseif ( 'gallery' === $projects_layout ) : ?>
 			<?php
 			$gallery_click  = (string) mk_setting( 'gallery_click', 'lightbox' );
 			$gallery_total  = (int) wp_count_posts( 'mk_project' )->publish;

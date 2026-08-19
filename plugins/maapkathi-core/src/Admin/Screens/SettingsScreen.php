@@ -86,7 +86,7 @@ final class SettingsScreen {
 
 		// FR-04: Projects layout. The responsive column ladder is derived
 		// from the maximum rather than being five separate settings.
-		$settings['projects_layout']     = in_array( $_POST['projects_layout'] ?? '', array( 'grid', 'gallery' ), true ) ? sanitize_text_field( wp_unslash( $_POST['projects_layout'] ) ) : 'grid';
+		$settings['projects_layout']     = in_array( $_POST['projects_layout'] ?? '', array( 'showcase', 'grid', 'gallery' ), true ) ? sanitize_text_field( wp_unslash( $_POST['projects_layout'] ) ) : 'showcase';
 		$settings['gallery_max_columns'] = max( 2, min( 5, absint( $_POST['gallery_max_columns'] ?? 4 ) ) );
 		$settings['gallery_gutter']      = max( 0, min( 48, absint( $_POST['gallery_gutter'] ?? 16 ) ) );
 		$settings['gallery_per_load']    = max( 1, min( 60, absint( $_POST['gallery_per_load'] ?? 12 ) ) );
