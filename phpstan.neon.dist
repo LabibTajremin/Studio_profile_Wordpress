@@ -15,14 +15,23 @@ parameters:
     # whole run — which makes a handful of genuinely config-dependent
     # branches look permanently dead/redundant relative to that specific
     # value, even though they are reachable for other real deployments.
+    #
+    # Which of those branches look dead therefore depends on the values the
+    # bootstrap happens to supply, so whether each path below actually
+    # produces its error varies between environments — an unmatched pattern
+    # here means "this deployment's constants made that branch live", not
+    # "the ignore is stale". reportUnmatched is set per entry rather than
+    # globally, so any ignore added later is still checked for drift.
     ignoreErrors:
         -
             message: '#^Result of \|\| is always true\.$#'
+            reportUnmatched: false
             paths:
                 - plugins/maapkathi-core/src/Config/Config.php
                 - plugins/maapkathi-core/src/Mail/Mailer.php
         -
             message: '#^Unreachable statement - code above always terminates\.$#'
+            reportUnmatched: false
             paths:
                 - plugins/maapkathi-core/src/Inquiries/Inquiries.php
                 - plugins/maapkathi-core/src/Mail/Mailer.php
