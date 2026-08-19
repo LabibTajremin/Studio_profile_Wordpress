@@ -16,9 +16,32 @@ fixed, and confirmed — plus what's still outside what could be checked here
 (no real browser/Playwright, no HTTPS, no production traffic).
 
 `composer install` still cannot reach `github.com`'s archive API through
-this sandbox's proxy, so PHPUnit/PHPCS/PHPStan themselves were never run —
-but the code they'd check has now been run for real instead, which is a
-stronger signal for the highest-risk parts of the system.
+this sandbox's proxy. PHPCS and PHPStan are now run anyway — they were
+fetched by git clone and symlinked into `vendor/` — and both are part of
+every change: phpcs clean, phpstan down to two long-standing
+ignore-pattern mismatches. PHPUnit still has no binary here, so the tests
+in `tests/Unit/` are exercised by standalone assertion scripts locally and
+by CI upstream rather than by a local `phpunit` run.
+
+## Change Request R1 (spec: `StudioProfileThemeRequirementsR1.docx`)
+
+All ten feature requirements implemented and verified against a real
+WordPress 6.7 / PHP 8.2 / MariaDB 10.6 stack. Full evidence, including
+what was *not* verified, is in `docs/QA_SIGNOFF_R1.md`.
+
+- FR-01 header colour, FR-02 section titles, FR-03 section builder,
+  FR-04 gallery/masonry, FR-05 map, FR-06/07 icons, FR-08 footer,
+  FR-09 copyright bar, FR-10 partners.
+- Plus a Showcase layout for Featured work, supplied by the client as a
+  reference recording and now the default.
+
+Two defects were found by running the gate rather than reading the code:
+deprecations on every admin request from `add_submenu_page( null, … )`,
+and a horizontal scrollbar at ≤768px from the header. Both fixed.
+
+Still unverified after R1: non-Chromium browsers, Lighthouse numbers, a
+real 30-section builder load, an SVG icon uploaded through the media
+library, and a screen-reader pass.
 
 ## Bugs found and fixed by live testing (would have shipped broken otherwise)
 

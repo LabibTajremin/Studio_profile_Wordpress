@@ -26,11 +26,5 @@ parameters:
             paths:
                 - plugins/maapkathi-core/src/Inquiries/Inquiries.php
                 - plugins/maapkathi-core/src/Mail/Mailer.php
-        -
-            # add_submenu_page() genuinely accepts a null $parent_slug since
-            # WP 5.3 to register a hidden page reachable only by URL — the
-            # bundled stub's signature just wasn't updated for it.
-            message: '#^Parameter \#1 \$parent_slug of function add_submenu_page expects string, null given\.$#'
-            path: plugins/maapkathi-core/src/Setup/SetupWizard.php
 includes:
     - vendor/szepeviktor/phpstan-wordpress/extension.neon
