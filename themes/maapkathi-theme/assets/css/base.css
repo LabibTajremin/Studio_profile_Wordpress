@@ -338,16 +338,35 @@ body.home .mk-site-header--custom .mk-menu-toggle {
 .mk-mobile-menu li { font-size: 1.5rem; margin-block: 1rem; opacity: 0; transform: translateY(var(--motion-distance)); transition: opacity var(--motion-duration) var(--motion-ease), transform var(--motion-duration) var(--motion-ease); transition-delay: calc(var(--mk-stagger-index, 0) * var(--motion-stagger)); }
 .mk-mobile-menu.is-open li { opacity: 1; transform: none; }
 
-@media (max-width: 767px) {
+/* The hand-off from the inline nav to the hamburger happens at 900px, not
+   768px. At 768 the five inline links measured 415px, which together with
+   the logo and the action row came to 750px inside a 707px content box —
+   the header overflowed and put a horizontal scrollbar on every inner
+   page (GR-04). */
+@media (max-width: 899px) {
 	.mk-nav--desktop { display: none; }
 	/* The call button stays in the header's top-right action row at every
 	   width — it used to be hidden here and re-rendered centred inside the
 	   overlay instead, which is what made it float mid-page. */
 	.mk-call-btn { padding: 0.5em 0.9em; font-size: 0.85rem; }
 }
-@media (min-width: 768px) {
+@media (min-width: 900px) {
 	.mk-menu-toggle, .mk-mobile-menu { display: none; }
 }
+
+/* Below the hand-off the header is logo + actions, and on a 320px screen
+   those still did not fit: a flex item will not shrink past its content
+   unless it is told it may, so the studio name held the logo at its full
+   width and pushed the actions off-screen. min-width:0 lets it shrink and
+   the title truncates rather than overflowing. */
+.mk-site-header__inner > * { min-width: 0; }
+.mk-logo { min-width: 0; }
+.mk-logo__title {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+.mk-header-actions { flex: 0 0 auto; }
 
 /* Footer (FR-08, FR-09)
    ---------------------------------------------------------------------
