@@ -78,6 +78,14 @@ final class SiteText {
 					'label' => __( 'FAQ heading', 'maapkathi' ),
 				),
 				array(
+					'key'   => 'home_partners_heading',
+					'label' => __( 'Partners heading', 'maapkathi' ),
+				),
+				array(
+					'key'   => 'home_partners_subtitle',
+					'label' => __( 'Partners subtitle', 'maapkathi' ),
+				),
+				array(
 					'key'   => 'home_cta_heading',
 					'label' => __( 'Closing CTA heading', 'maapkathi' ),
 				),
@@ -212,6 +220,8 @@ final class SiteText {
 			'home_testimonials_heading' => __( 'What our clients say', 'maapkathi' ),
 			'home_awards_heading'       => __( 'Recognition', 'maapkathi' ),
 			'home_faq_heading'          => __( 'Frequently asked questions', 'maapkathi' ),
+			'home_partners_heading'     => __( 'Our Partners', 'maapkathi' ),
+			'home_partners_subtitle'    => '',
 			'home_cta_heading'          => __( "Let's build something considered.", 'maapkathi' ),
 			'home_cta_button_label'     => __( 'Start a conversation', 'maapkathi' ),
 			'work_archive_heading'      => __( 'Our work', 'maapkathi' ),

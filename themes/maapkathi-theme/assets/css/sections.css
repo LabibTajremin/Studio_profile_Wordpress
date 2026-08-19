@@ -546,3 +546,94 @@ html[data-hero-style="split"] .mk-hero { background: var(--background); }
 @media (max-width: 480px) {
 	.mk-container { padding-inline: 1rem; }
 }
+
+/* ---------- Our Partners (FR-10) ----------
+   A logo band pinned above the footer. Every logo is fitted inside one
+   shared max height with object-fit: contain, so a 400x120 wordmark and a
+   200x200 square read at the same optical weight instead of one dwarfing
+   the other (FR-10.5). */
+.mk-partners__grid,
+.mk-partners__track {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+.mk-partners__grid {
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	gap: clamp(1rem, 3vw, 2.5rem);
+	align-items: center;
+}
+@media (min-width: 640px) {
+	.mk-partners__grid { grid-template-columns: repeat(min(3, var(--mk-partners-per-row, 5)), 1fr); }
+}
+@media (min-width: 992px) {
+	.mk-partners__grid { grid-template-columns: repeat(var(--mk-partners-per-row, 5), 1fr); }
+}
+.mk-partners__item {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	min-height: calc(var(--mk-partners-logo-h, 48px) + 1.5rem);
+}
+.mk-partners__item a { display: block; line-height: 0; }
+.mk-partners__logo {
+	max-height: var(--mk-partners-logo-h, 48px);
+	max-width: 100%;
+	width: auto;
+	height: auto;
+	object-fit: contain;
+	transition: filter var(--motion-duration) var(--motion-ease),
+		opacity var(--motion-duration) var(--motion-ease),
+		transform var(--motion-duration) var(--motion-ease);
+}
+/* Greyscale-to-colour is opt-out rather than baked in, because a logo set
+   with strict brand guidelines may not be allowed to be desaturated. */
+.mk-partners--greyscale .mk-partners__logo {
+	filter: grayscale(1);
+	opacity: 0.75;
+}
+.mk-partners--greyscale .mk-partners__item:hover .mk-partners__logo,
+.mk-partners--greyscale .mk-partners__item:focus-within .mk-partners__logo {
+	filter: grayscale(0);
+	opacity: 1;
+	transform: scale(1.04);
+}
+.mk-partners--bg-surface { background: color-mix(in srgb, var(--foreground) 4%, transparent); }
+.mk-partners--bg-accent { background: color-mix(in srgb, var(--accent) 8%, transparent); }
+
+/* Marquee: two identical tracks side by side, translated by exactly one
+   track width. Because the second track is a pixel-perfect copy, the loop
+   restarts on a frame identical to the one it left, so there is no jump. */
+.mk-partners__marquee {
+	display: flex;
+	overflow: hidden;
+	gap: clamp(1rem, 3vw, 2.5rem);
+	/* Fades the band into the page at both ends rather than cutting logos
+	   off against a hard edge. */
+	mask-image: linear-gradient(to right, transparent, #000 6%, #000 94%, transparent);
+}
+.mk-partners__track {
+	display: flex;
+	flex: 0 0 auto;
+	gap: clamp(1rem, 3vw, 2.5rem);
+	align-items: center;
+	padding-inline-end: clamp(1rem, 3vw, 2.5rem);
+	animation: mk-partners-scroll var(--mk-partners-speed, 40s) linear infinite;
+}
+.mk-partners__track .mk-partners__item { flex: 0 0 auto; min-width: 140px; }
+.mk-partners__marquee:hover .mk-partners__track,
+.mk-partners__marquee:focus-within .mk-partners__track { animation-play-state: paused; }
+/* Paused from JS when the tab is hidden, so a background tab is not
+   burning frames on an animation nobody is looking at. */
+.mk-partners__marquee.is-paused .mk-partners__track { animation-play-state: paused; }
+@keyframes mk-partners-scroll {
+	from { transform: translateX(0); }
+	to { transform: translateX(-100%); }
+}
+/* Reduced motion stops the band outright rather than merely slowing it —
+   a moving band is exactly what this preference is asking us not to do. */
+@media (prefers-reduced-motion: reduce) {
+	.mk-partners__track { animation: none; }
+	.mk-partners__marquee { overflow-x: auto; }
+}

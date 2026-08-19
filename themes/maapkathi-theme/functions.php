@@ -102,6 +102,12 @@ add_action(
 			wp_enqueue_script( 'maapkathi-lightbox', $theme_uri . '/assets/js/lightbox.js', array(), $ver( '/assets/js/lightbox.js' ), true );
 		}
 
+		// The marquee script only exists to pause the band in a hidden tab,
+		// so it is pointless anywhere the band is not a marquee.
+		if ( mk_theme_has_partner_marquee() ) {
+			wp_enqueue_script( 'maapkathi-partners-marquee', $theme_uri . '/assets/js/partners-marquee.js', array(), $ver( '/assets/js/partners-marquee.js' ), true );
+		}
+
 		// The subscribe script is only useful where the newsletter column
 		// actually renders, which is the Modern footer with column 4 set to
 		// the newsletter (GR-06: no script on a page that cannot use it).
@@ -497,4 +503,21 @@ function mk_theme_has_gallery_section(): bool {
 
 	return 'gallery' === mk_setting( 'projects_layout', 'grid' )
 		&& (bool) mk_setting( 'section_projects_enabled', true );
+}
+
+/**
+ * Whether the partner band on this request is the auto-scrolling variant.
+ *
+ * @return bool
+ */
+function mk_theme_has_partner_marquee(): bool {
+	if ( ! function_exists( 'mk_setting' ) || ! function_exists( 'mk_content' ) ) {
+		return false;
+	}
+
+	if ( ! mk_setting( 'section_partners_enabled', true ) || 'marquee' !== mk_setting( 'partners_layout', 'grid' ) ) {
+		return false;
+	}
+
+	return (bool) mk_content( 'partners' );
 }

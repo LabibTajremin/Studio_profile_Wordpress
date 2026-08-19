@@ -112,6 +112,63 @@ $socials = $settings['socials'] ?? array();
 			<tr><td colspan="2"><p class="description"><?php esc_html_e( 'A section with no content underneath already hides itself — these switches are for hiding a section on purpose even when it has content.', 'maapkathi' ); ?></p></td></tr>
 		</table>
 
+		<h2><?php esc_html_e( 'Our Partners', 'maapkathi' ); ?></h2>
+		<p class="description"><?php esc_html_e( 'The partner logo band that sits directly above the footer. Add the logos themselves under Partners in the menu — this section is only about how they are displayed. With no partner logos added, the section does not appear at all.', 'maapkathi' ); ?></p>
+		<table class="form-table">
+			<tr>
+				<th><?php esc_html_e( 'Layout', 'maapkathi' ); ?></th>
+				<td>
+					<?php
+					$mk_partner_layouts = array(
+						'grid'    => __( 'Static grid', 'maapkathi' ),
+						'marquee' => __( 'Auto-scrolling band', 'maapkathi' ),
+					);
+					foreach ( $mk_partner_layouts as $mk_layout_id => $mk_layout_label ) :
+						?>
+						<label style="margin-right:1.5em"><input type="radio" name="partners_layout" value="<?php echo esc_attr( $mk_layout_id ); ?>" <?php checked( (string) ( $settings['partners_layout'] ?? 'grid' ), $mk_layout_id ); ?> /> <?php echo esc_html( $mk_layout_label ); ?></label>
+					<?php endforeach; ?>
+					<p class="description"><?php esc_html_e( 'The scrolling band pauses when someone hovers over it, when the tab is hidden, and entirely for visitors who have asked their device to reduce motion.', 'maapkathi' ); ?></p>
+				</td>
+			</tr>
+			<tr>
+				<th><?php esc_html_e( 'Logos per row', 'maapkathi' ); ?></th>
+				<td><input type="number" min="2" max="6" name="partners_per_row" value="<?php echo esc_attr( (string) ( $settings['partners_per_row'] ?? 5 ) ); ?>" /></td>
+			</tr>
+			<tr>
+				<th><?php esc_html_e( 'Maximum logo height', 'maapkathi' ); ?></th>
+				<td>
+					<input type="number" min="24" max="160" name="partners_max_logo_h" value="<?php echo esc_attr( (string) ( $settings['partners_max_logo_h'] ?? 48 ) ); ?>" /> px
+					<p class="description"><?php esc_html_e( 'Every logo is fitted inside this height with its proportions kept, so logos of different shapes and sizes still look consistent.', 'maapkathi' ); ?></p>
+				</td>
+			</tr>
+			<tr>
+				<th><?php esc_html_e( 'Scroll speed', 'maapkathi' ); ?></th>
+				<td>
+					<input type="number" min="10" max="120" name="partners_speed" value="<?php echo esc_attr( (string) ( $settings['partners_speed'] ?? 40 ) ); ?>" />
+					<?php esc_html_e( 'seconds per full loop', 'maapkathi' ); ?>
+				</td>
+			</tr>
+			<tr>
+				<th><?php esc_html_e( 'Grey out until hovered', 'maapkathi' ); ?></th>
+				<td><label><input type="hidden" name="partners_greyscale" value="0" /><input type="checkbox" name="partners_greyscale" value="1" <?php checked( ! isset( $settings['partners_greyscale'] ) || $settings['partners_greyscale'] ); ?> /> <?php esc_html_e( 'On', 'maapkathi' ); ?></label></td>
+			</tr>
+			<tr>
+				<th><?php esc_html_e( 'Section background', 'maapkathi' ); ?></th>
+				<td>
+					<?php
+					$mk_partner_bgs = array(
+						'none'    => __( 'None', 'maapkathi' ),
+						'surface' => __( 'Subtle surface', 'maapkathi' ),
+						'accent'  => __( 'Accent tint', 'maapkathi' ),
+					);
+					foreach ( $mk_partner_bgs as $mk_bg_id => $mk_bg_label ) :
+						?>
+						<label style="margin-right:1.5em"><input type="radio" name="partners_background" value="<?php echo esc_attr( $mk_bg_id ); ?>" <?php checked( (string) ( $settings['partners_background'] ?? 'none' ), $mk_bg_id ); ?> /> <?php echo esc_html( $mk_bg_label ); ?></label>
+					<?php endforeach; ?>
+				</td>
+			</tr>
+		</table>
+
 		<h2><?php esc_html_e( 'Behaviour', 'maapkathi' ); ?></h2>
 		<table class="form-table">
 			<tr><th><?php esc_html_e( 'Blog enabled', 'maapkathi' ); ?></th><td><label><input type="checkbox" name="blog_enabled" value="1" <?php checked( ! empty( $settings['blog_enabled'] ) ); ?> /> <?php esc_html_e( 'On', 'maapkathi' ); ?></label></td></tr>

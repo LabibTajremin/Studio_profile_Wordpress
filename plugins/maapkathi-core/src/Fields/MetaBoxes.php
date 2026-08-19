@@ -149,6 +149,23 @@ final class MetaBoxes {
 					'type'  => 'number',
 				),
 			),
+			'mk_partner'      => array(
+				array(
+					'key'   => 'mk_website',
+					'label' => __( 'Website', 'maapkathi' ),
+					'type'  => 'url',
+				),
+				array(
+					'key'   => 'mk_alt_text',
+					'label' => __( 'Logo alt text', 'maapkathi' ),
+					'type'  => 'text',
+				),
+				array(
+					'key'   => 'mk_sort_order',
+					'label' => __( 'Sort order', 'maapkathi' ),
+					'type'  => 'number',
+				),
+			),
 			'mk_client'       => array(
 				array(
 					'key'   => 'mk_website',

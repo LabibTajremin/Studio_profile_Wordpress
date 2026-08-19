@@ -69,9 +69,18 @@ final class SettingsScreen {
 		foreach ( array( 'logo_light', 'logo_dark', 'favicon' ) as $image_key ) {
 			$settings[ $image_key ] = absint( $_POST[ $image_key ] ?? 0 );
 		}
-		foreach ( array( 'section_clients_enabled', 'section_categories_enabled', 'section_projects_enabled', 'section_services_enabled', 'section_stats_enabled', 'section_values_enabled', 'section_team_enabled', 'section_testimonials_enabled', 'section_awards_enabled', 'section_faq_enabled' ) as $section_key ) {
+		foreach ( array( 'section_clients_enabled', 'section_categories_enabled', 'section_projects_enabled', 'section_services_enabled', 'section_stats_enabled', 'section_values_enabled', 'section_team_enabled', 'section_testimonials_enabled', 'section_awards_enabled', 'section_faq_enabled', 'section_partners_enabled' ) as $section_key ) {
 			$settings[ $section_key ] = ! empty( $_POST[ $section_key ] );
 		}
+
+		// FR-10: Partners display options. Bounds mirror the spec's ranges
+		// so a hand-edited form cannot post a 400-logo-tall marquee.
+		$settings['partners_layout']     = in_array( $_POST['partners_layout'] ?? '', array( 'grid', 'marquee' ), true ) ? sanitize_text_field( wp_unslash( $_POST['partners_layout'] ) ) : 'grid';
+		$settings['partners_per_row']    = max( 2, min( 6, absint( $_POST['partners_per_row'] ?? 5 ) ) );
+		$settings['partners_max_logo_h'] = max( 24, min( 160, absint( $_POST['partners_max_logo_h'] ?? 48 ) ) );
+		$settings['partners_greyscale']  = ! empty( $_POST['partners_greyscale'] );
+		$settings['partners_speed']      = max( 10, min( 120, absint( $_POST['partners_speed'] ?? 40 ) ) );
+		$settings['partners_background'] = in_array( $_POST['partners_background'] ?? '', array( 'none', 'surface', 'accent' ), true ) ? sanitize_text_field( wp_unslash( $_POST['partners_background'] ) ) : 'none';
 
 		$settings['clients_show_name']            = ! empty( $_POST['clients_show_name'] );
 		$settings['blog_enabled']                 = ! empty( $_POST['blog_enabled'] );
