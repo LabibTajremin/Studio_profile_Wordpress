@@ -14,7 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 get_header();
 ?>
 <div class="mk-container mk-section">
-	<h1 class="mk-page-title"><?php mk_the_text( 'work_archive_heading' ); ?></h1>
+	<?php mk_the_section_heading( 'work_archive', 'h1', 'mk-page-title' ); ?>
 
 	<?php if ( have_posts() ) : ?>
 		<div class="mk-grid mk-grid--projects" data-scroll-reveal>

@@ -482,12 +482,15 @@ if ( ! function_exists( 'mk_the_section_heading' ) ) {
 	 * section's spacing collapses cleanly rather than leaving the gap
 	 * where the heading used to be.
 	 *
-	 * @param string $id    Section id from the registry.
-	 * @param string $tag   Heading tag to use.
-	 * @param string $class Extra classes for the heading element.
+	 * @param string $id        Section id from the registry.
+	 * @param string $tag       Heading tag to use.
+	 * @param string $css_class The heading's full class list. Replaces the
+	 *                          default rather than adding to it, so a page
+	 *                          title is not silently restyled as a section
+	 *                          heading by passing one extra class.
 	 * @return void
 	 */
-	function mk_the_section_heading( string $id, string $tag = 'h2', string $class = '' ): void {
+	function mk_the_section_heading( string $id, string $tag = 'h2', string $css_class = 'mk-section__heading' ): void {
 		$section = mk_section( $id );
 
 		if ( ! $section['show_title'] || '' === trim( $section['title'] ) ) {
@@ -495,7 +498,7 @@ if ( ! function_exists( 'mk_the_section_heading' ) ) {
 		}
 
 		$tag     = in_array( $tag, array( 'h1', 'h2', 'h3' ), true ) ? $tag : 'h2';
-		$classes = trim( 'mk-section__heading ' . $class );
+		$classes = '' !== trim( $css_class ) ? trim( $css_class ) : 'mk-section__heading';
 
 		printf(
 			'<%1$s class="%2$s">%3$s</%1$s>',

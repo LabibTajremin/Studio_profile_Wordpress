@@ -49,7 +49,7 @@ $projects        = mk_setting( 'section_projects_enabled', true )
 ?>
 
 <?php if ( $tagline_note ) : ?>
-<section class="mk-section mk-tagline-note" data-scroll-reveal>
+<section id="<?php echo esc_attr( mk_section_anchor( 'tagline' ) ); ?>" class="mk-section mk-tagline-note" data-scroll-reveal>
 	<div class="mk-container">
 		<p class="mk-tagline-note__text"><?php echo esc_html( $tagline_note ); ?></p>
 	</div>
@@ -57,9 +57,9 @@ $projects        = mk_setting( 'section_projects_enabled', true )
 <?php endif; ?>
 
 <?php if ( $clients ) : ?>
-<section class="mk-section mk-clients" data-scroll-reveal>
+<section id="<?php echo esc_attr( mk_section_anchor( 'clients' ) ); ?>" class="mk-section mk-clients" data-scroll-reveal>
 	<div class="mk-container">
-		<h2 class="mk-section__heading"><?php mk_the_text( 'home_clients_heading' ); ?></h2>
+		<?php mk_the_section_heading( 'clients' ); ?>
 		<div class="mk-clients__wall">
 			<?php foreach ( $clients as $client ) : ?>
 				<?php
@@ -109,9 +109,9 @@ $projects        = mk_setting( 'section_projects_enabled', true )
 <?php endif; ?>
 
 <?php if ( $categories ) : ?>
-<section class="mk-section mk-categories" data-scroll-reveal>
+<section id="<?php echo esc_attr( mk_section_anchor( 'categories' ) ); ?>" class="mk-section mk-categories" data-scroll-reveal>
 	<div class="mk-container">
-		<h2 class="mk-section__heading"><?php mk_the_text( 'home_categories_heading' ); ?></h2>
+		<?php mk_the_section_heading( 'categories' ); ?>
 		<div class="mk-grid mk-grid--categories">
 			<?php foreach ( $categories as $category_term ) : ?>
 				<a class="mk-card mk-card--category" href="<?php echo esc_url( get_term_link( $category_term ) ); ?>">
@@ -133,9 +133,9 @@ $projects        = mk_setting( 'section_projects_enabled', true )
 <?php endif; ?>
 
 <?php if ( $projects ) : ?>
-<section class="mk-section mk-projects mk-projects--<?php echo esc_attr( $projects_layout ); ?>" data-scroll-reveal>
+<section id="<?php echo esc_attr( mk_section_anchor( 'projects' ) ); ?>" class="mk-section mk-projects mk-projects--<?php echo esc_attr( $projects_layout ); ?>" data-scroll-reveal>
 	<div class="mk-container">
-		<h2 class="mk-section__heading"><?php mk_the_text( 'home_projects_heading' ); ?></h2>
+		<?php mk_the_section_heading( 'projects' ); ?>
 		<?php if ( 'showcase' === $projects_layout ) : ?>
 			<?php require get_theme_file_path( 'parts/section-projects-showcase.php' ); ?>
 		<?php elseif ( 'gallery' === $projects_layout ) : ?>
@@ -205,9 +205,9 @@ $projects        = mk_setting( 'section_projects_enabled', true )
 <?php endif; ?>
 
 <?php if ( $services ) : ?>
-<section class="mk-section mk-services mk-services--icon-<?php echo esc_attr( (string) mk_theme_setting( 'services_icon_position', 'beside' ) ); ?>" data-scroll-reveal>
+<section id="<?php echo esc_attr( mk_section_anchor( 'services' ) ); ?>" class="mk-section mk-services mk-services--icon-<?php echo esc_attr( (string) mk_theme_setting( 'services_icon_position', 'beside' ) ); ?>" data-scroll-reveal>
 	<div class="mk-container">
-		<h2 class="mk-section__heading"><?php mk_the_text( 'home_services_heading' ); ?></h2>
+		<?php mk_the_section_heading( 'services' ); ?>
 		<div class="mk-grid mk-grid--services">
 			<?php foreach ( $services as $service ) : ?>
 				<a class="mk-card mk-card--service" href="<?php echo esc_url( (string) get_permalink( $service ) ); ?>">
@@ -232,9 +232,9 @@ $projects        = mk_setting( 'section_projects_enabled', true )
 <?php endif; ?>
 
 <?php if ( $stats ) : ?>
-<section class="mk-section mk-stats-band" data-scroll-reveal>
+<section id="<?php echo esc_attr( mk_section_anchor( 'stats' ) ); ?>" class="mk-section mk-stats-band" data-scroll-reveal>
 	<div class="mk-container">
-		<h2 class="mk-section__heading mk-section__heading--on-accent"><?php mk_the_text( 'home_stats_heading' ); ?></h2>
+		<?php mk_the_section_heading( 'stats', 'h2', 'mk-section__heading mk-section__heading--on-accent' ); ?>
 		<div class="mk-grid mk-grid--stats">
 			<?php foreach ( $stats as $stat ) : ?>
 				<?php
@@ -255,9 +255,9 @@ $projects        = mk_setting( 'section_projects_enabled', true )
 <?php endif; ?>
 
 <?php if ( $values ) : ?>
-<section class="mk-section mk-values" data-scroll-reveal>
+<section id="<?php echo esc_attr( mk_section_anchor( 'values' ) ); ?>" class="mk-section mk-values" data-scroll-reveal>
 	<div class="mk-container">
-		<h2 class="mk-section__heading"><?php mk_the_text( 'home_values_heading' ); ?></h2>
+		<?php mk_the_section_heading( 'values' ); ?>
 		<div class="mk-grid mk-grid--values">
 			<?php foreach ( $values as $value ) : ?>
 				<div class="mk-card mk-card--value">
@@ -275,9 +275,9 @@ $projects        = mk_setting( 'section_projects_enabled', true )
 <?php endif; ?>
 
 <?php if ( $members ) : ?>
-<section class="mk-section mk-team-preview" data-scroll-reveal>
+<section id="<?php echo esc_attr( mk_section_anchor( 'team' ) ); ?>" class="mk-section mk-team-preview" data-scroll-reveal>
 	<div class="mk-container">
-		<h2 class="mk-section__heading"><?php mk_the_text( 'home_team_heading' ); ?></h2>
+		<?php mk_the_section_heading( 'team' ); ?>
 		<div class="mk-grid mk-grid--team">
 			<?php foreach ( $members as $member ) : ?>
 				<div class="mk-card mk-card--member">
@@ -301,9 +301,9 @@ $projects        = mk_setting( 'section_projects_enabled', true )
 <?php endif; ?>
 
 <?php if ( $testimonials ) : ?>
-<section class="mk-section mk-testimonials" data-scroll-reveal>
+<section id="<?php echo esc_attr( mk_section_anchor( 'testimonials' ) ); ?>" class="mk-section mk-testimonials" data-scroll-reveal>
 	<div class="mk-container">
-		<h2 class="mk-section__heading"><?php mk_the_text( 'home_testimonials_heading' ); ?></h2>
+		<?php mk_the_section_heading( 'testimonials' ); ?>
 		<div class="mk-grid mk-grid--testimonials">
 			<?php foreach ( $testimonials as $testimonial ) : ?>
 				<?php
@@ -333,9 +333,9 @@ $projects        = mk_setting( 'section_projects_enabled', true )
 <?php endif; ?>
 
 <?php if ( $awards ) : ?>
-<section class="mk-section mk-awards" data-scroll-reveal>
+<section id="<?php echo esc_attr( mk_section_anchor( 'awards' ) ); ?>" class="mk-section mk-awards" data-scroll-reveal>
 	<div class="mk-container">
-		<h2 class="mk-section__heading"><?php mk_the_text( 'home_awards_heading' ); ?></h2>
+		<?php mk_the_section_heading( 'awards' ); ?>
 		<ul class="mk-awards__list">
 			<?php foreach ( $awards as $award ) : ?>
 				<?php
@@ -360,9 +360,9 @@ $projects        = mk_setting( 'section_projects_enabled', true )
 <?php endif; ?>
 
 <?php if ( $faqs ) : ?>
-<section class="mk-section mk-faq" data-scroll-reveal>
+<section id="<?php echo esc_attr( mk_section_anchor( 'faq' ) ); ?>" class="mk-section mk-faq" data-scroll-reveal>
 	<div class="mk-container">
-		<h2 class="mk-section__heading"><?php mk_the_text( 'home_faq_heading' ); ?></h2>
+		<?php mk_the_section_heading( 'faq' ); ?>
 		<div class="mk-accordion">
 			<?php foreach ( $faqs as $faq ) : ?>
 				<details class="mk-accordion__item">
@@ -380,9 +380,9 @@ $projects        = mk_setting( 'section_projects_enabled', true )
 get_template_part( 'parts/section-map', null, array( 'context' => 'home' ) );
 ?>
 
-<section class="mk-section mk-cta-band">
+<section id="<?php echo esc_attr( mk_section_anchor( 'cta' ) ); ?>" class="mk-section mk-cta-band">
 	<div class="mk-container">
-		<h2 class="mk-section__heading mk-section__heading--on-accent"><?php mk_the_text( 'home_cta_heading' ); ?></h2>
+		<?php mk_the_section_heading( 'cta', 'h2', 'mk-section__heading mk-section__heading--on-accent' ); ?>
 		<a class="mk-btn mk-btn--on-accent" href="<?php echo esc_url( home_url( '/contact/' ) ); ?>">
 			<?php mk_the_text( 'home_cta_button_label' ); ?>
 		</a>

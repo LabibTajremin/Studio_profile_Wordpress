@@ -249,21 +249,24 @@ final class SectionRegistry {
 
 			// Uniqueness is per page: two sections on different templates
 			// can share an anchor without either becoming unreachable.
-			$scope = $section['page'] . '#' . $anchor;
-			if ( isset( $seen[ $scope ] ) ) {
-				$errors[ $id ] = sprintf(
-					/* translators: 1: the duplicate anchor, 2: the section already using it. */
-					__( '"%1$s" is already used by %2$s. The previous anchor has been kept.', 'maapkathi' ),
-					$anchor,
-					$sections[ $seen[ $scope ] ]['label']
-				);
-				$anchor = self::for_section( $id )['anchor'];
+			if ( isset( $seen[ $section['page'] . '#' . $anchor ] ) ) {
+				$taken = $sections[ $seen[ $section['page'] . '#' . $anchor ] ]['label'];
 
-				// If the kept anchor collides too, fall back to the
-				// registry default, which is unique by construction.
-				if ( isset( $seen[ $section['page'] . '#' . $anchor ] ) ) {
-					$anchor = $section['anchor'];
-				}
+				// Neither the previously saved anchor nor the registry
+				// default is guaranteed free — the section that took this
+				// anchor may well have taken it FROM this one. So the
+				// fallback appends a suffix until it actually is free,
+				// which cannot loop forever and cannot silently leave two
+				// sections sharing an anchor.
+				$anchor = self::free_anchor( $section['page'], $anchor, $seen );
+
+				$errors[ $id ] = sprintf(
+					/* translators: 1: the requested anchor, 2: the section already using it, 3: the anchor that was used instead. */
+					__( '"%1$s" is already used by %2$s, so this section was given "%3$s" instead.', 'maapkathi' ),
+					$section['anchor'],
+					$taken,
+					$anchor
+				);
 			}
 
 			$seen[ $section['page'] . '#' . $anchor ] = $id;
@@ -279,5 +282,23 @@ final class SectionRegistry {
 			'values' => $values,
 			'errors' => $errors,
 		);
+	}
+
+	/**
+	 * The first free variant of an anchor on a given page.
+	 *
+	 * @param string               $page   Page the anchor lives on.
+	 * @param string               $anchor Anchor that was already taken.
+	 * @param array<string,string> $seen   Anchors already assigned, keyed "page#anchor".
+	 * @return string An anchor not present in $seen.
+	 */
+	private static function free_anchor( string $page, string $anchor, array $seen ): string {
+		$suffix = 2;
+
+		while ( isset( $seen[ $page . '#' . $anchor . '-' . $suffix ] ) ) {
+			++$suffix;
+		}
+
+		return $anchor . '-' . $suffix;
 	}
 }

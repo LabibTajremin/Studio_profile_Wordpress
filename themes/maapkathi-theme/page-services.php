@@ -16,7 +16,7 @@ get_header();
 $mk_parents = mk_content( 'top_level_services' );
 ?>
 <div class="mk-container mk-section">
-	<h1 class="mk-page-title"><?php mk_the_text( 'services_heading' ); ?></h1>
+	<?php mk_the_section_heading( 'services_page', 'h1', 'mk-page-title' ); ?>
 	<?php $mk_intro = mk_text( 'services_intro' ); ?>
 	<?php if ( $mk_intro ) : ?>
 		<p class="mk-lede"><?php echo esc_html( $mk_intro ); ?></p>

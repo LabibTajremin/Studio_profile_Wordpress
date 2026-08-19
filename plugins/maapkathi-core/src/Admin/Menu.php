@@ -18,6 +18,7 @@ use Maapkathi\Core\Admin\Screens\ApprovalsScreen;
 use Maapkathi\Core\Admin\Screens\UsersScreen;
 use Maapkathi\Core\Admin\Screens\SiteTextScreen;
 use Maapkathi\Core\Admin\Screens\FooterScreen;
+use Maapkathi\Core\Admin\Screens\SectionsScreen;
 use Maapkathi\Core\Admin\Screens\SettingsScreen;
 use Maapkathi\Core\Admin\Screens\InquiriesScreen;
 
@@ -98,6 +99,8 @@ final class Menu {
 		add_submenu_page( 'maapkathi', __( 'Appearance', 'maapkathi' ), __( 'Appearance', 'maapkathi' ), Roles::CAP_MANAGE_APPEARANCE, 'maapkathi-appearance', array( $this, 'render_appearance' ) );
 
 		// #15 Site Text.
+		add_submenu_page( 'maapkathi', __( 'Sections', 'maapkathi' ), __( 'Sections', 'maapkathi' ), Roles::CAP_MANAGE_SETTINGS, 'maapkathi-sections', array( $this, 'render_sections' ) );
+
 		add_submenu_page( 'maapkathi', __( 'Footer', 'maapkathi' ), __( 'Footer', 'maapkathi' ), Roles::CAP_MANAGE_APPEARANCE, 'maapkathi-footer', array( $this, 'render_footer' ) );
 
 		add_submenu_page( 'maapkathi', __( 'Site Text', 'maapkathi' ), __( 'Site Text', 'maapkathi' ), Roles::CAP_MANAGE_SETTINGS, 'maapkathi-site-text', array( $this, 'render_site_text' ) );
@@ -228,6 +231,15 @@ final class Menu {
 	 */
 	public function render_site_text(): void {
 		( new SiteTextScreen() )->render();
+	}
+
+	/**
+	 * Renders and saves the Sections screen (FR-02).
+	 *
+	 * @return void
+	 */
+	public function render_sections(): void {
+		( new SectionsScreen() )->render();
 	}
 
 	/**

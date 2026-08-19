@@ -224,3 +224,20 @@
 }
 .mk-icon-picker__none { font-size: 11px; color: #50575e; }
 .mk-icon-picker__option[hidden] { display: none; }
+
+/* Sections screen (FR-02). */
+.mk-sections th { vertical-align: top; }
+.mk-sections__badge {
+	display: inline-block;
+	margin-left: 0.5em;
+	padding: 1px 6px;
+	border-radius: 999px;
+	background: rgba(0, 0, 0, 0.06);
+	color: #50575e;
+	font-size: 10px;
+	font-weight: 400;
+	text-transform: uppercase;
+	letter-spacing: 0.06em;
+	vertical-align: middle;
+}
+.mk-sections .mk-field-error { display: inline-block; margin-left: 0.5em; }

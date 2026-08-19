@@ -21,15 +21,13 @@ if ( ! $mk_partners ) {
 	return;
 }
 
-$mk_partners_layout   = (string) mk_setting( 'partners_layout', 'grid' );
-$mk_partners_per_row  = (int) mk_setting( 'partners_per_row', 5 );
-$mk_partners_logo_h   = (int) mk_setting( 'partners_max_logo_h', 48 );
-$mk_partners_grey     = (bool) mk_setting( 'partners_greyscale', true );
-$mk_partners_speed    = (int) mk_setting( 'partners_speed', 40 );
-$mk_partners_bg       = (string) mk_setting( 'partners_background', 'none' );
-$mk_partners_heading  = mk_text( 'home_partners_heading' );
-$mk_partners_subtitle = mk_text( 'home_partners_subtitle' );
-$mk_show_title        = (bool) mk_setting( 'partners_show_title', true );
+$mk_partners_layout  = (string) mk_setting( 'partners_layout', 'grid' );
+$mk_partners_per_row = (int) mk_setting( 'partners_per_row', 5 );
+$mk_partners_logo_h  = (int) mk_setting( 'partners_max_logo_h', 48 );
+$mk_partners_grey    = (bool) mk_setting( 'partners_greyscale', true );
+$mk_partners_speed   = (int) mk_setting( 'partners_speed', 40 );
+$mk_partners_bg      = (string) mk_setting( 'partners_background', 'none' );
+$mk_partners_section = mk_section( 'partners' );
 
 $mk_partner_classes = array( 'mk-section', 'mk-partners' );
 if ( 'none' !== $mk_partners_bg ) {
@@ -79,18 +77,13 @@ $mk_render_partner = static function ( \WP_Post $partner ): void {
 };
 ?>
 <section
-	id="partners"
+	id="<?php echo esc_attr( $mk_partners_section['anchor'] ); ?>"
 	class="<?php echo esc_attr( implode( ' ', $mk_partner_classes ) ); ?>"
 	style="--mk-partners-logo-h: <?php echo esc_attr( (string) $mk_partners_logo_h ); ?>px; --mk-partners-per-row: <?php echo esc_attr( (string) $mk_partners_per_row ); ?>; --mk-partners-speed: <?php echo esc_attr( (string) $mk_partners_speed ); ?>s;"
 	data-scroll-reveal
 >
 	<div class="mk-container">
-		<?php if ( $mk_show_title && $mk_partners_heading ) : ?>
-			<h2 class="mk-section__heading"><?php echo esc_html( $mk_partners_heading ); ?></h2>
-		<?php endif; ?>
-		<?php if ( $mk_partners_subtitle ) : ?>
-			<p class="mk-section__subtitle"><?php echo esc_html( $mk_partners_subtitle ); ?></p>
-		<?php endif; ?>
+		<?php mk_the_section_heading( 'partners' ); ?>
 
 		<?php if ( 'marquee' === $mk_partners_layout ) : ?>
 			<?php

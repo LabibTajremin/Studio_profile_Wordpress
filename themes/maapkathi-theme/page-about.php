@@ -20,7 +20,7 @@ $mk_members = mk_content( 'members', 4 );
 $mk_steps   = mk_content( 'process_steps' );
 ?>
 <div class="mk-container mk-section">
-	<h1 class="mk-page-title"><?php mk_the_text( 'about_heading' ); ?></h1>
+	<?php mk_the_section_heading( 'about_page', 'h1', 'mk-page-title' ); ?>
 	<p class="mk-lede"><?php echo esc_html( mk_setting( 'tagline', mk_text( 'about_intro' ) ) ); ?></p>
 
 	<?php if ( have_posts() ) : ?>
