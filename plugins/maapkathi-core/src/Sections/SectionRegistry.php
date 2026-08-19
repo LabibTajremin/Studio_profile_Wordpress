@@ -183,24 +183,53 @@ final class SectionRegistry {
 	}
 
 	/**
-	 * The stored per-section state, merged over the registry defaults.
+	 * Every section instance that can render, keyed by instance id.
 	 *
-	 * @return array<string,array{subtitle:string,show_title:bool,anchor:string}>
+	 * The homepage's instances come from the layout, so a duplicated
+	 * section gets its own record; the inner pages are one instance each,
+	 * keyed by their type.
+	 *
+	 * @return array<string,array{type:string,title:string,subtitle:string,show_title:bool,anchor:string}>
 	 */
 	public static function get(): array {
 		$stored = get_option( self::OPTION, array() );
 		$stored = is_array( $stored ) ? $stored : array();
+		$types  = self::all();
 		$out    = array();
 
-		foreach ( self::all() as $id => $section ) {
+		$instances = array();
+		foreach ( SectionLayout::get() as $row ) {
+			$instances[ $row['id'] ] = $row['type'];
+		}
+		foreach ( $types as $type => $section ) {
+			if ( 'home' !== $section['page'] ) {
+				$instances[ $type ] = $type;
+			}
+		}
+
+		foreach ( $instances as $id => $type ) {
+			$section = $types[ $type ] ?? null;
+			if ( null === $section ) {
+				continue;
+			}
+
 			$row = is_array( $stored[ $id ] ?? null ) ? $stored[ $id ] : array();
 
+			// The first instance of a type keeps its anchor and title from
+			// the registry/Site Text, so an existing site is untouched. A
+			// duplicate has to differ, or the two would collide.
+			$is_original = ( $id === $type );
+
 			$out[ $id ] = array(
+				'type'       => $type,
+				'title'      => (string) ( $row['title'] ?? '' ),
 				'subtitle'   => (string) ( $row['subtitle'] ?? '' ),
 				// Defaults to shown: a section that has always had a heading
 				// must keep it after the update (GR-03).
 				'show_title' => ! isset( $row['show_title'] ) || (bool) $row['show_title'],
-				'anchor'     => '' !== (string) ( $row['anchor'] ?? '' ) ? (string) $row['anchor'] : $section['anchor'],
+				'anchor'     => '' !== (string) ( $row['anchor'] ?? '' )
+					? (string) $row['anchor']
+					: ( $is_original ? $section['anchor'] : sanitize_title( $id ) ),
 			);
 		}
 
@@ -208,15 +237,29 @@ final class SectionRegistry {
 	}
 
 	/**
+	 * The type a section instance is an instance of.
+	 *
+	 * @param string $id Instance id.
+	 * @return string Type id, or an empty string when unknown.
+	 */
+	public static function type_of( string $id ): string {
+		$state = self::get();
+
+		return (string) ( $state[ $id ]['type'] ?? ( isset( self::all()[ $id ] ) ? $id : '' ) );
+	}
+
+	/**
 	 * One section's stored state.
 	 *
-	 * @param string $id Section id.
-	 * @return array{subtitle:string,show_title:bool,anchor:string}
+	 * @param string $id Section instance id.
+	 * @return array{type:string,title:string,subtitle:string,show_title:bool,anchor:string}
 	 */
 	public static function for_section( string $id ): array {
 		$all = self::get();
 
 		return $all[ $id ] ?? array(
+			'type'       => isset( self::all()[ $id ] ) ? $id : '',
+			'title'      => '',
 			'subtitle'   => '',
 			'show_title' => true,
 			'anchor'     => sanitize_title( $id ),
@@ -234,17 +277,25 @@ final class SectionRegistry {
 	 * @return array{values:array<string,array{subtitle:string,show_title:bool,anchor:string}>,errors:array<string,string>}
 	 */
 	public static function sanitize( array $input ): array {
-		$sections = self::all();
+		$types    = self::all();
+		$sections = array();
 		$values   = array();
 		$errors   = array();
 		$seen     = array();
+
+		// Iterate instances rather than types, so a duplicated section is
+		// validated in its own right instead of being folded into the
+		// original's record.
+		foreach ( self::get() as $id => $state ) {
+			$sections[ $id ] = $types[ $state['type'] ];
+		}
 
 		foreach ( $sections as $id => $section ) {
 			$row = is_array( $input[ $id ] ?? null ) ? $input[ $id ] : array();
 
 			$anchor = sanitize_title( (string) ( $row['anchor'] ?? '' ) );
 			if ( '' === $anchor ) {
-				$anchor = $section['anchor'];
+				$anchor = self::for_section( $id )['anchor'];
 			}
 
 			// Uniqueness is per page: two sections on different templates
@@ -263,7 +314,7 @@ final class SectionRegistry {
 				$errors[ $id ] = sprintf(
 					/* translators: 1: the requested anchor, 2: the section already using it, 3: the anchor that was used instead. */
 					__( '"%1$s" is already used by %2$s, so this section was given "%3$s" instead.', 'maapkathi' ),
-					$section['anchor'],
+					sanitize_title( (string) ( $row['anchor'] ?? '' ) ),
 					$taken,
 					$anchor
 				);
@@ -272,6 +323,7 @@ final class SectionRegistry {
 			$seen[ $section['page'] . '#' . $anchor ] = $id;
 
 			$values[ $id ] = array(
+				'title'      => sanitize_text_field( (string) ( $row['title'] ?? '' ) ),
 				'subtitle'   => sanitize_textarea_field( (string) ( $row['subtitle'] ?? '' ) ),
 				'show_title' => ! empty( $row['show_title'] ),
 				'anchor'     => $anchor,

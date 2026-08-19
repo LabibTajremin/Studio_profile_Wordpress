@@ -4,7 +4,7 @@
  *
  * Full-bleed, gapless tiles matching the client's reference: hovering a
  * tile washes it and lifts a caption carrying the project title and its
- * category. Required from front-page.php, which owns $projects.
+ * category. Required from the projects section partial, which owns $mk_data.
  *
  * @package maapkathi-theme
  */
@@ -18,11 +18,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Variables supplied by front-page.php.
  *
- * @var \WP_Post[] $projects Projects to show.
+ * @var \WP_Post[] $mk_data Projects to show.
  */
 ?>
 <ul class="mk-showcase">
-	<?php foreach ( $projects as $mk_showcase_project ) : ?>
+	<?php foreach ( $mk_data as $mk_showcase_project ) : ?>
 		<?php
 		$mk_showcase_title = get_the_title( $mk_showcase_project );
 		$mk_showcase_terms = get_the_terms( $mk_showcase_project, 'mk_project_category' );

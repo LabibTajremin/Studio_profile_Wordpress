@@ -449,12 +449,21 @@ if ( ! function_exists( 'mk_section' ) ) {
 	function mk_section( string $id ): array {
 		$registry = \Maapkathi\Core\Sections\SectionRegistry::all();
 		$state    = \Maapkathi\Core\Sections\SectionRegistry::for_section( $id );
-		$text_key = (string) ( $registry[ $id ]['text_key'] ?? '' );
+		$type     = '' !== $state['type'] ? $state['type'] : $id;
+		$text_key = (string) ( $registry[ $type ]['text_key'] ?? '' );
+
+		// A duplicated section carries its own title. Only the original
+		// instance reads the shared Site Text field, so renaming one copy
+		// cannot rename every other copy of the same type.
+		$title = '' !== trim( $state['title'] )
+			? $state['title']
+			: ( '' !== $text_key ? mk_text( $text_key ) : '' );
 
 		return array(
+			'type'       => $type,
 			// Site Text already falls back to the shipped default when a
 			// field is cleared, so a blank title can never reach the page.
-			'title'      => '' !== $text_key ? mk_text( $text_key ) : '',
+			'title'      => $title,
 			'subtitle'   => $state['subtitle'],
 			'anchor'     => $state['anchor'],
 			'show_title' => $state['show_title'],
@@ -515,5 +524,16 @@ if ( ! function_exists( 'mk_the_section_heading' ) ) {
 				esc_html( $section['subtitle'] )
 			);
 		}
+	}
+}
+
+if ( ! function_exists( 'mk_section_layout' ) ) {
+	/**
+	 * The homepage's ordered section instances (FR-03).
+	 *
+	 * @return array<int,array{id:string,type:string,enabled:bool}>
+	 */
+	function mk_section_layout(): array {
+		return \Maapkathi\Core\Sections\SectionLayout::get();
 	}
 }

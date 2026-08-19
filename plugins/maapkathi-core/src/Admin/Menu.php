@@ -18,6 +18,7 @@ use Maapkathi\Core\Admin\Screens\ApprovalsScreen;
 use Maapkathi\Core\Admin\Screens\UsersScreen;
 use Maapkathi\Core\Admin\Screens\SiteTextScreen;
 use Maapkathi\Core\Admin\Screens\FooterScreen;
+use Maapkathi\Core\Admin\Screens\SectionBuilderScreen;
 use Maapkathi\Core\Admin\Screens\SectionsScreen;
 use Maapkathi\Core\Admin\Screens\SettingsScreen;
 use Maapkathi\Core\Admin\Screens\InquiriesScreen;
@@ -99,6 +100,8 @@ final class Menu {
 		add_submenu_page( 'maapkathi', __( 'Appearance', 'maapkathi' ), __( 'Appearance', 'maapkathi' ), Roles::CAP_MANAGE_APPEARANCE, 'maapkathi-appearance', array( $this, 'render_appearance' ) );
 
 		// #15 Site Text.
+		add_submenu_page( 'maapkathi', __( 'Section Builder', 'maapkathi' ), __( 'Section Builder', 'maapkathi' ), Roles::CAP_MANAGE_SETTINGS, 'maapkathi-section-builder', array( $this, 'render_section_builder' ) );
+
 		add_submenu_page( 'maapkathi', __( 'Sections', 'maapkathi' ), __( 'Sections', 'maapkathi' ), Roles::CAP_MANAGE_SETTINGS, 'maapkathi-sections', array( $this, 'render_sections' ) );
 
 		add_submenu_page( 'maapkathi', __( 'Footer', 'maapkathi' ), __( 'Footer', 'maapkathi' ), Roles::CAP_MANAGE_APPEARANCE, 'maapkathi-footer', array( $this, 'render_footer' ) );
@@ -139,6 +142,29 @@ final class Menu {
 				'useImage'    => __( 'Use this image', 'maapkathi' ),
 			)
 		);
+
+		// The builder is the only screen that needs a sortable, so its
+		// script and jQuery UI stay off every other Maapkathi page.
+		if ( str_contains( $hook, 'maapkathi-section-builder' ) ) {
+			wp_enqueue_script( 'maapkathi-section-builder', MK_PLUGIN_URL . 'assets/admin/section-builder.js', array( 'jquery-ui-sortable' ), MK_DB_VERSION, true );
+			wp_localize_script(
+				'maapkathi-section-builder',
+				'mkBuilder',
+				array(
+					'ajaxUrl'       => admin_url( 'admin-ajax.php' ),
+					'nonce'         => wp_create_nonce( 'mk_save_layout' ),
+					'saving'        => __( 'Saving…', 'maapkathi' ),
+					'failed'        => __( 'Could not save. Your changes are still here — try again.', 'maapkathi' ),
+					'unsaved'       => __( 'Unsaved changes', 'maapkathi' ),
+					'duplicate'     => __( 'Duplicate', 'maapkathi' ),
+					'remove'        => __( 'Delete', 'maapkathi' ),
+					'copyBadge'     => __( 'copy', 'maapkathi' ),
+					'newBadge'      => __( 'new', 'maapkathi' ),
+					/* translators: %s: the section's name. */
+					'confirmDelete' => __( 'Remove the "%s" section from your homepage?', 'maapkathi' ),
+				)
+			);
+		}
 	}
 
 	/**
@@ -231,6 +257,15 @@ final class Menu {
 	 */
 	public function render_site_text(): void {
 		( new SiteTextScreen() )->render();
+	}
+
+	/**
+	 * Renders and saves the Section Builder screen (FR-03).
+	 *
+	 * @return void
+	 */
+	public function render_section_builder(): void {
+		( new SectionBuilderScreen() )->render();
 	}
 
 	/**

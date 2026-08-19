@@ -19,6 +19,7 @@ use Maapkathi\Core\Theme\ThemeSettings;
 use Maapkathi\Core\Admin\Menu;
 use Maapkathi\Core\Inquiries\Inquiries;
 use Maapkathi\Core\Rest\UploadController;
+use Maapkathi\Core\Admin\Screens\SectionBuilderScreen;
 use Maapkathi\Core\Footer\Subscribers;
 use Maapkathi\Core\Gallery\GalleryController;
 use Maapkathi\Core\Rest\HealthController;
@@ -111,6 +112,7 @@ final class Plugin {
 			( new Menu() )->register_hooks();
 			( new SetupWizard() )->register_hooks();
 			( new AdminSkin() )->register_hooks();
+			( new SectionBuilderScreen() )->register_hooks();
 		}
 
 		if ( defined( 'WP_CLI' ) && WP_CLI && class_exists( '\WP_CLI' ) ) {

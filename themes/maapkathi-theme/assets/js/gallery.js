@@ -79,12 +79,18 @@
 		resizeTimer = window.setTimeout( repackAll, 150 );
 	} );
 
-	var button = document.querySelector( '[data-mk-gallery-more]' );
-	if ( ! button || ! window.mkGallery ) {
+	if ( ! window.mkGallery ) {
 		return;
 	}
 
-	var gallery = document.querySelector( '[data-mk-gallery]' );
+	// Each button names the gallery it belongs to. A page may carry more
+	// than one Featured work section, and a document-wide selector here
+	// would have every button appending into the first one (FR-03.5).
+	Array.prototype.forEach.call( document.querySelectorAll( '[data-mk-gallery-more]' ), function ( button ) {
+	var gallery = document.getElementById( button.getAttribute( 'data-mk-gallery-more' ) );
+	if ( ! gallery ) {
+		return;
+	}
 
 	button.addEventListener( 'click', function () {
 		var offset = parseInt( button.getAttribute( 'data-offset' ), 10 ) || 0;
@@ -125,5 +131,6 @@
 				button.disabled = false;
 				button.textContent = window.mkGallery.label;
 			} );
+	} );
 	} );
 } )();
