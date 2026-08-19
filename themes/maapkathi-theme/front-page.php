@@ -327,6 +327,11 @@ $show_client_names = (bool) mk_setting( 'clients_show_name', true );
 </section>
 <?php endif; ?>
 
+<?php
+// FR-05.1: the same map block, behind its own separate home toggle.
+get_template_part( 'parts/section-map', null, array( 'context' => 'home' ) );
+?>
+
 <section class="mk-section mk-cta-band">
 	<div class="mk-container">
 		<h2 class="mk-section__heading mk-section__heading--on-accent"><?php mk_the_text( 'home_cta_heading' ); ?></h2>

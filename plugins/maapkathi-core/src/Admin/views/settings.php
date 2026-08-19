@@ -16,6 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @var array<string,mixed> $settings
  * @var array<string,mixed> $seo
+ * @var array<string,mixed> $map
  * @var string $notice
  */
 $socials = $settings['socials'] ?? array();
@@ -165,6 +166,82 @@ $socials = $settings['socials'] ?? array();
 						?>
 						<label style="margin-right:1.5em"><input type="radio" name="partners_background" value="<?php echo esc_attr( $mk_bg_id ); ?>" <?php checked( (string) ( $settings['partners_background'] ?? 'none' ), $mk_bg_id ); ?> /> <?php echo esc_html( $mk_bg_label ); ?></label>
 					<?php endforeach; ?>
+				</td>
+			</tr>
+		</table>
+
+		<h2><?php esc_html_e( 'Map', 'maapkathi' ); ?></h2>
+		<p class="description"><?php esc_html_e( 'The map shown on your Contact page. It needs no Google account and no API key. If you leave both the address and the coordinates empty, the map is simply not shown — no blank grey box appears on your site.', 'maapkathi' ); ?></p>
+		<table class="form-table">
+			<tr>
+				<th><?php esc_html_e( 'Show map', 'maapkathi' ); ?></th>
+				<td>
+					<label style="margin-right:1.5em"><input type="hidden" name="mk_map[enabled_contact]" value="0" /><input type="checkbox" name="mk_map[enabled_contact]" value="1" <?php checked( ! empty( $map['enabled_contact'] ) ); ?> /> <?php esc_html_e( 'On the Contact page', 'maapkathi' ); ?></label>
+					<label><input type="hidden" name="mk_map[enabled_home]" value="0" /><input type="checkbox" name="mk_map[enabled_home]" value="1" <?php checked( ! empty( $map['enabled_home'] ) ); ?> /> <?php esc_html_e( 'On the homepage', 'maapkathi' ); ?></label>
+				</td>
+			</tr>
+			<tr>
+				<th><?php esc_html_e( 'Provider', 'maapkathi' ); ?></th>
+				<td>
+					<select name="mk_map[provider]">
+						<?php foreach ( \Maapkathi\Core\Map\MapSettings::providers() as $mk_provider_id => $mk_provider_label ) : ?>
+							<option value="<?php echo esc_attr( $mk_provider_id ); ?>" <?php selected( (string) $map['provider'], $mk_provider_id ); ?>><?php echo esc_html( $mk_provider_label ); ?></option>
+						<?php endforeach; ?>
+					</select>
+				</td>
+			</tr>
+			<tr>
+				<th><?php esc_html_e( 'Address', 'maapkathi' ); ?></th>
+				<td><input type="text" class="large-text" name="mk_map[address]" value="<?php echo esc_attr( (string) $map['address'] ); ?>" /></td>
+			</tr>
+			<tr>
+				<th><?php esc_html_e( 'Latitude / Longitude', 'maapkathi' ); ?></th>
+				<td>
+					<input type="text" name="mk_map[lat]" value="<?php echo esc_attr( (string) $map['lat'] ); ?>" placeholder="23.7806" />
+					<input type="text" name="mk_map[lng]" value="<?php echo esc_attr( (string) $map['lng'] ); ?>" placeholder="90.4074" />
+					<p class="description"><?php esc_html_e( 'If you fill in both the address and the coordinates, the coordinates win — they point at an exact spot, whereas an address has to be looked up and can land on the wrong side of the street.', 'maapkathi' ); ?></p>
+				</td>
+			</tr>
+			<tr>
+				<th><?php esc_html_e( 'Zoom', 'maapkathi' ); ?></th>
+				<td><input type="number" min="1" max="20" name="mk_map[zoom]" value="<?php echo esc_attr( (string) $map['zoom'] ); ?>" /></td>
+			</tr>
+			<tr>
+				<th><?php esc_html_e( 'Height', 'maapkathi' ); ?></th>
+				<td>
+					<input type="number" min="120" max="1200" name="mk_map[h_desktop]" value="<?php echo esc_attr( (string) $map['h_desktop'] ); ?>" /> <?php esc_html_e( 'px on desktop', 'maapkathi' ); ?>
+					&nbsp;
+					<input type="number" min="120" max="1200" name="mk_map[h_mobile]" value="<?php echo esc_attr( (string) $map['h_mobile'] ); ?>" /> <?php esc_html_e( 'px on mobile', 'maapkathi' ); ?>
+				</td>
+			</tr>
+			<tr>
+				<th><?php esc_html_e( 'Map style', 'maapkathi' ); ?></th>
+				<td>
+					<?php
+					$mk_map_styles = array(
+						'auto'  => __( 'Follow site light/dark mode', 'maapkathi' ),
+						'light' => __( 'Always light', 'maapkathi' ),
+						'dark'  => __( 'Always dark', 'maapkathi' ),
+					);
+					foreach ( $mk_map_styles as $mk_style_id => $mk_map_style_label ) :
+						?>
+						<label style="margin-right:1.5em"><input type="radio" name="mk_map[style]" value="<?php echo esc_attr( $mk_style_id ); ?>" <?php checked( (string) $map['style'], $mk_style_id ); ?> /> <?php echo esc_html( $mk_map_style_label ); ?></label>
+					<?php endforeach; ?>
+				</td>
+			</tr>
+			<tr>
+				<th><?php esc_html_e( 'Marker label', 'maapkathi' ); ?></th>
+				<td><input type="text" class="regular-text" name="mk_map[marker]" value="<?php echo esc_attr( (string) $map['marker'] ); ?>" placeholder="<?php echo esc_attr( (string) ( $settings['studio_name'] ?? '' ) ); ?>" /></td>
+			</tr>
+			<tr>
+				<th><?php esc_html_e( 'Directions button', 'maapkathi' ); ?></th>
+				<td><label><input type="hidden" name="mk_map[show_directions]" value="0" /><input type="checkbox" name="mk_map[show_directions]" value="1" <?php checked( ! empty( $map['show_directions'] ) ); ?> /> <?php esc_html_e( 'Show an "Open in Google Maps" button', 'maapkathi' ); ?></label></td>
+			</tr>
+			<tr>
+				<th><?php esc_html_e( 'Google API key', 'maapkathi' ); ?></th>
+				<td>
+					<input type="text" class="regular-text" name="mk_map[api_key]" value="<?php echo esc_attr( (string) $map['api_key'] ); ?>" autocomplete="off" />
+					<p class="description"><?php esc_html_e( 'Only needed for the JavaScript API option. Without a valid key that option falls back to the keyless embed, so your visitors never see an error box.', 'maapkathi' ); ?></p>
 				</td>
 			</tr>
 		</table>

@@ -715,3 +715,37 @@ html[data-hero-style="split"] .mk-hero { background: var(--background); }
 	.mk-partners__track { animation: none; }
 	.mk-partners__marquee { overflow-x: auto; }
 }
+
+/* ---------- Map (FR-05) ----------
+   Full width of its column, with the theme's own corner radius rather
+   than a shape of its own. Height is admin-set per breakpoint, since a
+   map that is right on a desktop is usually too tall on a phone. */
+.mk-map {
+	margin-top: clamp(2rem, 4vw, 3rem);
+}
+.mk-map__frame {
+	display: block;
+	width: 100%;
+	height: var(--mk-map-h-mobile, 280px);
+	border: 1px solid color-mix(in srgb, var(--accent) 25%, transparent);
+	border-radius: var(--radius);
+	background: color-mix(in srgb, var(--foreground) 5%, transparent);
+}
+@media (min-width: 768px) {
+	.mk-map__frame { height: var(--mk-map-h-desktop, 420px); }
+}
+.mk-map__actions { margin-top: 1rem; }
+
+/* Providers give us no styling hook inside the iframe, so "dark" is a
+   filter over the whole frame. Deliberately not a plain invert, which
+   turns roads black-on-white into a negative that reads as broken:
+   hue-rotate puts the colours back the right way round afterwards. */
+.mk-map--style-dark .mk-map__frame,
+:root[data-theme="dark"] .mk-map--style-auto .mk-map__frame {
+	filter: invert(0.92) hue-rotate(180deg) saturate(0.8) contrast(0.9);
+}
+@media (prefers-color-scheme: dark) {
+	:root:not([data-theme="light"]) .mk-map--style-auto .mk-map__frame {
+		filter: invert(0.92) hue-rotate(180deg) saturate(0.8) contrast(0.9);
+	}
+}

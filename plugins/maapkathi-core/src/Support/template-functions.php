@@ -373,3 +373,55 @@ if ( ! function_exists( 'mk_theme_setting' ) ) {
 		return $settings[ $key ] ?? $default_value;
 	}
 }
+
+if ( ! function_exists( 'mk_map_settings' ) ) {
+	/**
+	 * The sanitized map configuration (FR-05).
+	 *
+	 * @return array<string,mixed>
+	 */
+	function mk_map_settings(): array {
+		return \Maapkathi\Core\Map\MapSettings::get();
+	}
+}
+
+if ( ! function_exists( 'mk_map_is_visible' ) ) {
+	/**
+	 * Whether the map should render in this context.
+	 *
+	 * Both the per-context toggle and "is it pointed at anywhere real" have
+	 * to be true; a map enabled but unconfigured renders nothing rather
+	 * than an empty frame.
+	 *
+	 * @param string $context Either 'contact' or 'home'.
+	 * @return bool
+	 */
+	function mk_map_is_visible( string $context = 'contact' ): bool {
+		$settings = mk_map_settings();
+		$enabled  = 'home' === $context ? ! empty( $settings['enabled_home'] ) : ! empty( $settings['enabled_contact'] );
+
+		return $enabled && \Maapkathi\Core\Map\MapSettings::is_configured( $settings );
+	}
+}
+
+if ( ! function_exists( 'mk_map_embed_url' ) ) {
+	/**
+	 * The iframe URL for the configured provider.
+	 *
+	 * @return string Embed URL, or an empty string when unconfigured.
+	 */
+	function mk_map_embed_url(): string {
+		return \Maapkathi\Core\Map\MapSettings::embed_url( mk_map_settings() );
+	}
+}
+
+if ( ! function_exists( 'mk_map_directions_url' ) ) {
+	/**
+	 * A link that opens the location in the visitor's own maps app.
+	 *
+	 * @return string URL, or an empty string when unconfigured.
+	 */
+	function mk_map_directions_url(): string {
+		return \Maapkathi\Core\Map\MapSettings::directions_url( mk_map_settings() );
+	}
+}

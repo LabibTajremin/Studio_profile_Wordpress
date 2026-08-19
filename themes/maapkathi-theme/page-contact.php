@@ -108,6 +108,12 @@ $mk_old    = class_exists( Inquiries::class ) ? Inquiries::take_old_input() : ar
 			<button type="submit" class="mk-btn mk-btn--accent"><?php mk_the_text( 'contact_form_button_label' ); ?></button>
 		</form>
 	</div>
+
+	<?php
+	// The map sits below the details and the form, so a visitor reads who
+	// to contact before where to go. It hides itself when unconfigured.
+	get_template_part( 'parts/section-map', null, array( 'context' => 'contact' ) );
+	?>
 </div>
 <?php
 get_footer();

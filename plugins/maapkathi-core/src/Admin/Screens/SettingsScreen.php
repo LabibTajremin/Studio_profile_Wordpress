@@ -9,6 +9,7 @@ declare( strict_types = 1 );
 
 namespace Maapkathi\Core\Admin\Screens;
 
+use Maapkathi\Core\Map\MapSettings;
 use Maapkathi\Core\Roles\Roles;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -40,6 +41,7 @@ final class SettingsScreen {
 
 		$settings = get_option( 'mk_site_settings', array() );
 		$seo      = get_option( 'mk_seo_settings', array() );
+		$map      = MapSettings::get();
 
 		require MK_PLUGIN_DIR . 'src/Admin/views/settings.php';
 	}
@@ -119,6 +121,11 @@ final class SettingsScreen {
 			'meta_pixel_id'       => sanitize_text_field( wp_unslash( $_POST['seo_meta_pixel_id'] ?? '' ) ),
 		);
 		update_option( 'mk_seo_settings', $seo );
+
+		// FR-05: the map lives in its own option so a map change does not
+		// rewrite the whole site-settings blob.
+		$raw_map = wp_unslash( $_POST['mk_map'] ?? array() );
+		update_option( MapSettings::OPTION, MapSettings::sanitize( is_array( $raw_map ) ? $raw_map : array() ) );
 		// phpcs:enable WordPress.Security.NonceVerification.Missing
 	}
 }
