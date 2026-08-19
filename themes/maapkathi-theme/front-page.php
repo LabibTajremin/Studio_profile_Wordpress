@@ -28,7 +28,6 @@ get_template_part( 'parts/hero' );
 $tagline_note = mk_text( 'home_tagline_note' );
 $clients      = mk_setting( 'section_clients_enabled', true ) ? mk_content( 'clients' ) : array();
 $categories   = mk_setting( 'section_categories_enabled', true ) ? mk_content( 'project_categories' ) : array();
-$projects     = mk_setting( 'section_projects_enabled', true ) ? mk_content( 'featured_projects', 6 ) : array();
 $services     = mk_setting( 'section_services_enabled', true ) ? mk_content( 'top_level_services', 4 ) : array();
 $stats        = mk_setting( 'section_stats_enabled', true ) ? mk_content( 'stats' ) : array();
 $values       = mk_setting( 'section_values_enabled', true ) ? mk_content( 'values' ) : array();
@@ -39,6 +38,14 @@ $faqs         = mk_setting( 'section_faq_enabled', true ) ? mk_content( 'faqs' )
 
 // Whether the "Trusted by" tiles carry the client's name beside the logo.
 $show_client_names = (bool) mk_setting( 'clients_show_name', true );
+
+// FR-04: the gallery layout shows the admin's configured page size and
+// offers "Load more"; the grid keeps its original fixed six.
+$projects_layout = (string) mk_setting( 'projects_layout', 'grid' );
+$gallery_per     = (int) mk_setting( 'gallery_per_load', 12 );
+$projects        = mk_setting( 'section_projects_enabled', true )
+	? mk_content( 'featured_projects', 'gallery' === $projects_layout ? $gallery_per : 6 )
+	: array();
 ?>
 
 <?php if ( $tagline_note ) : ?>
@@ -126,9 +133,47 @@ $show_client_names = (bool) mk_setting( 'clients_show_name', true );
 <?php endif; ?>
 
 <?php if ( $projects ) : ?>
-<section class="mk-section mk-projects" data-scroll-reveal>
+<section class="mk-section mk-projects mk-projects--<?php echo esc_attr( $projects_layout ); ?>" data-scroll-reveal>
 	<div class="mk-container">
 		<h2 class="mk-section__heading"><?php mk_the_text( 'home_projects_heading' ); ?></h2>
+		<?php if ( 'gallery' === $projects_layout ) : ?>
+			<?php
+			$gallery_click  = (string) mk_setting( 'gallery_click', 'lightbox' );
+			$gallery_total  = (int) wp_count_posts( 'mk_project' )->publish;
+			$gallery_shown  = count( $projects );
+			$gallery_cols   = (int) mk_setting( 'gallery_max_columns', 4 );
+			$gallery_gutter = (int) mk_setting( 'gallery_gutter', 16 );
+			?>
+			<ul
+				class="mk-masonry"
+				style="--mk-masonry-cols: <?php echo esc_attr( (string) $gallery_cols ); ?>; --mk-masonry-gutter: <?php echo esc_attr( (string) $gallery_gutter ); ?>px;"
+				data-mk-gallery
+				<?php echo 'lightbox' === $gallery_click ? 'data-lightbox-gallery' : ''; ?>
+			>
+				<?php
+				echo mk_gallery_items( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- built by GalleryRenderer, escaped at source.
+					$projects,
+					array(
+						'click'  => $gallery_click,
+						'offset' => 0,
+					)
+				);
+				?>
+			</ul>
+			<?php if ( $gallery_total > $gallery_shown ) : ?>
+				<p class="mk-masonry__actions">
+					<button
+						type="button"
+						class="mk-btn mk-btn--ghost mk-masonry__more"
+						data-mk-gallery-more
+						data-offset="<?php echo esc_attr( (string) $gallery_shown ); ?>"
+						data-per-page="<?php echo esc_attr( (string) $gallery_per ); ?>"
+					>
+						<?php esc_html_e( 'Load more', 'maapkathi' ); ?>
+					</button>
+				</p>
+			<?php endif; ?>
+		<?php else : ?>
 		<div class="mk-grid mk-grid--projects">
 			<?php foreach ( $projects as $project ) : ?>
 				<a class="mk-card mk-card--project" href="<?php echo esc_url( (string) get_permalink( $project ) ); ?>">
@@ -147,6 +192,7 @@ $show_client_names = (bool) mk_setting( 'clients_show_name', true );
 				</a>
 			<?php endforeach; ?>
 		</div>
+		<?php endif; ?>
 		<p class="mk-section__more">
 			<a class="mk-link-more" href="<?php echo esc_url( (string) get_post_type_archive_link( 'mk_project' ) ); ?>">
 				<?php esc_html_e( 'View all work', 'maapkathi' ); ?>

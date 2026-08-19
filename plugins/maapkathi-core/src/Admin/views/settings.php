@@ -170,6 +170,57 @@ $socials = $settings['socials'] ?? array();
 			</tr>
 		</table>
 
+		<h2><?php esc_html_e( 'Featured work layout', 'maapkathi' ); ?></h2>
+		<table class="form-table">
+			<tr>
+				<th><?php esc_html_e( 'Layout style', 'maapkathi' ); ?></th>
+				<td>
+					<?php
+					$mk_project_layouts = array(
+						'grid'    => __( 'Grid — uniform cards', 'maapkathi' ),
+						'gallery' => __( 'Gallery — photos at their own shape', 'maapkathi' ),
+					);
+					foreach ( $mk_project_layouts as $mk_project_layout_id => $mk_project_layout_label ) :
+						?>
+						<label style="margin-right:1.5em"><input type="radio" name="projects_layout" value="<?php echo esc_attr( $mk_project_layout_id ); ?>" <?php checked( (string) ( $settings['projects_layout'] ?? 'grid' ), $mk_project_layout_id ); ?> /> <?php echo esc_html( $mk_project_layout_label ); ?></label>
+					<?php endforeach; ?>
+					<p class="description"><?php esc_html_e( 'Gallery keeps every photo at its own shape and packs them together, so wide, tall and square shots can sit in one wall without any of them being cropped.', 'maapkathi' ); ?></p>
+				</td>
+			</tr>
+			<tr>
+				<th><?php esc_html_e( 'Most columns', 'maapkathi' ); ?></th>
+				<td>
+					<input type="number" min="2" max="5" name="gallery_max_columns" value="<?php echo esc_attr( (string) ( $settings['gallery_max_columns'] ?? 4 ) ); ?>" />
+					<p class="description"><?php esc_html_e( 'On the widest screens. Narrower screens step down from here automatically, to a single column on small phones.', 'maapkathi' ); ?></p>
+				</td>
+			</tr>
+			<tr>
+				<th><?php esc_html_e( 'Gap between photos', 'maapkathi' ); ?></th>
+				<td><input type="number" min="0" max="48" name="gallery_gutter" value="<?php echo esc_attr( (string) ( $settings['gallery_gutter'] ?? 16 ) ); ?>" /> px</td>
+			</tr>
+			<tr>
+				<th><?php esc_html_e( 'Photos shown at first', 'maapkathi' ); ?></th>
+				<td>
+					<input type="number" min="1" max="60" name="gallery_per_load" value="<?php echo esc_attr( (string) ( $settings['gallery_per_load'] ?? 12 ) ); ?>" />
+					<p class="description"><?php esc_html_e( 'A "Load more" button appears when there are more than this. Loading more adds to what is already on screen without moving it.', 'maapkathi' ); ?></p>
+				</td>
+			</tr>
+			<tr>
+				<th><?php esc_html_e( 'Clicking a photo', 'maapkathi' ); ?></th>
+				<td>
+					<?php
+					$mk_gallery_clicks = array(
+						'lightbox' => __( 'Opens it full size', 'maapkathi' ),
+						'link'     => __( 'Goes to the project page', 'maapkathi' ),
+					);
+					foreach ( $mk_gallery_clicks as $mk_click_id => $mk_click_label ) :
+						?>
+						<label style="margin-right:1.5em"><input type="radio" name="gallery_click" value="<?php echo esc_attr( $mk_click_id ); ?>" <?php checked( (string) ( $settings['gallery_click'] ?? 'lightbox' ), $mk_click_id ); ?> /> <?php echo esc_html( $mk_click_label ); ?></label>
+					<?php endforeach; ?>
+				</td>
+			</tr>
+		</table>
+
 		<h2><?php esc_html_e( 'Map', 'maapkathi' ); ?></h2>
 		<p class="description"><?php esc_html_e( 'The map shown on your Contact page. It needs no Google account and no API key. If you leave both the address and the coordinates empty, the map is simply not shown — no blank grey box appears on your site.', 'maapkathi' ); ?></p>
 		<table class="form-table">

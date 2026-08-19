@@ -19,7 +19,13 @@
 		overlay.innerHTML =
 			'<button class="mk-lightbox__close" aria-label="Close">&times;</button>' +
 			'<button class="mk-lightbox__prev" aria-label="Previous">&larr;</button>' +
+			'<figure class="mk-lightbox__figure">' +
 			'<img class="mk-lightbox__image" alt="" />' +
+			'<figcaption class="mk-lightbox__caption">' +
+			'<span class="mk-lightbox__title"></span>' +
+			'<span class="mk-lightbox__counter" aria-live="polite"></span>' +
+			'</figcaption>' +
+			'</figure>' +
 			'<button class="mk-lightbox__next" aria-label="Next">&rarr;</button>';
 		document.body.appendChild( overlay );
 
@@ -54,9 +60,24 @@
 
 	function show( index ) {
 		currentIndex = ( index + images.length ) % images.length;
+
+		var current = images[ currentIndex ];
 		var img = overlay.querySelector( '.mk-lightbox__image' );
-		img.src = images[ currentIndex ].getAttribute( 'href' ) || images[ currentIndex ].src;
-		img.alt = images[ currentIndex ].getAttribute( 'data-alt' ) || '';
+		img.src = current.getAttribute( 'href' ) || current.src;
+		img.alt = current.getAttribute( 'data-alt' ) || '';
+
+		// The project's own title as the caption, and a counter so it is
+		// clear how far through the set you are (FR-04.6).
+		overlay.querySelector( '.mk-lightbox__title' ).textContent =
+			current.getAttribute( 'data-caption' ) || '';
+		overlay.querySelector( '.mk-lightbox__counter' ).textContent =
+			( currentIndex + 1 ) + ' / ' + images.length;
+
+		// A single-image gallery has nowhere to go, so the arrows would be
+		// controls that visibly do nothing.
+		var single = images.length < 2;
+		overlay.querySelector( '.mk-lightbox__prev' ).hidden = single;
+		overlay.querySelector( '.mk-lightbox__next' ).hidden = single;
 	}
 
 	function open( gallery, index ) {
@@ -103,14 +124,21 @@
 	}
 
 	document.addEventListener( 'DOMContentLoaded', function () {
+		// Delegated rather than bound per item, because a gallery with
+		// "Load more" gains items after this runs — binding once would
+		// leave every appended photo unclickable.
 		document.querySelectorAll( '[data-lightbox-gallery]' ).forEach( function ( gallery ) {
-			var items = gallery.querySelectorAll( '[data-lightbox-item]' );
-			items.forEach( function ( item, index ) {
-				item.addEventListener( 'click', function ( e ) {
-					e.preventDefault();
-					lastTrigger = item;
-					open( gallery, index );
-				} );
+			gallery.addEventListener( 'click', function ( e ) {
+				var item = e.target.closest( '[data-lightbox-item]' );
+				if ( ! item || ! gallery.contains( item ) ) {
+					return;
+				}
+
+				e.preventDefault();
+				lastTrigger = item;
+
+				var items = Array.prototype.slice.call( gallery.querySelectorAll( '[data-lightbox-item]' ) );
+				open( gallery, items.indexOf( item ) );
 			} );
 		} );
 	} );

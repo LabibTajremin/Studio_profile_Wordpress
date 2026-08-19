@@ -20,6 +20,7 @@ use Maapkathi\Core\Admin\Menu;
 use Maapkathi\Core\Inquiries\Inquiries;
 use Maapkathi\Core\Rest\UploadController;
 use Maapkathi\Core\Footer\Subscribers;
+use Maapkathi\Core\Gallery\GalleryController;
 use Maapkathi\Core\Rest\HealthController;
 use Maapkathi\Core\Rest\PlaceholderController;
 use Maapkathi\Core\Approval\ApprovalService;
@@ -104,6 +105,7 @@ final class Plugin {
 		( new Mailer() )->register_hooks();
 		( new EmailVerification() )->register_hooks();
 		( new Subscribers() )->register_hooks();
+		( new GalleryController() )->register_hooks();
 
 		if ( is_admin() ) {
 			( new Menu() )->register_hooks();

@@ -102,6 +102,20 @@ add_action(
 			wp_enqueue_script( 'maapkathi-lightbox', $theme_uri . '/assets/js/lightbox.js', array(), $ver( '/assets/js/lightbox.js' ), true );
 		}
 
+		// The gallery script only ships where a gallery section renders.
+		if ( mk_theme_has_gallery_section() ) {
+			wp_enqueue_script( 'maapkathi-gallery', $theme_uri . '/assets/js/gallery.js', array(), $ver( '/assets/js/gallery.js' ), true );
+			wp_localize_script(
+				'maapkathi-gallery',
+				'mkGallery',
+				array(
+					'endpoint' => esc_url_raw( rest_url( 'maapkathi/v1/gallery' ) ),
+					'label'    => __( 'Load more', 'maapkathi' ),
+					'loading'  => __( 'Loading…', 'maapkathi' ),
+				)
+			);
+		}
+
 		// The marquee script only exists to pause the band in a hidden tab,
 		// so it is pointless anywhere the band is not a marquee.
 		if ( mk_theme_has_partner_marquee() ) {

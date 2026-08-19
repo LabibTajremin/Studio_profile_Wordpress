@@ -84,6 +84,14 @@ final class SettingsScreen {
 		$settings['partners_speed']      = max( 10, min( 120, absint( $_POST['partners_speed'] ?? 40 ) ) );
 		$settings['partners_background'] = in_array( $_POST['partners_background'] ?? '', array( 'none', 'surface', 'accent' ), true ) ? sanitize_text_field( wp_unslash( $_POST['partners_background'] ) ) : 'none';
 
+		// FR-04: Projects layout. The responsive column ladder is derived
+		// from the maximum rather than being five separate settings.
+		$settings['projects_layout']     = in_array( $_POST['projects_layout'] ?? '', array( 'grid', 'gallery' ), true ) ? sanitize_text_field( wp_unslash( $_POST['projects_layout'] ) ) : 'grid';
+		$settings['gallery_max_columns'] = max( 2, min( 5, absint( $_POST['gallery_max_columns'] ?? 4 ) ) );
+		$settings['gallery_gutter']      = max( 0, min( 48, absint( $_POST['gallery_gutter'] ?? 16 ) ) );
+		$settings['gallery_per_load']    = max( 1, min( 60, absint( $_POST['gallery_per_load'] ?? 12 ) ) );
+		$settings['gallery_click']       = in_array( $_POST['gallery_click'] ?? '', array( 'lightbox', 'link' ), true ) ? sanitize_text_field( wp_unslash( $_POST['gallery_click'] ) ) : 'lightbox';
+
 		$settings['clients_show_name']            = ! empty( $_POST['clients_show_name'] );
 		$settings['blog_enabled']                 = ! empty( $_POST['blog_enabled'] );
 		$settings['vision_mission_enabled']       = ! empty( $_POST['vision_mission_enabled'] );

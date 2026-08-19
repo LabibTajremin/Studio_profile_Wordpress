@@ -602,7 +602,30 @@ html[data-hero-style="split"] .mk-hero { background: var(--background); }
 	justify-content: center;
 }
 .mk-lightbox.is-open { display: flex; }
-.mk-lightbox__image { max-width: 92vw; max-height: 86vh; object-fit: contain; }
+/* The figure keeps the caption tied to the image rather than floating it
+   over the overlay, so a tall portrait shot does not push the caption off
+   screen. */
+.mk-lightbox__figure {
+	margin: 0;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 0.75rem;
+	max-width: 92vw;
+}
+.mk-lightbox__image { max-width: 92vw; max-height: 78vh; object-fit: contain; }
+.mk-lightbox__caption {
+	display: flex;
+	align-items: baseline;
+	justify-content: center;
+	gap: 1rem;
+	flex-wrap: wrap;
+	color: #fff;
+	font-size: 0.9rem;
+	text-align: center;
+}
+.mk-lightbox__title { font-family: var(--font-headings); }
+.mk-lightbox__counter { opacity: 0.75; font-variant-numeric: tabular-nums; }
 .mk-lightbox__close,
 .mk-lightbox__prev,
 .mk-lightbox__next {
@@ -748,4 +771,121 @@ html[data-hero-style="split"] .mk-hero { background: var(--background); }
 	:root:not([data-theme="light"]) .mk-map--style-auto .mk-map__frame {
 		filter: invert(0.92) hue-rotate(180deg) saturate(0.8) contrast(0.9);
 	}
+}
+
+/* ---------- Projects gallery (FR-04) ----------
+   Baseline is a responsive grid whose cells take each photo's own aspect
+   ratio, so nothing is ever cropped even with no JavaScript at all. The
+   packing script then upgrades it to true masonry by giving each item a
+   row span; that is an enhancement, not a requirement. Column count steps
+   down from the admin's maximum rather than being five separate settings. */
+.mk-masonry {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	display: grid;
+	gap: var(--mk-masonry-gutter, 16px);
+	grid-template-columns: 1fr;
+	/* Items keep their own height rather than being stretched to the
+	   tallest in the row. Correct for the no-JS fallback, and load-bearing
+	   for the packing script, which measures each item's natural height
+	   with packing momentarily switched off — stretched rows would report
+	   one shared height and give every item the same span. */
+	align-items: start;
+}
+@media (min-width: 480px) {
+	.mk-masonry { grid-template-columns: repeat(min(2, var(--mk-masonry-cols, 4)), 1fr); }
+}
+@media (min-width: 992px) {
+	.mk-masonry { grid-template-columns: repeat(min(3, var(--mk-masonry-cols, 4)), 1fr); }
+}
+@media (min-width: 1200px) {
+	.mk-masonry { grid-template-columns: repeat(var(--mk-masonry-cols, 4), 1fr); }
+}
+
+/* The item takes its height from the photo rather than the other way
+   round. That is what makes "no cropping and no letterboxing" (FR-04.2)
+   structural: there is no box for the image to be fitted into, so there is
+   nothing to crop against and no bars to fill. */
+.mk-masonry__item {
+	position: relative;
+	overflow: hidden;
+	border-radius: var(--radius);
+	line-height: 0;
+}
+.mk-masonry__link {
+	display: block;
+	width: 100%;
+	color: inherit;
+}
+.mk-masonry__image {
+	display: block;
+	width: 100%;
+	height: auto;
+	/* Belt and braces with the width/height attributes: the box is
+	   reserved at the right shape before the file arrives, so a slow
+	   connection sees a correctly-proportioned placeholder and the layout
+	   never shifts. */
+	aspect-ratio: var(--mk-ratio, 4 / 3);
+	/* An image smaller than its column renders at its own size, centred,
+	   rather than being blown up into a blur (FR-04.11). */
+	max-width: min(100%, var(--mk-natural-w, 100%));
+	margin-inline: auto;
+	transition: transform var(--motion-duration) var(--motion-ease);
+}
+/* The one deliberate exception: an extreme panorama would otherwise be a
+   hairline across the column, so its displayed ratio is capped and only
+   that outlier is cropped. The lightbox still opens the whole image. */
+.mk-masonry__item--capped .mk-masonry__image {
+	aspect-ratio: var(--mk-ratio, 4 / 3);
+	object-fit: cover;
+	max-width: 100%;
+}
+
+.mk-masonry__overlay {
+	position: absolute;
+	inset: 0;
+	display: flex;
+	align-items: flex-end;
+	padding: 1rem;
+	background: linear-gradient(
+		to top,
+		color-mix(in srgb, var(--accent) 78%, transparent),
+		transparent 62%
+	);
+	color: var(--accent-foreground);
+	opacity: 0;
+	transition: opacity var(--motion-duration) var(--motion-ease);
+}
+.mk-masonry__overlay-title {
+	font-family: var(--font-headings);
+	font-size: 0.95rem;
+	line-height: 1.3;
+}
+/* Hover effects only where hovering is a real thing. On a touch screen
+   :hover latches after a tap and leaves the overlay stuck on. */
+@media (hover: hover) and (pointer: fine) {
+	.mk-masonry__item:hover .mk-masonry__image { transform: scale(1.04); }
+	.mk-masonry__item:hover .mk-masonry__overlay { opacity: 1; }
+}
+/* Keyboard users get the same affordance, on every device. */
+.mk-masonry__link:focus-visible .mk-masonry__overlay { opacity: 1; }
+
+.mk-masonry__actions { margin-top: 1.5rem; text-align: center; }
+.mk-masonry__more[disabled] { opacity: 0.6; cursor: default; }
+
+/* Packed mode: rows are 1px and the script spans each item by its own
+   measured height, so items sit directly under their neighbour instead of
+   on a shared row baseline. The item is never stretched to fill the span —
+   it keeps the photo's height, and the span merely reserves enough rows
+   for it.
+   row-gap MUST be zero here. A gap applies between every row, not between
+   items, so with 1px rows an item spanning 300 rows would also collect 299
+   gaps and throw the column hundreds of pixels down the page. The vertical
+   gutter is instead reserved as extra rows inside each item's span, which
+   the packing script adds. */
+.mk-masonry.is-packed {
+	grid-auto-rows: 1px;
+	row-gap: 0;
+	align-items: start;
 }

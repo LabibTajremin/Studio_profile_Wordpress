@@ -425,3 +425,16 @@ if ( ! function_exists( 'mk_map_directions_url' ) ) {
 		return \Maapkathi\Core\Map\MapSettings::directions_url( mk_map_settings() );
 	}
 }
+
+if ( ! function_exists( 'mk_gallery_items' ) ) {
+	/**
+	 * Gallery item markup for a set of projects (FR-04).
+	 *
+	 * @param \WP_Post[]          $projects Projects to render.
+	 * @param array<string,mixed> $options  Rendering options: click, offset.
+	 * @return string Markup, already escaped.
+	 */
+	function mk_gallery_items( array $projects, array $options = array() ): string {
+		return \Maapkathi\Core\Gallery\GalleryRenderer::items( $projects, $options );
+	}
+}
