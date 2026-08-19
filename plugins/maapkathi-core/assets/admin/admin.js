@@ -194,3 +194,86 @@
 		} );
 	}
 } )();
+
+/**
+ * Header colour controls (FR-01.3).
+ *
+ * The palette and hex inputs are never removed from the page — ticking
+ * "follows accent colour" only disables them, so the admin's previous
+ * custom choice is still there when they untick it again.
+ */
+( function () {
+	var follow = document.getElementById( 'mk-header-follow-accent' );
+	if ( ! follow ) {
+		return;
+	}
+
+	var fieldset = document.querySelector( '.mk-header-colour' );
+	var hint = document.querySelector( '.mk-header-colour__hint' );
+	if ( ! fieldset ) {
+		return;
+	}
+
+	var sync = function () {
+		fieldset.disabled = follow.checked;
+		if ( hint ) {
+			hint.hidden = ! follow.checked;
+		}
+	};
+
+	follow.addEventListener( 'change', sync );
+	sync();
+
+	// Live preview chip beside the hex field.
+	var hex = fieldset.querySelector( 'input[name="mk_theme_settings[header_hex]"]' );
+	var chip = fieldset.querySelector( '.mk-colour-chip' );
+	if ( hex && chip ) {
+		hex.addEventListener( 'input', function () {
+			var value = hex.value.trim().replace( /^#/, '' );
+			chip.style.background = /^([0-9a-f]{3}|[0-9a-f]{6})$/i.test( value ) ? '#' + value : 'transparent';
+		} );
+	}
+} )();
+
+/**
+ * Icon picker search (FR-07.2).
+ *
+ * Filters by the icon's name. Falls back to showing everything if the
+ * search box is emptied, and the picker is fully usable with this script
+ * absent — it is a filter over an already-rendered list, not the thing
+ * that renders it.
+ */
+( function () {
+	var pickers = document.querySelectorAll( '[data-mk-icon-picker]' );
+	if ( ! pickers.length ) {
+		return;
+	}
+
+	Array.prototype.forEach.call( pickers, function ( picker ) {
+		var search = picker.querySelector( '.mk-icon-picker__search' );
+		var options = picker.querySelectorAll( '.mk-icon-picker__option' );
+		if ( ! search ) {
+			return;
+		}
+
+		search.addEventListener( 'input', function () {
+			var term = search.value.trim().toLowerCase();
+
+			Array.prototype.forEach.call( options, function ( option ) {
+				if ( ! term ) {
+					option.hidden = false;
+					return;
+				}
+
+				var name = ( option.getAttribute( 'data-name' ) || '' ).toLowerCase();
+				var label = ( option.textContent || '' ).toLowerCase();
+				// A checked option always stays visible, so the current
+				// choice cannot be filtered out of sight and silently
+				// look unset.
+				var checked = option.querySelector( 'input:checked' );
+
+				option.hidden = ! checked && name.indexOf( term ) < 0 && label.indexOf( term ) < 0;
+			} );
+		} );
+	} );
+} )();

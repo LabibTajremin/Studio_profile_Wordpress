@@ -8,6 +8,7 @@
 declare( strict_types = 1 );
 
 use Maapkathi\Core\Theme\Accents;
+use Maapkathi\Core\Theme\HeaderColor;
 use Maapkathi\Core\Theme\Backgrounds;
 use Maapkathi\Core\Theme\Patterns;
 use Maapkathi\Core\Theme\Fonts;
@@ -24,6 +25,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * screen wins a design award.
  *
  * @var array<string,mixed> $settings
+ * @var array<string,string> $field_errors Per-field validation errors from the last save.
  */
 
 $is_custom_preset = 'custom' === $settings['motion_preset'];
@@ -139,6 +141,91 @@ $is_custom_preset = 'custom' === $settings['motion_preset'];
 					<input type="range" min="0" max="100" name="mk_theme_settings[header_opacity]" value="<?php echo esc_attr( (string) $settings['header_opacity'] ); ?>" oninput="this.nextElementSibling.textContent=this.value+'%'" />
 					<output><?php echo esc_html( (string) $settings['header_opacity'] ); ?>%</output>
 					<p class="description"><?php esc_html_e( 'How strongly the accent colour tints the menu bar floating over the homepage hero. 0% is fully see-through, 100% is solid accent. Once you scroll past the hero the bar thickens automatically so the links stay readable.', 'maapkathi' ); ?></p>
+				</td>
+			</tr>
+			<tr>
+				<th><?php esc_html_e( '9c. Header colour', 'maapkathi' ); ?></th>
+				<td>
+					<label>
+						<input type="hidden" name="mk_theme_settings[header_follow_accent]" value="0" />
+						<input type="checkbox" id="mk-header-follow-accent" name="mk_theme_settings[header_follow_accent]" value="1" <?php checked( ! empty( $settings['header_follow_accent'] ) ); ?> />
+						<?php esc_html_e( 'Header background follows accent colour', 'maapkathi' ); ?>
+					</label>
+					<p class="description"><?php esc_html_e( 'On by default, which is how the header has always behaved. Uncheck to give the header a colour of its own.', 'maapkathi' ); ?></p>
+
+					<?php
+					// FR-01.3: these controls stay in the DOM and keep their
+					// saved values when the checkbox is on — they are only
+					// disabled, so unchecking restores the previous choice.
+					$mk_header_locked = ! empty( $settings['header_follow_accent'] );
+					?>
+					<fieldset class="mk-header-colour" <?php disabled( $mk_header_locked ); ?>>
+						<p class="description mk-header-colour__hint" <?php echo $mk_header_locked ? '' : 'hidden'; ?>>
+							<?php esc_html_e( 'Uncheck to choose a custom header colour.', 'maapkathi' ); ?>
+						</p>
+
+						<p><strong><?php esc_html_e( 'Palette', 'maapkathi' ); ?></strong></p>
+						<div class="mk-swatch-grid">
+							<label class="mk-swatch mk-swatch--none">
+								<input type="radio" name="mk_theme_settings[header_palette_id]" value="" <?php checked( '', (string) ( $settings['header_palette_id'] ?? '' ) ); ?> />
+								<span class="screen-reader-text"><?php esc_html_e( 'No swatch', 'maapkathi' ); ?></span>
+							</label>
+							<?php foreach ( HeaderColor::palette() as $mk_header_swatch ) : ?>
+								<label class="mk-swatch" style="background:<?php echo esc_attr( $mk_header_swatch['light'] ); ?>" title="<?php echo esc_attr( $mk_header_swatch['name'] ); ?>">
+									<input type="radio" name="mk_theme_settings[header_palette_id]" value="<?php echo esc_attr( $mk_header_swatch['id'] ); ?>" <?php checked( (string) ( $settings['header_palette_id'] ?? '' ), $mk_header_swatch['id'] ); ?> />
+									<span class="screen-reader-text"><?php echo esc_html( $mk_header_swatch['name'] ); ?></span>
+								</label>
+							<?php endforeach; ?>
+						</div>
+
+						<p>
+							<strong><?php esc_html_e( 'Custom hex', 'maapkathi' ); ?></strong><br />
+							<input type="text" name="mk_theme_settings[header_hex]" value="<?php echo esc_attr( (string) ( $settings['header_hex'] ?? '' ) ); ?>" placeholder="#RRGGBB" aria-describedby="mk-header-hex-help" />
+							<input type="color" value="<?php echo esc_attr( (string) ( $settings['header_hex'] ?? '#000000' ) ); ?>" oninput="this.previousElementSibling.value=this.value" aria-label="<?php esc_attr_e( 'Pick a header colour', 'maapkathi' ); ?>" />
+							<span class="mk-colour-chip" style="background:<?php echo esc_attr( (string) ( $settings['header_hex'] ?? 'transparent' ) ); ?>" aria-hidden="true"></span>
+						</p>
+						<?php if ( isset( $field_errors['header_hex'] ) ) : ?>
+							<p class="mk-field-error"><?php echo esc_html( $field_errors['header_hex'] ); ?></p>
+						<?php endif; ?>
+						<p class="description" id="mk-header-hex-help"><?php esc_html_e( 'A hex value here beats the palette swatch. Clear it to go back to the swatch. Accepts #abc or #aabbcc, with or without the #.', 'maapkathi' ); ?></p>
+					</fieldset>
+				</td>
+			</tr>
+			<tr>
+				<th><?php esc_html_e( '9d. Header logo variant', 'maapkathi' ); ?></th>
+				<td>
+					<?php foreach ( array( 'auto', 'light', 'dark' ) as $mk_logo_mode_id ) : ?>
+						<label style="margin-right:1em"><input type="radio" name="mk_theme_settings[header_logo_mode]" value="<?php echo esc_attr( $mk_logo_mode_id ); ?>" <?php checked( (string) $settings['header_logo_mode'], $mk_logo_mode_id ); ?> /> <?php echo esc_html( ucfirst( $mk_logo_mode_id ) ); ?></label>
+					<?php endforeach; ?>
+					<p class="description"><?php esc_html_e( 'Auto picks the variant that stays visible on the header colour. Force one if your logo needs it.', 'maapkathi' ); ?></p>
+				</td>
+			</tr>
+			<tr>
+				<th><?php esc_html_e( '9e. Services icon size', 'maapkathi' ); ?></th>
+				<td>
+					<input type="number" min="24" max="160" name="mk_theme_settings[services_icon_size]" value="<?php echo esc_attr( (string) $settings['services_icon_size'] ); ?>" /> px
+					<p class="description"><?php esc_html_e( 'Applies to the Services section on the homepage and the Services page. Shrinks to 60% of this on phones so the icon and title stay side by side.', 'maapkathi' ); ?></p>
+				</td>
+			</tr>
+			<tr>
+				<th><?php esc_html_e( '9f. Services icon position', 'maapkathi' ); ?></th>
+				<td>
+					<?php
+					$mk_icon_positions = array(
+						'beside' => __( 'Beside the title', 'maapkathi' ),
+						'above'  => __( 'Above the title', 'maapkathi' ),
+					);
+					foreach ( $mk_icon_positions as $mk_position_id => $mk_position_label ) :
+						?>
+						<label style="margin-right:1.5em"><input type="radio" name="mk_theme_settings[services_icon_position]" value="<?php echo esc_attr( $mk_position_id ); ?>" <?php checked( (string) $settings['services_icon_position'], $mk_position_id ); ?> /> <?php echo esc_html( $mk_position_label ); ?></label>
+					<?php endforeach; ?>
+				</td>
+			</tr>
+			<tr>
+				<th><?php esc_html_e( '9g. "What we stand for" icon size', 'maapkathi' ); ?></th>
+				<td>
+					<input type="number" min="24" max="160" name="mk_theme_settings[values_icon_size]" value="<?php echo esc_attr( (string) $settings['values_icon_size'] ); ?>" /> px
+					<p class="description"><?php esc_html_e( 'Pick each item\'s icon on its own edit screen, under Values.', 'maapkathi' ); ?></p>
 				</td>
 			</tr>
 			<tr>

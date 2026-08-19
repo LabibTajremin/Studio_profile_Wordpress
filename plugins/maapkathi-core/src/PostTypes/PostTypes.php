@@ -72,6 +72,14 @@ final class PostTypes {
 				'supports' => array( 'title', 'thumbnail' ),
 				'public'   => false,
 			),
+			'mk_partner'      => array(
+				'label'    => __( 'Partners', 'maapkathi' ),
+				'singular' => __( 'Partner', 'maapkathi' ),
+				'slug'     => 'partner',
+				'icon'     => 'dashicons-networking',
+				'supports' => array( 'title', 'thumbnail' ),
+				'public'   => false,
+			),
 			'mk_award'        => array(
 				'label'    => __( 'Awards', 'maapkathi' ),
 				'singular' => __( 'Award', 'maapkathi' ),

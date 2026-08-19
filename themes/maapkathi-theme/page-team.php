@@ -16,7 +16,7 @@ get_header();
 $mk_members = mk_content( 'members' );
 ?>
 <div class="mk-container mk-section">
-	<h1 class="mk-page-title"><?php mk_the_text( 'team_heading' ); ?></h1>
+	<?php mk_the_section_heading( 'team_page', 'h1', 'mk-page-title' ); ?>
 	<?php $mk_intro = mk_text( 'team_intro' ); ?>
 	<?php if ( $mk_intro ) : ?>
 		<p class="mk-lede"><?php echo esc_html( $mk_intro ); ?></p>

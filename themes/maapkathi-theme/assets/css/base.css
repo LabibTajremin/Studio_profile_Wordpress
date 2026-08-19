@@ -95,8 +95,8 @@ h1, h2, h3, h4, h5, h6 {
 	top: 0;
 	z-index: 100;
 	backdrop-filter: blur(var(--glass-blur));
-	background: color-mix(in srgb, var(--accent) var(--header-opacity, 14%), color-mix(in srgb, var(--background) 82%, transparent));
-	border-bottom: 1px solid color-mix(in srgb, var(--accent) 22%, transparent);
+	background: color-mix(in srgb, var(--header-bg, var(--accent)) var(--header-opacity, 14%), color-mix(in srgb, var(--background) 82%, transparent));
+	border-bottom: 1px solid color-mix(in srgb, var(--header-bg, var(--accent)) 22%, transparent);
 	transition: background var(--motion-duration) var(--motion-ease),
 		border-color var(--motion-duration) var(--motion-ease);
 }
@@ -106,7 +106,7 @@ h1, h2, h3, h4, h5, h6 {
 body.home .mk-site-header {
 	position: fixed;
 	inset-inline: 0;
-	background: color-mix(in srgb, var(--accent) var(--header-opacity, 14%), transparent);
+	background: color-mix(in srgb, var(--header-bg, var(--accent)) var(--header-opacity, 14%), transparent);
 	backdrop-filter: blur(10px) saturate(1.2);
 	border-bottom-color: rgba(255, 255, 255, 0.12);
 }
@@ -130,9 +130,54 @@ body.home .mk-call-btn { color: var(--accent-foreground); }
    carry its own contrast — still short of opaque, so the accent reads as
    a tint rather than a slab. */
 body.home .mk-site-header.is-scrolled {
-	background: color-mix(in srgb, var(--accent) var(--header-opacity-solid, 74%), transparent);
+	background: color-mix(in srgb, var(--header-bg, var(--accent)) var(--header-opacity-solid, 74%), transparent);
 	border-bottom-color: rgba(255, 255, 255, 0.18);
 }
+/* FR-01: once the admin gives the header a colour of its own it stops
+   being a wash over the hero and becomes a surface in its own right, so it
+   is painted solid and its ink is the auto-contrast --header-fg. Both the
+   over-hero and scrolled states read the same token, which is what stops
+   the two drifting apart (FR-01.8). The white-on-hero rules above are
+   overridden here rather than duplicated, so there is still exactly one
+   place that decides the header colour. */
+.mk-site-header--custom,
+body.home .mk-site-header--custom,
+body.home .mk-site-header--custom.is-scrolled {
+	background: var(--header-bg);
+	border-bottom-color: color-mix(in srgb, var(--header-fg) 18%, transparent);
+}
+.mk-site-header--custom,
+.mk-site-header--custom a,
+body.home .mk-site-header--custom,
+body.home .mk-site-header--custom a,
+body.home .mk-site-header--custom .mk-logo__title,
+body.home .mk-site-header--custom .mk-theme-toggle,
+body.home .mk-site-header--custom .mk-menu-toggle {
+	color: var(--header-fg);
+}
+.mk-site-header--custom .mk-theme-toggle {
+	border-color: color-mix(in srgb, var(--header-fg) 35%, transparent);
+}
+.mk-site-header--custom .mk-theme-toggle:hover {
+	background: color-mix(in srgb, var(--header-fg) 14%, transparent);
+}
+/* A sticky bar whose colour matches the section beneath it would vanish at
+   the seam, so it carries a shadow token rather than a hardcoded line. */
+.mk-site-header--custom.is-scrolled {
+	box-shadow: 0 1px 16px color-mix(in srgb, var(--header-fg) 16%, transparent);
+}
+
+/* Forced header logo variant. Presentation stays in CSS so there is still
+   no flash of the wrong logo before scripts run. */
+.mk-site-header[data-logo-mode="light"] .mk-logo__img--light,
+.mk-site-header[data-logo-mode="dark"] .mk-logo__img--dark {
+	display: block;
+}
+.mk-site-header[data-logo-mode="light"] .mk-logo__img--dark,
+.mk-site-header[data-logo-mode="dark"] .mk-logo__img--light {
+	display: none;
+}
+
 .mk-site-header__inner {
 	max-width: 1200px;
 	margin-inline: auto;
@@ -293,27 +338,206 @@ body.home .mk-site-header.is-scrolled {
 .mk-mobile-menu li { font-size: 1.5rem; margin-block: 1rem; opacity: 0; transform: translateY(var(--motion-distance)); transition: opacity var(--motion-duration) var(--motion-ease), transform var(--motion-duration) var(--motion-ease); transition-delay: calc(var(--mk-stagger-index, 0) * var(--motion-stagger)); }
 .mk-mobile-menu.is-open li { opacity: 1; transform: none; }
 
-@media (max-width: 767px) {
+/* The hand-off from the inline nav to the hamburger happens at 900px, not
+   768px. At 768 the five inline links measured 415px, which together with
+   the logo and the action row came to 750px inside a 707px content box —
+   the header overflowed and put a horizontal scrollbar on every inner
+   page (GR-04). */
+@media (max-width: 899px) {
 	.mk-nav--desktop { display: none; }
 	/* The call button stays in the header's top-right action row at every
 	   width — it used to be hidden here and re-rendered centred inside the
 	   overlay instead, which is what made it float mid-page. */
 	.mk-call-btn { padding: 0.5em 0.9em; font-size: 0.85rem; }
 }
-@media (min-width: 768px) {
+@media (min-width: 900px) {
 	.mk-menu-toggle, .mk-mobile-menu { display: none; }
 }
 
-/* Footer */
-.mk-site-footer { border-top: 1px solid color-mix(in srgb, var(--foreground) 12%, transparent); }
-.mk-site-footer__inner { max-width: 1200px; margin-inline: auto; padding-inline: clamp(1.25rem, 4vw, 3rem); padding-block: clamp(2.5rem, 6vw, 4rem); display: flex; flex-wrap: wrap; gap: 2rem; justify-content: space-between; }
-.mk-site-footer nav ul { list-style: none; display: flex; flex-wrap: wrap; gap: 1rem; padding: 0; }
+/* Below the hand-off the header is logo + actions, and on a 320px screen
+   those still did not fit: a flex item will not shrink past its content
+   unless it is told it may, so the studio name held the logo at its full
+   width and pushed the actions off-screen. min-width:0 lets it shrink and
+   the title truncates rather than overflowing. */
+.mk-site-header__inner > * { min-width: 0; }
+.mk-logo { min-width: 0; }
+.mk-logo__title {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+.mk-header-actions { flex: 0 0 auto; }
 
-/* The copyright is its own full-width bar with a divider above it, like
-   the reference's footer — it previously sat outside .mk-site-footer__inner
-   with no styles at all, so it ran flush to the viewport edge while every
-   other footer element was aligned to the container. */
-.mk-site-footer__bottom { border-top: 1px solid color-mix(in srgb, var(--foreground) 12%, transparent); }
+/* Footer (FR-08, FR-09)
+   ---------------------------------------------------------------------
+   The footer element itself owns the background, and the copyright bar
+   inside it declares no background of its own, so the two are the same
+   painted surface rather than two colours that happen to match. That is
+   what makes "no seam" structural instead of a coincidence (FR-09.3). */
+.mk-site-footer {
+	background: var(--footer-bg);
+	color: var(--footer-fg);
+}
+.mk-footer__inner {
+	max-width: 1200px;
+	margin-inline: auto;
+	padding-inline: clamp(1.25rem, 4vw, 3rem);
+	padding-block: clamp(3rem, 6vw, 5rem) clamp(2rem, 4vw, 3.5rem);
+}
+.mk-footer__inner--classic {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 2rem;
+	justify-content: space-between;
+}
+.mk-site-footer nav ul { list-style: none; display: flex; flex-wrap: wrap; gap: 1rem; padding: 0; }
+.mk-site-footer a { color: inherit; }
+.mk-site-footer a:hover { color: var(--accent-foreground); }
+
+/* Four equal columns at XL/LG, two at MD, one stacked at SM/XS with the
+   brand column first (FR-08.13). Headings sit on a shared baseline because
+   every column starts at the same grid row (FR-08.14). */
+.mk-footer__inner--modern {
+	display: grid;
+	grid-template-columns: 1fr;
+	gap: 2rem;
+}
+@media (min-width: 768px) {
+	.mk-footer__inner--modern { grid-template-columns: repeat(2, 1fr); gap: 2rem 2rem; }
+}
+@media (min-width: 992px) {
+	.mk-footer__inner--modern { grid-template-columns: repeat(4, 1fr); gap: 2rem; }
+}
+.mk-footer__heading {
+	font-family: var(--font-headings);
+	font-size: clamp(1.05rem, 1.5vw, 1.25rem);
+	font-weight: 600;
+	margin: 0 0 1rem;
+	color: var(--footer-fg);
+}
+.mk-footer__col ul { list-style: none; margin: 0; padding: 0; }
+.mk-footer__col a { text-decoration: none; }
+
+.mk-footer__logo-img {
+	max-height: var(--footer-logo-max-h, 64px);
+	width: auto;
+	display: block;
+}
+.mk-footer__logo-img--dark { display: none; }
+:root[data-theme="dark"] .mk-footer__logo-img--light { display: none; }
+:root[data-theme="dark"] .mk-footer__logo-img--dark { display: block; }
+/* Forced footer logo variant (FR-08.4) overrides the mode-based swap. */
+.mk-site-footer[data-logo-mode="light"] .mk-footer__logo-img--light,
+.mk-site-footer[data-logo-mode="dark"] .mk-footer__logo-img--dark { display: block; }
+.mk-site-footer[data-logo-mode="light"] .mk-footer__logo-img--dark,
+.mk-site-footer[data-logo-mode="dark"] .mk-footer__logo-img--light { display: none; }
+.mk-footer__wordmark {
+	font-family: var(--font-headings);
+	font-size: 1.4rem;
+	font-weight: 600;
+}
+
+/* Icon-only social buttons: no URL text, no platform name (FR-08.6). The
+   accessible name lives on the link, so nothing is lost to a screen
+   reader. An empty list collapses because the <ul> is not rendered at all
+   when there are no links (FR-08.7). */
+.mk-footer__socials {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 12px;
+	margin-top: 1.25rem !important;
+}
+.mk-footer__social {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 36px;
+	height: 36px;
+	border-radius: 999px;
+	border: 1px solid color-mix(in srgb, var(--footer-fg) 20%, transparent);
+	color: inherit;
+	transition: background var(--motion-duration) var(--motion-ease),
+		color var(--motion-duration) var(--motion-ease),
+		border-color var(--motion-duration) var(--motion-ease);
+}
+.mk-footer__social:hover,
+.mk-footer__social:focus-visible {
+	background: var(--accent);
+	border-color: var(--accent);
+	color: var(--accent-foreground);
+}
+
+/* One contact per line, each with its own icon. The icon is top-aligned so
+   a multi-line address keeps its following lines in the text column rather
+   than tucked under the icon (FR-08.10). */
+.mk-footer__contacts { display: grid; gap: 0.85rem; }
+.mk-footer__contact {
+	display: grid;
+	grid-template-columns: 18px 1fr;
+	gap: 0.65rem;
+	align-items: start;
+	line-height: 1.7;
+	font-size: 0.95rem;
+}
+.mk-footer__contact-icon { margin-top: 0.28em; color: var(--accent-foreground); }
+.mk-footer__contact a { text-decoration: none; overflow-wrap: anywhere; }
+.mk-footer__contact a:hover { text-decoration: underline; }
+
+.mk-footer__links { display: grid; gap: 0.6rem; font-size: 0.95rem; line-height: 1.7; }
+.mk-footer__links a { transition: color var(--motion-duration) var(--motion-ease); }
+
+.mk-subscribe__row { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+.mk-subscribe input[type="email"] {
+	flex: 1 1 10rem;
+	min-width: 0;
+	padding: 0.6rem 0.75rem;
+	border-radius: var(--radius);
+	border: 1px solid color-mix(in srgb, var(--footer-fg) 25%, transparent);
+	background: color-mix(in srgb, var(--footer-fg) 8%, transparent);
+	color: var(--footer-fg);
+}
+.mk-subscribe__button {
+	padding: 0.6rem 1.1rem;
+	border: 0;
+	border-radius: var(--radius);
+	background: var(--accent);
+	color: var(--accent-foreground);
+	font-family: var(--font-buttons);
+	cursor: pointer;
+}
+.mk-subscribe__helper { font-size: 0.85rem; color: var(--footer-muted); margin: 0.75rem 0 0; }
+.mk-subscribe__status { margin: 0.5rem 0 0; font-size: 0.9rem; min-height: 1.2em; }
+.mk-subscribe__status--error { color: #ffb4b4; }
+/* Off-screen rather than display:none — some bots skip fields that are not
+   laid out at all, which would defeat the trap. */
+.mk-subscribe__trap {
+	position: absolute;
+	left: -9999px;
+	width: 1px;
+	height: 1px;
+	overflow: hidden;
+}
+
+@media (max-width: 767px) {
+	.mk-footer__inner--modern.is-centred { text-align: center; }
+	.mk-footer__inner--modern.is-centred .mk-footer__socials,
+	.mk-footer__inner--modern.is-centred .mk-footer__logo { justify-content: center; display: flex; }
+	.mk-footer__inner--modern.is-centred .mk-footer__contact { grid-template-columns: 1fr; justify-items: center; }
+}
+
+/* The copyright bar reads the same --footer-bg token as the footer around
+   it, so the two compute to byte-identical colours and cannot drift apart
+   when the footer background setting changes (FR-09.2, FR-09.3). Declaring
+   it rather than inheriting is deliberate: it makes the two wrappers
+   comparable in DevTools, which is how the acceptance criterion is
+   checked. The divider is opt-in and off by default (FR-09.4). */
+.mk-site-footer__bottom {
+	background: var(--footer-bg);
+	border-top: 0;
+}
+.mk-site-footer__bottom--divided {
+	border-top: 1px solid color-mix(in srgb, var(--footer-fg) 15%, transparent);
+}
 .mk-copyright {
 	max-width: 1200px;
 	margin-inline: auto;
@@ -322,7 +546,10 @@ body.home .mk-site-header.is-scrolled {
 	margin-block: 0;
 	text-align: center;
 	font-size: 0.8rem;
-	opacity: 0.6;
+	/* A colour token rather than opacity: opacity would silently drop this
+	   line below 4.5:1 on some footer backgrounds, where --footer-muted is
+	   computed to stay above it. */
+	color: var(--footer-muted);
 }
 
 /* Contact form */

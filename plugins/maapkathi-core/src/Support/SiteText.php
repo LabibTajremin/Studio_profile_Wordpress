@@ -78,6 +78,14 @@ final class SiteText {
 					'label' => __( 'FAQ heading', 'maapkathi' ),
 				),
 				array(
+					'key'   => 'home_partners_heading',
+					'label' => __( 'Partners heading', 'maapkathi' ),
+				),
+				array(
+					'key'   => 'home_partners_subtitle',
+					'label' => __( 'Partners subtitle', 'maapkathi' ),
+				),
+				array(
 					'key'   => 'home_cta_heading',
 					'label' => __( 'Closing CTA heading', 'maapkathi' ),
 				),
@@ -157,6 +165,22 @@ final class SiteText {
 					'key'   => 'footer_note',
 					'label' => __( 'Footer note', 'maapkathi' ),
 				),
+				array(
+					'key'   => 'footer_contacts_heading',
+					'label' => __( 'Contacts column heading', 'maapkathi' ),
+				),
+				array(
+					'key'   => 'footer_links_heading',
+					'label' => __( 'Links column heading', 'maapkathi' ),
+				),
+				array(
+					'key'   => 'footer_subscribe_heading',
+					'label' => __( 'Subscribe column heading', 'maapkathi' ),
+				),
+				array(
+					'key'   => 'footer_subscribe_helper',
+					'label' => __( 'Subscribe helper text', 'maapkathi' ),
+				),
 			),
 		);
 	}
@@ -196,6 +220,8 @@ final class SiteText {
 			'home_testimonials_heading' => __( 'What our clients say', 'maapkathi' ),
 			'home_awards_heading'       => __( 'Recognition', 'maapkathi' ),
 			'home_faq_heading'          => __( 'Frequently asked questions', 'maapkathi' ),
+			'home_partners_heading'     => __( 'Our Partners', 'maapkathi' ),
+			'home_partners_subtitle'    => '',
 			'home_cta_heading'          => __( "Let's build something considered.", 'maapkathi' ),
 			'home_cta_button_label'     => __( 'Start a conversation', 'maapkathi' ),
 			'work_archive_heading'      => __( 'Our work', 'maapkathi' ),
@@ -213,6 +239,10 @@ final class SiteText {
 			'contact_form_button_label' => __( 'Send message', 'maapkathi' ),
 			'contact_success_message'   => __( 'Thanks — we received your message and will be in touch shortly.', 'maapkathi' ),
 			'footer_note'               => __( 'Designed and built with care.', 'maapkathi' ),
+			'footer_contacts_heading'   => __( 'Contacts', 'maapkathi' ),
+			'footer_links_heading'      => __( 'Our Projects', 'maapkathi' ),
+			'footer_subscribe_heading'  => __( 'Subscribe', 'maapkathi' ),
+			'footer_subscribe_helper'   => __( 'Occasional notes on new work. No spam, unsubscribe any time.', 'maapkathi' ),
 		);
 	}
 

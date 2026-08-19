@@ -26,7 +26,7 @@ $mk_errors = class_exists( Inquiries::class ) ? Inquiries::take_errors() : array
 $mk_old    = class_exists( Inquiries::class ) ? Inquiries::take_old_input() : array();
 ?>
 <div class="mk-container mk-section mk-contact">
-	<h1 class="mk-page-title"><?php mk_the_text( 'contact_heading' ); ?></h1>
+	<?php mk_the_section_heading( 'contact_page', 'h1', 'mk-page-title' ); ?>
 	<?php $mk_intro = mk_text( 'contact_intro' ); ?>
 	<?php if ( $mk_intro ) : ?>
 		<p class="mk-lede"><?php echo esc_html( $mk_intro ); ?></p>
@@ -108,6 +108,12 @@ $mk_old    = class_exists( Inquiries::class ) ? Inquiries::take_old_input() : ar
 			<button type="submit" class="mk-btn mk-btn--accent"><?php mk_the_text( 'contact_form_button_label' ); ?></button>
 		</form>
 	</div>
+
+	<?php
+	// The map sits below the details and the form, so a visitor reads who
+	// to contact before where to go. It hides itself when unconfigured.
+	get_template_part( 'parts/section-map', null, array( 'context' => 'contact' ) );
+	?>
 </div>
 <?php
 get_footer();

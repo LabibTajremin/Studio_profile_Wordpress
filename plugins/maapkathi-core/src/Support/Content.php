@@ -91,6 +91,24 @@ final class Content {
 	}
 
 	/**
+	 * All published partners (FR-10).
+	 *
+	 * A published partner with no logo attached is dropped rather than
+	 * rendered: the section is a wall of logos, and an entry with nothing
+	 * to show would leave a hole in it.
+	 *
+	 * @return \WP_Post[]
+	 */
+	public static function partners(): array {
+		return array_values(
+			array_filter(
+				self::items( 'mk_partner' ),
+				static fn( $partner ) => (bool) get_post_thumbnail_id( $partner )
+			)
+		);
+	}
+
+	/**
 	 * All published testimonials.
 	 *
 	 * @return \WP_Post[]

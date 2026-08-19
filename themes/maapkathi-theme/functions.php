@@ -98,8 +98,45 @@ add_action(
 		wp_enqueue_script( 'maapkathi-theme-toggle', $theme_uri . '/assets/js/theme-toggle.js', array(), $ver( '/assets/js/theme-toggle.js' ), true );
 
 		// Lightbox only where a gallery can actually appear.
-		if ( is_singular( array( 'mk_project', 'mk_service' ) ) ) {
+		if ( is_singular( array( 'mk_project', 'mk_service' ) ) || mk_theme_has_gallery_section() ) {
 			wp_enqueue_script( 'maapkathi-lightbox', $theme_uri . '/assets/js/lightbox.js', array(), $ver( '/assets/js/lightbox.js' ), true );
+		}
+
+		// The gallery script only ships where a gallery section renders.
+		if ( mk_theme_has_gallery_section() ) {
+			wp_enqueue_script( 'maapkathi-gallery', $theme_uri . '/assets/js/gallery.js', array(), $ver( '/assets/js/gallery.js' ), true );
+			wp_localize_script(
+				'maapkathi-gallery',
+				'mkGallery',
+				array(
+					'endpoint' => esc_url_raw( rest_url( 'maapkathi/v1/gallery' ) ),
+					'label'    => __( 'Load more', 'maapkathi' ),
+					'loading'  => __( 'Loading…', 'maapkathi' ),
+				)
+			);
+		}
+
+		// The marquee script only exists to pause the band in a hidden tab,
+		// so it is pointless anywhere the band is not a marquee.
+		if ( mk_theme_has_partner_marquee() ) {
+			wp_enqueue_script( 'maapkathi-partners-marquee', $theme_uri . '/assets/js/partners-marquee.js', array(), $ver( '/assets/js/partners-marquee.js' ), true );
+		}
+
+		// The subscribe script is only useful where the newsletter column
+		// actually renders, which is the Modern footer with column 4 set to
+		// the newsletter (GR-06: no script on a page that cannot use it).
+		if ( mk_theme_has_subscribe_form() ) {
+			wp_enqueue_script( 'maapkathi-subscribe', $theme_uri . '/assets/js/subscribe.js', array(), $ver( '/assets/js/subscribe.js' ), true );
+			wp_localize_script(
+				'maapkathi-subscribe',
+				'mkSubscribe',
+				array(
+					'endpoint' => esc_url_raw( rest_url( 'maapkathi/v1/subscribe' ) ),
+					'sending'  => __( 'Sending…', 'maapkathi' ),
+					'invalid'  => __( 'Please enter a valid email address.', 'maapkathi' ),
+					'failed'   => __( 'Something went wrong. Please try again.', 'maapkathi' ),
+				)
+			);
 		}
 
 		// Dashicons power the optional service icons, and are a separate
@@ -445,4 +482,56 @@ if ( ! function_exists( 'mk_client_mark_color' ) ) {
 		$hue  = $hues[ abs( crc32( $name ) ) % count( $hues ) ];
 		return "hsl({$hue} 45% 38%)";
 	}
+}
+
+/**
+ * Whether the footer currently rendering carries the newsletter form.
+ *
+ * Used to keep the subscribe script off every page that cannot show the
+ * form at all (GR-06).
+ *
+ * @return bool
+ */
+function mk_theme_has_subscribe_form(): bool {
+	if ( ! function_exists( 'mk_footer_settings' ) ) {
+		return false;
+	}
+
+	$footer = mk_footer_settings();
+
+	return 'modern' === $footer['style'] && 'newsletter' === $footer['col4']['type'];
+}
+
+/**
+ * Whether a Projects section on this request is set to the Gallery layout.
+ *
+ * The lightbox is the gallery's only consumer outside single templates, so
+ * this keeps it off every page that cannot open one (GR-06).
+ *
+ * @return bool
+ */
+function mk_theme_has_gallery_section(): bool {
+	if ( ! is_front_page() || ! function_exists( 'mk_setting' ) ) {
+		return false;
+	}
+
+	return 'gallery' === mk_setting( 'projects_layout', 'showcase' )
+		&& (bool) mk_setting( 'section_projects_enabled', true );
+}
+
+/**
+ * Whether the partner band on this request is the auto-scrolling variant.
+ *
+ * @return bool
+ */
+function mk_theme_has_partner_marquee(): bool {
+	if ( ! function_exists( 'mk_setting' ) || ! function_exists( 'mk_content' ) ) {
+		return false;
+	}
+
+	if ( ! mk_setting( 'section_partners_enabled', true ) || 'marquee' !== mk_setting( 'partners_layout', 'grid' ) ) {
+		return false;
+	}
+
+	return (bool) mk_content( 'partners' );
 }

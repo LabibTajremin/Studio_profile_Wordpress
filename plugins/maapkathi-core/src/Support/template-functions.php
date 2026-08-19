@@ -176,3 +176,364 @@ if ( ! function_exists( 'mk_placeholder_url' ) ) {
 		return \Maapkathi\Core\Rest\PlaceholderController::url( $label, $width, $height );
 	}
 }
+
+if ( ! function_exists( 'mk_header_is_custom' ) ) {
+	/**
+	 * Whether the header is painted with a colour of its own (FR-01).
+	 *
+	 * The theme paints a solid, auto-contrasted bar when this is true and
+	 * keeps its translucent accent wash when it is false, so a site that
+	 * never opened the setting looks exactly as it did before (GR-03).
+	 *
+	 * @return bool
+	 */
+	function mk_header_is_custom(): bool {
+		return \Maapkathi\Core\Theme\HeaderColor::is_custom( \Maapkathi\Core\Theme\ThemeSettings::get() );
+	}
+}
+
+if ( ! function_exists( 'mk_header_logo_mode' ) ) {
+	/**
+	 * Which logo variant the header should show (FR-01 edge case).
+	 *
+	 * Once the header can be any colour, "follow the site's light/dark mode"
+	 * stops being enough — a dark logo on a dark custom header disappears.
+	 * "auto" therefore resolves against the header's own luminance rather
+	 * than the page mode whenever a custom colour is set.
+	 *
+	 * @return string One of 'auto', 'light' or 'dark'.
+	 */
+	function mk_header_logo_mode(): string {
+		$settings = \Maapkathi\Core\Theme\ThemeSettings::get();
+		$mode     = (string) ( $settings['header_logo_mode'] ?? 'auto' );
+
+		if ( 'auto' !== $mode ) {
+			return $mode;
+		}
+
+		if ( ! \Maapkathi\Core\Theme\HeaderColor::is_custom( $settings ) ) {
+			return 'auto';
+		}
+
+		// on_accent() returns the ink that reads on the bar; a cream ink
+		// means the bar is dark, which is where the light logo belongs.
+		$resolved = \Maapkathi\Core\Theme\HeaderColor::resolve(
+			$settings,
+			\Maapkathi\Core\Theme\Accents::by_id( $settings['accent_id'] )['light'] ?? '#6e1f2a'
+		);
+
+		return \Maapkathi\Core\Theme\Accents::CREAM === $resolved['fg'] ? 'light' : 'dark';
+	}
+}
+
+if ( ! function_exists( 'mk_footer_settings' ) ) {
+	/**
+	 * The sanitized footer configuration (FR-08).
+	 *
+	 * @return array<string,mixed>
+	 */
+	function mk_footer_settings(): array {
+		return \Maapkathi\Core\Footer\FooterSettings::get();
+	}
+}
+
+if ( ! function_exists( 'mk_footer_social_icon' ) ) {
+	/**
+	 * Inline SVG mark for one social platform (FR-08.6).
+	 *
+	 * @param string $platform Platform slug.
+	 * @return string SVG markup, already safe to echo.
+	 */
+	function mk_footer_social_icon( string $platform ): string {
+		return \Maapkathi\Core\Footer\SocialIcons::svg( $platform );
+	}
+}
+
+if ( ! function_exists( 'mk_footer_platform_label' ) ) {
+	/**
+	 * Human-readable name for a social platform, used as the icon's
+	 * accessible label since the link itself shows no text.
+	 *
+	 * @param string $platform Platform slug.
+	 * @return string
+	 */
+	function mk_footer_platform_label( string $platform ): string {
+		$platforms = \Maapkathi\Core\Footer\FooterSettings::platforms();
+		return (string) ( $platforms[ $platform ] ?? $platform );
+	}
+}
+
+if ( ! function_exists( 'mk_footer_column_links' ) ) {
+	/**
+	 * Resolves a footer link column to a flat list of {label, url} rows
+	 * (FR-08.11).
+	 *
+	 * @param string                                    $source One of menu, services, projects, custom.
+	 * @param int                                       $limit  Maximum rows to return.
+	 * @param array<int,array{label:string,url:string}> $custom Custom rows, used when $source is 'custom'.
+	 * @return array<int,array{label:string,url:string}>
+	 */
+	function mk_footer_column_links( string $source, int $limit, array $custom = array() ): array {
+		$rows = array();
+
+		switch ( $source ) {
+			case 'custom':
+				$rows = $custom;
+				break;
+
+			case 'services':
+			case 'projects':
+				$posts = get_posts(
+					array(
+						'post_type'        => 'services' === $source ? 'mk_service' : 'mk_project',
+						'posts_per_page'   => $limit,
+						'orderby'          => 'menu_order title',
+						'order'            => 'ASC',
+						'suppress_filters' => false,
+					)
+				);
+				foreach ( $posts as $post ) {
+					$rows[] = array(
+						'label' => get_the_title( $post ),
+						'url'   => (string) get_permalink( $post ),
+					);
+				}
+				break;
+
+			default:
+				foreach ( mk_nav_items() as $item ) {
+					$rows[] = array(
+						'label' => (string) $item['label'],
+						'url'   => (string) $item['href'],
+					);
+				}
+				break;
+		}
+
+		return array_slice( $rows, 0, $limit );
+	}
+}
+
+if ( ! function_exists( 'mk_icon' ) ) {
+	/**
+	 * Inline SVG from the bundled icon library (FR-06/07/08).
+	 *
+	 * @param string $id        Icon id.
+	 * @param int    $size      Rendered size in pixels.
+	 * @param string $css_class Optional CSS class.
+	 * @return string SVG markup, already safe to echo.
+	 */
+	function mk_icon( string $id, int $size = 24, string $css_class = '' ): string {
+		return \Maapkathi\Core\Icons\IconLibrary::svg( $id, $size, $css_class );
+	}
+}
+
+if ( ! function_exists( 'mk_contact_icon' ) ) {
+	/**
+	 * The icon that belongs beside a footer contact row of this type.
+	 *
+	 * @param string $type Contact row type.
+	 * @param int    $size Rendered size in pixels.
+	 * @return string SVG markup, already safe to echo.
+	 */
+	function mk_contact_icon( string $type, int $size = 18 ): string {
+		return \Maapkathi\Core\Icons\IconLibrary::svg(
+			\Maapkathi\Core\Icons\IconLibrary::for_contact_type( $type ),
+			$size,
+			'mk-footer__contact-icon'
+		);
+	}
+}
+
+if ( ! function_exists( 'mk_item_icon' ) ) {
+	/**
+	 * The resolved icon for one content item (FR-06, FR-07).
+	 *
+	 * @param int $post_id Post to render the icon for.
+	 * @return string Markup, already safe to echo. Empty when the item has no icon.
+	 */
+	function mk_item_icon( int $post_id ): string {
+		return \Maapkathi\Core\Icons\IconRenderer::render( $post_id );
+	}
+}
+
+if ( ! function_exists( 'mk_theme_setting' ) ) {
+	/**
+	 * One value from the Appearance settings (theme + motion registry).
+	 *
+	 * Distinct from mk_setting(), which reads the site/business settings —
+	 * these two are separate options and separate admin screens.
+	 *
+	 * @param string $key           Setting key.
+	 * @param mixed  $default_value Value to return when the key is unset.
+	 * @return mixed
+	 */
+	function mk_theme_setting( string $key, $default_value = '' ) {
+		$settings = \Maapkathi\Core\Theme\ThemeSettings::get();
+		return $settings[ $key ] ?? $default_value;
+	}
+}
+
+if ( ! function_exists( 'mk_map_settings' ) ) {
+	/**
+	 * The sanitized map configuration (FR-05).
+	 *
+	 * @return array<string,mixed>
+	 */
+	function mk_map_settings(): array {
+		return \Maapkathi\Core\Map\MapSettings::get();
+	}
+}
+
+if ( ! function_exists( 'mk_map_is_visible' ) ) {
+	/**
+	 * Whether the map should render in this context.
+	 *
+	 * Both the per-context toggle and "is it pointed at anywhere real" have
+	 * to be true; a map enabled but unconfigured renders nothing rather
+	 * than an empty frame.
+	 *
+	 * @param string $context Either 'contact' or 'home'.
+	 * @return bool
+	 */
+	function mk_map_is_visible( string $context = 'contact' ): bool {
+		$settings = mk_map_settings();
+		$enabled  = 'home' === $context ? ! empty( $settings['enabled_home'] ) : ! empty( $settings['enabled_contact'] );
+
+		return $enabled && \Maapkathi\Core\Map\MapSettings::is_configured( $settings );
+	}
+}
+
+if ( ! function_exists( 'mk_map_embed_url' ) ) {
+	/**
+	 * The iframe URL for the configured provider.
+	 *
+	 * @return string Embed URL, or an empty string when unconfigured.
+	 */
+	function mk_map_embed_url(): string {
+		return \Maapkathi\Core\Map\MapSettings::embed_url( mk_map_settings() );
+	}
+}
+
+if ( ! function_exists( 'mk_map_directions_url' ) ) {
+	/**
+	 * A link that opens the location in the visitor's own maps app.
+	 *
+	 * @return string URL, or an empty string when unconfigured.
+	 */
+	function mk_map_directions_url(): string {
+		return \Maapkathi\Core\Map\MapSettings::directions_url( mk_map_settings() );
+	}
+}
+
+if ( ! function_exists( 'mk_gallery_items' ) ) {
+	/**
+	 * Gallery item markup for a set of projects (FR-04).
+	 *
+	 * @param \WP_Post[]          $projects Projects to render.
+	 * @param array<string,mixed> $options  Rendering options: click, offset.
+	 * @return string Markup, already escaped.
+	 */
+	function mk_gallery_items( array $projects, array $options = array() ): string {
+		return \Maapkathi\Core\Gallery\GalleryRenderer::items( $projects, $options );
+	}
+}
+
+if ( ! function_exists( 'mk_section' ) ) {
+	/**
+	 * One section's title, subtitle, anchor and visibility (FR-02).
+	 *
+	 * @param string $id Section id from the registry.
+	 * @return array{title:string,subtitle:string,anchor:string,show_title:bool}
+	 */
+	function mk_section( string $id ): array {
+		$registry = \Maapkathi\Core\Sections\SectionRegistry::all();
+		$state    = \Maapkathi\Core\Sections\SectionRegistry::for_section( $id );
+		$type     = '' !== $state['type'] ? $state['type'] : $id;
+		$text_key = (string) ( $registry[ $type ]['text_key'] ?? '' );
+
+		// A duplicated section carries its own title. Only the original
+		// instance reads the shared Site Text field, so renaming one copy
+		// cannot rename every other copy of the same type.
+		$title = '' !== trim( $state['title'] )
+			? $state['title']
+			: ( '' !== $text_key ? mk_text( $text_key ) : '' );
+
+		return array(
+			'type'       => $type,
+			// Site Text already falls back to the shipped default when a
+			// field is cleared, so a blank title can never reach the page.
+			'title'      => $title,
+			'subtitle'   => $state['subtitle'],
+			'anchor'     => $state['anchor'],
+			'show_title' => $state['show_title'],
+		);
+	}
+}
+
+if ( ! function_exists( 'mk_section_anchor' ) ) {
+	/**
+	 * A section's anchor, for the id attribute and for menu links.
+	 *
+	 * @param string $id Section id from the registry.
+	 * @return string
+	 */
+	function mk_section_anchor( string $id ): string {
+		return mk_section( $id )['anchor'];
+	}
+}
+
+if ( ! function_exists( 'mk_the_section_heading' ) ) {
+	/**
+	 * Renders a section's heading and subtitle (FR-02.3, FR-02.6, FR-02.8).
+	 *
+	 * Prints nothing at all when the heading is switched off, so the
+	 * section's spacing collapses cleanly rather than leaving the gap
+	 * where the heading used to be.
+	 *
+	 * @param string $id        Section id from the registry.
+	 * @param string $tag       Heading tag to use.
+	 * @param string $css_class The heading's full class list. Replaces the
+	 *                          default rather than adding to it, so a page
+	 *                          title is not silently restyled as a section
+	 *                          heading by passing one extra class.
+	 * @return void
+	 */
+	function mk_the_section_heading( string $id, string $tag = 'h2', string $css_class = 'mk-section__heading' ): void {
+		$section = mk_section( $id );
+
+		if ( ! $section['show_title'] || '' === trim( $section['title'] ) ) {
+			return;
+		}
+
+		$tag     = in_array( $tag, array( 'h1', 'h2', 'h3' ), true ) ? $tag : 'h2';
+		$classes = '' !== trim( $css_class ) ? trim( $css_class ) : 'mk-section__heading';
+
+		printf(
+			'<%1$s class="%2$s">%3$s</%1$s>',
+			esc_attr( $tag ),
+			esc_attr( $classes ),
+			// Escaped, never rendered: pasted markup shows as text rather
+			// than executing (FR-02.8).
+			esc_html( $section['title'] )
+		);
+
+		if ( '' !== trim( $section['subtitle'] ) ) {
+			printf(
+				'<p class="mk-section__subtitle">%s</p>',
+				esc_html( $section['subtitle'] )
+			);
+		}
+	}
+}
+
+if ( ! function_exists( 'mk_section_layout' ) ) {
+	/**
+	 * The homepage's ordered section instances (FR-03).
+	 *
+	 * @return array<int,array{id:string,type:string,enabled:bool}>
+	 */
+	function mk_section_layout(): array {
+		return \Maapkathi\Core\Sections\SectionLayout::get();
+	}
+}

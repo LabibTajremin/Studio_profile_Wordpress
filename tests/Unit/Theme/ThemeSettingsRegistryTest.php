@@ -18,21 +18,34 @@ use PHPUnit\Framework\TestCase;
  */
 final class ThemeSettingsRegistryTest extends TestCase {
 
-	public function test_exactly_33_settings(): void {
-		$this->assertCount( 33, ThemeSettings::keys() );
+	public function test_settings_registry_matches_the_expected_key_list(): void {
+		$this->assertCount( count( $this->expected_keys() ), ThemeSettings::keys() );
 	}
 
-	public function test_expected_keys_present(): void {
-		$expected = array(
+	/**
+	 * The registry's full key list, in order. Kept as one list rather than a
+	 * bare count so that adding a setting has to name it here — a count on
+	 * its own would let a rename slip through unnoticed.
+	 *
+	 * @return string[]
+	 */
+	private function expected_keys(): array {
+		return array(
 			'mode', 'accent_id', 'custom_accent_hex', 'pattern_id', 'pattern_opacity',
 			'font_pair_id', 'font_overrides', 'heading_color_hex', 'body_color_hex',
-			'background_tone', 'header_opacity', 'radius', 'density', 'grain', 'glass', 'hero_style',
+			'background_tone', 'header_opacity',
+			'header_follow_accent', 'header_palette_id', 'header_hex', 'header_logo_mode',
+			'services_icon_size', 'services_icon_position', 'values_icon_size',
+			'radius', 'density', 'grain', 'glass', 'hero_style',
 			'motion_preset', 'motion_level', 'scroll_reveal_style', 'hero_animation',
 			'image_hover_style', 'card_hover_style', 'text_reveal_style', 'page_transition',
 			'cursor_style', 'loader_style', 'scroll_progress', 'smooth_scroll',
 			'parallax_intensity', 'motion_speed', 'stagger_ms', 'animate_once', 'motion_on_mobile',
 		);
-		$this->assertSame( $expected, ThemeSettings::keys() );
+	}
+
+	public function test_expected_keys_present(): void {
+		$this->assertSame( $this->expected_keys(), ThemeSettings::keys() );
 	}
 
 	public function test_2_background_tones_never_plain_white(): void {

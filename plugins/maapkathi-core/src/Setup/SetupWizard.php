@@ -64,7 +64,14 @@ final class SetupWizard {
 	 * @return void
 	 */
 	public function register_page(): void {
-		$hook = add_submenu_page( null, __( 'Maapkathi Setup', 'maapkathi' ), __( 'Maapkathi Setup', 'maapkathi' ), 'manage_options', self::PAGE_SLUG, array( $this, 'render' ) );
+		// The parent slug is 'options.php' rather than null. null is the old
+		// way to register a page that has no menu entry, but WordPress runs
+		// the parent through plugin_basename(), which on PHP 8.1+ emits two
+		// deprecation notices per admin request for passing null to
+		// str_replace() and strpos(). 'options.php' is a real file that is
+		// not itself a top-level menu, so the page is still registered and
+		// reachable by URL while appearing nowhere in the menu.
+		$hook = add_submenu_page( 'options.php', __( 'Maapkathi Setup', 'maapkathi' ), __( 'Maapkathi Setup', 'maapkathi' ), 'manage_options', self::PAGE_SLUG, array( $this, 'render' ) );
 
 		if ( $hook ) {
 			add_action( "load-{$hook}", array( $this, 'handle_submit' ) );

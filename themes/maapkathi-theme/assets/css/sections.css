@@ -210,22 +210,35 @@ html[data-hero-style="split"] .mk-hero { background: var(--background); }
  * made small placeholder logos read as illegible gray boxes on mobile.
  * A client with no logo gets a coloured initials mark + name instead of
  * a bare title string. */
+/* Flex rather than grid so a part-full last row centres under the rows
+   above it instead of hanging off to the left. --mk-clients-gap has to be
+   a real length (not a rem in the calc alone) because every tile's width
+   is derived from it. */
 .mk-clients__wall {
-	display: grid;
-	grid-template-columns: repeat(2, 1fr);
-	gap: 1.25rem;
+	--mk-clients-gap: 1.25rem;
+	--mk-clients-per-row: 2;
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	gap: var(--mk-clients-gap);
 }
 @media (min-width: 640px) {
-	.mk-clients__wall { grid-template-columns: repeat(3, 1fr); }
+	.mk-clients__wall { --mk-clients-per-row: 3; }
 }
 @media (min-width: 900px) {
-	.mk-clients__wall { grid-template-columns: repeat(4, 1fr); }
+	.mk-clients__wall { --mk-clients-per-row: 4; }
 }
 
+/* Every tile is the same width and the same height in both layouts, so
+   the wall stays a clean rectangle whether names are on, off, or mixed
+   (a client with no logo always carries its name). */
 .mk-clients__item {
+	flex: 0 0 calc(
+		(100% - (var(--mk-clients-per-row) - 1) * var(--mk-clients-gap)) /
+		var(--mk-clients-per-row)
+	);
 	display: flex;
 	align-items: center;
-	justify-content: center;
 	gap: 0.7rem;
 	height: 112px;
 	padding-inline: 1.15rem;
@@ -236,19 +249,61 @@ html[data-hero-style="split"] .mk-hero { background: var(--background); }
 .mk-clients__link {
 	display: flex;
 	align-items: center;
-	justify-content: center;
-	gap: 0.5rem;
+	gap: 0.7rem;
 	width: 100%;
 	height: 100%;
 	color: inherit;
 	text-decoration: none;
 }
 .mk-clients__logo {
-	max-height: 72px;
 	max-width: 100%;
 	width: auto;
 	display: block;
 	transition: transform var(--motion-duration) var(--motion-ease);
+}
+
+/* Logo-only: centred, and as large as the tile allows. */
+.mk-clients__item--logo,
+.mk-clients__item--logo .mk-clients__link {
+	justify-content: center;
+}
+.mk-clients__item--logo .mk-clients__logo {
+	max-height: 88px;
+}
+
+/* With a name: the logo shrinks and sits left, leaving the rest of the
+   tile to the text so the full name fits without truncation. */
+.mk-clients__item--named,
+.mk-clients__item--named .mk-clients__link {
+	justify-content: flex-start;
+}
+.mk-clients__item--named .mk-clients__logo {
+	max-height: 44px;
+	max-width: 38%;
+	flex-shrink: 0;
+}
+
+/* Two tiles to a row on phones leaves a named tile too narrow to hold a
+   logo and text side by side — 38% of it is an unreadable stamp. Below
+   the 3-up breakpoint the named layout stacks instead, which gives the
+   logo the full tile width back. Tile height is untouched, so the wall
+   stays uniform either way. */
+@media (max-width: 639px) {
+	.mk-clients__item--named,
+	.mk-clients__item--named .mk-clients__link {
+		flex-direction: column;
+		justify-content: center;
+		gap: 0.45rem;
+	}
+	.mk-clients__item--named .mk-clients__logo {
+		max-height: 34px;
+		max-width: 84%;
+	}
+	.mk-clients__item--named .mk-clients__name {
+		text-align: center;
+		font-size: 0.8rem;
+		-webkit-line-clamp: 4;
+	}
 }
 .mk-clients__mark {
 	display: inline-flex;
@@ -278,12 +333,20 @@ html[data-hero-style="split"] .mk-hero { background: var(--background); }
 }
 .mk-clients__item:hover .mk-clients__logo { transform: scale(1.06); }
 
+/* Wraps instead of truncating — a client's name reading "Harbour Gr…" is
+   worse than one sitting on two lines. min-width:0 lets the flex item
+   actually shrink to its column, and the line clamp keeps a very long
+   name from pushing itself out of a fixed-height tile. */
 .mk-clients__name {
-	font-size: 1rem;
+	font-size: 0.95rem;
 	font-weight: 600;
+	line-height: 1.25;
+	min-width: 0;
+	overflow-wrap: break-word;
+	display: -webkit-box;
+	-webkit-line-clamp: 3;
+	-webkit-box-orient: vertical;
 	overflow: hidden;
-	text-overflow: ellipsis;
-	white-space: nowrap;
 }
 
 /* ---------- Cards & grids ---------- */
@@ -310,7 +373,85 @@ html[data-hero-style="split"] .mk-hero { background: var(--background); }
 .mk-card__role { color: var(--accent-readable, var(--accent)); font-weight: 600; margin: 0 0 0.5rem; padding-inline: 1rem; }
 .mk-card--member .mk-card__bio { padding: 0 1rem 1rem; font-size: 0.92rem; opacity: 0.8; }
 .mk-card__socials { padding: 0 1rem 1rem; display: flex; gap: 0.75rem; font-size: 0.9rem; }
-.mk-card__icon { font-size: 28px; width: 28px; height: 28px; color: var(--accent-readable, var(--accent)); }
+/* Icons (FR-06, FR-07)
+   ---------------------------------------------------------------------
+   One rule sets the colour for every icon shape — bundled SVG, uploaded
+   SVG and legacy dashicon alike — because they all draw with
+   currentColor. Changing the accent therefore changes all of them, with
+   no per-icon markup and nowhere for an old colour to survive. */
+.mk-card__icon {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	flex: 0 0 auto;
+	color: var(--accent-readable, var(--accent));
+	transition: color var(--motion-duration) var(--motion-ease);
+	/* Sized per section below; this is the floor for anything that does
+	   not set one. */
+	--mk-icon-size: 28px;
+	width: var(--mk-icon-size);
+	height: var(--mk-icon-size);
+}
+.mk-card__icon > svg,
+.mk-card__icon > img {
+	width: 100%;
+	height: 100%;
+	display: block;
+	object-fit: contain;
+}
+.mk-card__icon .dashicons,
+.mk-card__icon.dashicons {
+	font-size: var(--mk-icon-size);
+	width: var(--mk-icon-size);
+	height: var(--mk-icon-size);
+}
+.mk-card:hover .mk-card__icon { color: var(--accent); }
+
+/* Services: icon beside the title, description below spanning the whole
+   card. align-items:center keeps the two optically centred on each other
+   whether the title runs to one line or two (FR-06.6). */
+.mk-card__head {
+	display: flex;
+	align-items: center;
+	gap: 0.9rem;
+	margin-bottom: 0.6rem;
+}
+.mk-card__head .mk-card__title { margin: 0; }
+.mk-services .mk-card__icon,
+.mk-service-group .mk-card__icon { --mk-icon-size: var(--services-icon-size, 84px); }
+.mk-values .mk-card__icon { --mk-icon-size: var(--values-icon-size, 56px); }
+
+/* Legacy layout, kept reachable so a site can be put back without code. */
+.mk-services--icon-above .mk-card__head,
+.mk-service-group.mk-services--icon-above .mk-card__head {
+	display: block;
+}
+.mk-services--icon-above .mk-card__head .mk-card__icon,
+.mk-service-group.mk-services--icon-above .mk-card__head .mk-card__icon {
+	margin-bottom: 0.6rem;
+}
+
+/* Cards in a row keep equal heights regardless of icon size or how long
+   the description runs (FR-06.7). */
+.mk-grid--services { align-items: stretch; }
+.mk-grid--services .mk-card--service {
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+}
+
+/* Below 480px the icon scales to 60% rather than wrapping under the
+   title, so the beside-title arrangement survives on a phone (FR-06.8). */
+@media (max-width: 479px) {
+	.mk-services .mk-card__icon,
+	.mk-service-group .mk-card__icon {
+		--mk-icon-size: calc(var(--services-icon-size, 84px) * 0.6);
+	}
+	.mk-values .mk-card__icon {
+		--mk-icon-size: calc(var(--values-icon-size, 56px) * 0.6);
+	}
+	.mk-card__head { gap: 0.65rem; }
+}
 .mk-card__media { overflow: hidden; }
 .mk-card__media img { width: 100%; height: auto; display: block; aspect-ratio: 4 / 5; object-fit: cover; }
 .mk-card--member .mk-card__media img { aspect-ratio: 3 / 4; }
@@ -461,7 +602,30 @@ html[data-hero-style="split"] .mk-hero { background: var(--background); }
 	justify-content: center;
 }
 .mk-lightbox.is-open { display: flex; }
-.mk-lightbox__image { max-width: 92vw; max-height: 86vh; object-fit: contain; }
+/* The figure keeps the caption tied to the image rather than floating it
+   over the overlay, so a tall portrait shot does not push the caption off
+   screen. */
+.mk-lightbox__figure {
+	margin: 0;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 0.75rem;
+	max-width: 92vw;
+}
+.mk-lightbox__image { max-width: 92vw; max-height: 78vh; object-fit: contain; }
+.mk-lightbox__caption {
+	display: flex;
+	align-items: baseline;
+	justify-content: center;
+	gap: 1rem;
+	flex-wrap: wrap;
+	color: #fff;
+	font-size: 0.9rem;
+	text-align: center;
+}
+.mk-lightbox__title { font-family: var(--font-headings); }
+.mk-lightbox__counter { opacity: 0.75; font-variant-numeric: tabular-nums; }
 .mk-lightbox__close,
 .mk-lightbox__prev,
 .mk-lightbox__next {
@@ -482,4 +646,406 @@ html[data-hero-style="split"] .mk-hero { background: var(--background); }
 
 @media (max-width: 480px) {
 	.mk-container { padding-inline: 1rem; }
+}
+
+/* ---------- Our Partners (FR-10) ----------
+   A logo band pinned above the footer. Every logo is fitted inside one
+   shared max height with object-fit: contain, so a 400x120 wordmark and a
+   200x200 square read at the same optical weight instead of one dwarfing
+   the other (FR-10.5). */
+.mk-partners__grid,
+.mk-partners__track {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+.mk-partners__grid {
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	gap: clamp(1rem, 3vw, 2.5rem);
+	align-items: center;
+}
+@media (min-width: 640px) {
+	.mk-partners__grid { grid-template-columns: repeat(min(3, var(--mk-partners-per-row, 5)), 1fr); }
+}
+@media (min-width: 992px) {
+	.mk-partners__grid { grid-template-columns: repeat(var(--mk-partners-per-row, 5), 1fr); }
+}
+.mk-partners__item {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	min-height: calc(var(--mk-partners-logo-h, 48px) + 1.5rem);
+}
+.mk-partners__item a { display: block; line-height: 0; }
+.mk-partners__logo {
+	max-height: var(--mk-partners-logo-h, 48px);
+	max-width: 100%;
+	width: auto;
+	height: auto;
+	object-fit: contain;
+	transition: filter var(--motion-duration) var(--motion-ease),
+		opacity var(--motion-duration) var(--motion-ease),
+		transform var(--motion-duration) var(--motion-ease);
+}
+/* Greyscale-to-colour is opt-out rather than baked in, because a logo set
+   with strict brand guidelines may not be allowed to be desaturated. */
+.mk-partners--greyscale .mk-partners__logo {
+	filter: grayscale(1);
+	opacity: 0.75;
+}
+.mk-partners--greyscale .mk-partners__item:hover .mk-partners__logo,
+.mk-partners--greyscale .mk-partners__item:focus-within .mk-partners__logo {
+	filter: grayscale(0);
+	opacity: 1;
+	transform: scale(1.04);
+}
+.mk-partners--bg-surface { background: color-mix(in srgb, var(--foreground) 4%, transparent); }
+.mk-partners--bg-accent { background: color-mix(in srgb, var(--accent) 8%, transparent); }
+
+/* Marquee: two identical tracks side by side, translated by exactly one
+   track width. Because the second track is a pixel-perfect copy, the loop
+   restarts on a frame identical to the one it left, so there is no jump. */
+.mk-partners__marquee {
+	display: flex;
+	overflow: hidden;
+	gap: clamp(1rem, 3vw, 2.5rem);
+	/* Fades the band into the page at both ends rather than cutting logos
+	   off against a hard edge. */
+	mask-image: linear-gradient(to right, transparent, #000 6%, #000 94%, transparent);
+}
+.mk-partners__track {
+	display: flex;
+	flex: 0 0 auto;
+	gap: clamp(1rem, 3vw, 2.5rem);
+	align-items: center;
+	padding-inline-end: clamp(1rem, 3vw, 2.5rem);
+	animation: mk-partners-scroll var(--mk-partners-speed, 40s) linear infinite;
+}
+.mk-partners__track .mk-partners__item { flex: 0 0 auto; min-width: 140px; }
+.mk-partners__marquee:hover .mk-partners__track,
+.mk-partners__marquee:focus-within .mk-partners__track { animation-play-state: paused; }
+/* Paused from JS when the tab is hidden, so a background tab is not
+   burning frames on an animation nobody is looking at. */
+.mk-partners__marquee.is-paused .mk-partners__track { animation-play-state: paused; }
+@keyframes mk-partners-scroll {
+	from { transform: translateX(0); }
+	to { transform: translateX(-100%); }
+}
+/* Reduced motion stops the band outright rather than merely slowing it —
+   a moving band is exactly what this preference is asking us not to do. */
+@media (prefers-reduced-motion: reduce) {
+	.mk-partners__track { animation: none; }
+	.mk-partners__marquee { overflow-x: auto; }
+}
+
+/* ---------- Map (FR-05) ----------
+   Full width of its column, with the theme's own corner radius rather
+   than a shape of its own. Height is admin-set per breakpoint, since a
+   map that is right on a desktop is usually too tall on a phone. */
+.mk-map {
+	margin-top: clamp(2rem, 4vw, 3rem);
+}
+.mk-map__frame {
+	display: block;
+	width: 100%;
+	height: var(--mk-map-h-mobile, 280px);
+	border: 1px solid color-mix(in srgb, var(--accent) 25%, transparent);
+	border-radius: var(--radius);
+	background: color-mix(in srgb, var(--foreground) 5%, transparent);
+}
+@media (min-width: 768px) {
+	.mk-map__frame { height: var(--mk-map-h-desktop, 420px); }
+}
+.mk-map__actions { margin-top: 1rem; }
+
+/* Providers give us no styling hook inside the iframe, so "dark" is a
+   filter over the whole frame. Deliberately not a plain invert, which
+   turns roads black-on-white into a negative that reads as broken:
+   hue-rotate puts the colours back the right way round afterwards. */
+.mk-map--style-dark .mk-map__frame,
+:root[data-theme="dark"] .mk-map--style-auto .mk-map__frame {
+	filter: invert(0.92) hue-rotate(180deg) saturate(0.8) contrast(0.9);
+}
+@media (prefers-color-scheme: dark) {
+	:root:not([data-theme="light"]) .mk-map--style-auto .mk-map__frame {
+		filter: invert(0.92) hue-rotate(180deg) saturate(0.8) contrast(0.9);
+	}
+}
+
+/* ---------- Projects gallery (FR-04) ----------
+   Baseline is a responsive grid whose cells take each photo's own aspect
+   ratio, so nothing is ever cropped even with no JavaScript at all. The
+   packing script then upgrades it to true masonry by giving each item a
+   row span; that is an enhancement, not a requirement. Column count steps
+   down from the admin's maximum rather than being five separate settings. */
+.mk-masonry {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	display: grid;
+	gap: var(--mk-masonry-gutter, 16px);
+	grid-template-columns: 1fr;
+	/* Items keep their own height rather than being stretched to the
+	   tallest in the row. Correct for the no-JS fallback, and load-bearing
+	   for the packing script, which measures each item's natural height
+	   with packing momentarily switched off — stretched rows would report
+	   one shared height and give every item the same span. */
+	align-items: start;
+}
+@media (min-width: 480px) {
+	.mk-masonry { grid-template-columns: repeat(min(2, var(--mk-masonry-cols, 4)), 1fr); }
+}
+@media (min-width: 992px) {
+	.mk-masonry { grid-template-columns: repeat(min(3, var(--mk-masonry-cols, 4)), 1fr); }
+}
+@media (min-width: 1200px) {
+	.mk-masonry { grid-template-columns: repeat(var(--mk-masonry-cols, 4), 1fr); }
+}
+
+/* The item takes its height from the photo rather than the other way
+   round. That is what makes "no cropping and no letterboxing" (FR-04.2)
+   structural: there is no box for the image to be fitted into, so there is
+   nothing to crop against and no bars to fill. */
+.mk-masonry__item {
+	position: relative;
+	overflow: hidden;
+	border-radius: var(--radius);
+	line-height: 0;
+}
+.mk-masonry__link {
+	display: block;
+	width: 100%;
+	color: inherit;
+}
+.mk-masonry__image {
+	display: block;
+	width: 100%;
+	height: auto;
+	/* Belt and braces with the width/height attributes: the box is
+	   reserved at the right shape before the file arrives, so a slow
+	   connection sees a correctly-proportioned placeholder and the layout
+	   never shifts. */
+	aspect-ratio: var(--mk-ratio, 4 / 3);
+	/* An image smaller than its column renders at its own size, centred,
+	   rather than being blown up into a blur (FR-04.11). */
+	max-width: min(100%, var(--mk-natural-w, 100%));
+	margin-inline: auto;
+	transition: transform var(--motion-duration) var(--motion-ease);
+}
+/* The one deliberate exception: an extreme panorama would otherwise be a
+   hairline across the column, so its displayed ratio is capped and only
+   that outlier is cropped. The lightbox still opens the whole image. */
+.mk-masonry__item--capped .mk-masonry__image {
+	aspect-ratio: var(--mk-ratio, 4 / 3);
+	object-fit: cover;
+	max-width: 100%;
+}
+
+.mk-masonry__overlay {
+	position: absolute;
+	inset: 0;
+	display: flex;
+	align-items: flex-end;
+	padding: 1rem;
+	background: linear-gradient(
+		to top,
+		color-mix(in srgb, var(--accent) 78%, transparent),
+		transparent 62%
+	);
+	color: var(--accent-foreground);
+	opacity: 0;
+	transition: opacity var(--motion-duration) var(--motion-ease);
+}
+.mk-masonry__overlay-title {
+	font-family: var(--font-headings);
+	font-size: 0.95rem;
+	line-height: 1.3;
+}
+/* Hover effects only where hovering is a real thing. On a touch screen
+   :hover latches after a tap and leaves the overlay stuck on. */
+@media (hover: hover) and (pointer: fine) {
+	.mk-masonry__item:hover .mk-masonry__image { transform: scale(1.04); }
+	.mk-masonry__item:hover .mk-masonry__overlay { opacity: 1; }
+}
+/* Keyboard users get the same affordance, on every device. */
+.mk-masonry__link:focus-visible .mk-masonry__overlay { opacity: 1; }
+
+.mk-masonry__actions { margin-top: 1.5rem; text-align: center; }
+.mk-masonry__more[disabled] { opacity: 0.6; cursor: default; }
+
+/* Packed mode: rows are 1px and the script spans each item by its own
+   measured height, so items sit directly under their neighbour instead of
+   on a shared row baseline. The item is never stretched to fill the span —
+   it keeps the photo's height, and the span merely reserves enough rows
+   for it.
+   row-gap MUST be zero here. A gap applies between every row, not between
+   items, so with 1px rows an item spanning 300 rows would also collect 299
+   gaps and throw the column hundreds of pixels down the page. The vertical
+   gutter is instead reserved as extra rows inside each item's span, which
+   the packing script adds. */
+.mk-masonry.is-packed {
+	grid-auto-rows: 1px;
+	row-gap: 0;
+	align-items: start;
+}
+
+/* ---------- Featured work: showcase layout ----------
+   The client's reference: full-bleed tiles running edge to edge with no
+   gaps at all, so the photographs read as one continuous wall. Hovering a
+   tile washes it back and lifts a caption carrying the project title and
+   its category. */
+/* Only the wall breaks out to the viewport edges. Zeroing the container's
+   padding instead would drag the section heading out with it, leaving the
+   title flush against the screen edge while every other section's heading
+   stays in the gutter.
+   overflow-x: clip on the section is not optional: 100vw counts the
+   scrollbar's width, so the breakout is a few pixels wider than the space
+   actually available and would otherwise put a horizontal scrollbar on
+   every page (GR-04). clip rather than hidden, because hidden would make
+   the section a scroll container and break sticky positioning inside it. */
+.mk-projects--showcase {
+	overflow-x: clip;
+}
+.mk-showcase {
+	list-style: none;
+	padding: 0;
+	display: grid;
+	grid-template-columns: 1fr;
+	/* Deliberately gapless — the tiles butt against each other, which is
+	   what makes the wall read as one surface rather than a set of cards. */
+	gap: 0;
+	/* The breakout has to live in the same rule as the margin reset: a
+	   later `margin: 0` would silently cancel a margin-inline set earlier. */
+	width: 100vw;
+	max-width: 100vw;
+	margin-block: 0;
+	margin-inline: calc(50% - 50vw);
+}
+@media (min-width: 600px) {
+	.mk-showcase { grid-template-columns: repeat(2, 1fr); }
+}
+@media (min-width: 992px) {
+	.mk-showcase { grid-template-columns: repeat(3, 1fr); }
+}
+
+.mk-showcase__item {
+	position: relative;
+	overflow: hidden;
+	/* One shared ratio across every tile, so the wall stays a clean grid
+	   whatever shape the uploaded photographs happen to be. */
+	aspect-ratio: 3 / 2;
+}
+.mk-showcase__link {
+	display: block;
+	width: 100%;
+	height: 100%;
+	position: relative;
+	color: #fff;
+	text-decoration: none;
+	line-height: 0;
+}
+.mk-showcase__image {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	display: block;
+	transform: scale(1.001);
+	transition: transform calc(var(--motion-duration) * 1.4) var(--motion-ease);
+}
+
+/* The veil is a separate element rather than a background on the link, so
+   it can fade independently of the caption's slide and the two do not
+   have to share one timing function. */
+.mk-showcase__veil {
+	position: absolute;
+	inset: 0;
+	background: linear-gradient(
+		to top,
+		color-mix(in srgb, #000 62%, transparent) 0%,
+		color-mix(in srgb, #000 28%, transparent) 45%,
+		color-mix(in srgb, #000 8%, transparent) 100%
+	);
+	opacity: 0;
+	transition: opacity var(--motion-duration) var(--motion-ease);
+}
+
+.mk-showcase__caption {
+	position: absolute;
+	inset-inline: 0;
+	bottom: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 0.35rem;
+	padding: clamp(1rem, 2.5vw, 1.75rem);
+	line-height: 1.3;
+	opacity: 0;
+	transform: translateY(0.9rem);
+	transition: opacity var(--motion-duration) var(--motion-ease),
+		transform var(--motion-duration) var(--motion-ease);
+}
+.mk-showcase__title {
+	font-family: var(--font-headings);
+	font-size: clamp(1rem, 1.6vw, 1.25rem);
+	text-wrap: balance;
+}
+.mk-showcase__meta {
+	font-size: 0.72rem;
+	letter-spacing: 0.16em;
+	text-transform: uppercase;
+	opacity: 0.85;
+	/* The reference brackets its category line with rules either side. */
+	display: inline-flex;
+	align-items: center;
+	gap: 0.6em;
+}
+.mk-showcase__meta::before,
+.mk-showcase__meta::after {
+	content: "";
+	width: 1.1em;
+	height: 1px;
+	background: currentColor;
+	opacity: 0.7;
+}
+
+/* Only where hovering is real. On a touch screen :hover latches after a
+   tap, which would leave one tile permanently washed. */
+@media (hover: hover) and (pointer: fine) {
+	.mk-showcase__item:hover .mk-showcase__image { transform: scale(1.06); }
+	.mk-showcase__item:hover .mk-showcase__veil { opacity: 1; }
+	.mk-showcase__item:hover .mk-showcase__caption {
+		opacity: 1;
+		transform: translateY(0);
+		/* The caption follows the veil rather than racing it, which is what
+		   makes the two read as one movement. */
+		transition-delay: calc(var(--motion-duration) * 0.15);
+	}
+}
+
+/* Without hover there is no way to reveal a caption, so it simply stays
+   visible — a wall of unlabelled photographs is worse than a permanent
+   caption. Keyboard users get the same reveal as a mouse. */
+@media not all and (hover: hover) {
+	.mk-showcase__veil,
+	.mk-showcase__caption {
+		opacity: 1;
+		transform: none;
+	}
+}
+.mk-showcase__link:focus-visible .mk-showcase__veil { opacity: 1; }
+.mk-showcase__link:focus-visible .mk-showcase__caption {
+	opacity: 1;
+	transform: translateY(0);
+}
+.mk-showcase__link:focus-visible {
+	outline: 3px solid var(--accent-foreground);
+	outline-offset: -6px;
+}
+
+/* Reduced motion keeps the reveal — it is information, not decoration —
+   but removes the travel and the zoom. */
+@media (prefers-reduced-motion: reduce) {
+	.mk-showcase__image { transition: none; }
+	.mk-showcase__item:hover .mk-showcase__image { transform: none; }
+	.mk-showcase__caption { transform: none; }
 }

@@ -16,6 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @var array<string,mixed> $settings
  * @var array<string,mixed> $seo
+ * @var array<string,mixed> $map
  * @var string $notice
  */
 $socials = $settings['socials'] ?? array();
@@ -110,6 +111,191 @@ $socials = $settings['socials'] ?? array();
 				</td>
 			</tr>
 			<tr><td colspan="2"><p class="description"><?php esc_html_e( 'A section with no content underneath already hides itself — these switches are for hiding a section on purpose even when it has content.', 'maapkathi' ); ?></p></td></tr>
+		</table>
+
+		<h2><?php esc_html_e( 'Our Partners', 'maapkathi' ); ?></h2>
+		<p class="description"><?php esc_html_e( 'The partner logo band that sits directly above the footer. Add the logos themselves under Partners in the menu — this section is only about how they are displayed. With no partner logos added, the section does not appear at all.', 'maapkathi' ); ?></p>
+		<table class="form-table">
+			<tr>
+				<th><?php esc_html_e( 'Layout', 'maapkathi' ); ?></th>
+				<td>
+					<?php
+					$mk_partner_layouts = array(
+						'grid'    => __( 'Static grid', 'maapkathi' ),
+						'marquee' => __( 'Auto-scrolling band', 'maapkathi' ),
+					);
+					foreach ( $mk_partner_layouts as $mk_layout_id => $mk_layout_label ) :
+						?>
+						<label style="margin-right:1.5em"><input type="radio" name="partners_layout" value="<?php echo esc_attr( $mk_layout_id ); ?>" <?php checked( (string) ( $settings['partners_layout'] ?? 'grid' ), $mk_layout_id ); ?> /> <?php echo esc_html( $mk_layout_label ); ?></label>
+					<?php endforeach; ?>
+					<p class="description"><?php esc_html_e( 'The scrolling band pauses when someone hovers over it, when the tab is hidden, and entirely for visitors who have asked their device to reduce motion.', 'maapkathi' ); ?></p>
+				</td>
+			</tr>
+			<tr>
+				<th><?php esc_html_e( 'Logos per row', 'maapkathi' ); ?></th>
+				<td><input type="number" min="2" max="6" name="partners_per_row" value="<?php echo esc_attr( (string) ( $settings['partners_per_row'] ?? 5 ) ); ?>" /></td>
+			</tr>
+			<tr>
+				<th><?php esc_html_e( 'Maximum logo height', 'maapkathi' ); ?></th>
+				<td>
+					<input type="number" min="24" max="160" name="partners_max_logo_h" value="<?php echo esc_attr( (string) ( $settings['partners_max_logo_h'] ?? 48 ) ); ?>" /> px
+					<p class="description"><?php esc_html_e( 'Every logo is fitted inside this height with its proportions kept, so logos of different shapes and sizes still look consistent.', 'maapkathi' ); ?></p>
+				</td>
+			</tr>
+			<tr>
+				<th><?php esc_html_e( 'Scroll speed', 'maapkathi' ); ?></th>
+				<td>
+					<input type="number" min="10" max="120" name="partners_speed" value="<?php echo esc_attr( (string) ( $settings['partners_speed'] ?? 40 ) ); ?>" />
+					<?php esc_html_e( 'seconds per full loop', 'maapkathi' ); ?>
+				</td>
+			</tr>
+			<tr>
+				<th><?php esc_html_e( 'Grey out until hovered', 'maapkathi' ); ?></th>
+				<td><label><input type="hidden" name="partners_greyscale" value="0" /><input type="checkbox" name="partners_greyscale" value="1" <?php checked( ! isset( $settings['partners_greyscale'] ) || $settings['partners_greyscale'] ); ?> /> <?php esc_html_e( 'On', 'maapkathi' ); ?></label></td>
+			</tr>
+			<tr>
+				<th><?php esc_html_e( 'Section background', 'maapkathi' ); ?></th>
+				<td>
+					<?php
+					$mk_partner_bgs = array(
+						'none'    => __( 'None', 'maapkathi' ),
+						'surface' => __( 'Subtle surface', 'maapkathi' ),
+						'accent'  => __( 'Accent tint', 'maapkathi' ),
+					);
+					foreach ( $mk_partner_bgs as $mk_bg_id => $mk_bg_label ) :
+						?>
+						<label style="margin-right:1.5em"><input type="radio" name="partners_background" value="<?php echo esc_attr( $mk_bg_id ); ?>" <?php checked( (string) ( $settings['partners_background'] ?? 'none' ), $mk_bg_id ); ?> /> <?php echo esc_html( $mk_bg_label ); ?></label>
+					<?php endforeach; ?>
+				</td>
+			</tr>
+		</table>
+
+		<h2><?php esc_html_e( 'Featured work layout', 'maapkathi' ); ?></h2>
+		<table class="form-table">
+			<tr>
+				<th><?php esc_html_e( 'Layout style', 'maapkathi' ); ?></th>
+				<td>
+					<?php
+					$mk_project_layouts = array(
+						'showcase' => __( 'Showcase — full-width photo wall (default)', 'maapkathi' ),
+						'grid'     => __( 'Classic — cards with titles and text', 'maapkathi' ),
+						'gallery'  => __( 'Gallery — photos at their own shape', 'maapkathi' ),
+					);
+					foreach ( $mk_project_layouts as $mk_project_layout_id => $mk_project_layout_label ) :
+						?>
+						<label style="margin-right:1.5em"><input type="radio" name="projects_layout" value="<?php echo esc_attr( $mk_project_layout_id ); ?>" <?php checked( (string) ( $settings['projects_layout'] ?? 'showcase' ), $mk_project_layout_id ); ?> /> <?php echo esc_html( $mk_project_layout_label ); ?></label>
+					<?php endforeach; ?>
+					<p class="description"><?php esc_html_e( 'Showcase runs your photographs edge to edge with no gaps; hovering one dims it and slides up its title and category. Classic is the older card layout with a title and a line of text under each photo. Gallery keeps every photo at its own shape and packs them together, so wide, tall and square shots can sit in one wall without any of them being cropped.', 'maapkathi' ); ?></p>
+				</td>
+			</tr>
+			<tr>
+				<th><?php esc_html_e( 'Most columns', 'maapkathi' ); ?></th>
+				<td>
+					<input type="number" min="2" max="5" name="gallery_max_columns" value="<?php echo esc_attr( (string) ( $settings['gallery_max_columns'] ?? 4 ) ); ?>" />
+					<p class="description"><?php esc_html_e( 'On the widest screens. Narrower screens step down from here automatically, to a single column on small phones.', 'maapkathi' ); ?></p>
+				</td>
+			</tr>
+			<tr>
+				<th><?php esc_html_e( 'Gap between photos', 'maapkathi' ); ?></th>
+				<td><input type="number" min="0" max="48" name="gallery_gutter" value="<?php echo esc_attr( (string) ( $settings['gallery_gutter'] ?? 16 ) ); ?>" /> px</td>
+			</tr>
+			<tr>
+				<th><?php esc_html_e( 'Photos shown at first', 'maapkathi' ); ?></th>
+				<td>
+					<input type="number" min="1" max="60" name="gallery_per_load" value="<?php echo esc_attr( (string) ( $settings['gallery_per_load'] ?? 12 ) ); ?>" />
+					<p class="description"><?php esc_html_e( 'A "Load more" button appears when there are more than this. Loading more adds to what is already on screen without moving it.', 'maapkathi' ); ?></p>
+				</td>
+			</tr>
+			<tr>
+				<th><?php esc_html_e( 'Clicking a photo', 'maapkathi' ); ?></th>
+				<td>
+					<?php
+					$mk_gallery_clicks = array(
+						'lightbox' => __( 'Opens it full size', 'maapkathi' ),
+						'link'     => __( 'Goes to the project page', 'maapkathi' ),
+					);
+					foreach ( $mk_gallery_clicks as $mk_click_id => $mk_click_label ) :
+						?>
+						<label style="margin-right:1.5em"><input type="radio" name="gallery_click" value="<?php echo esc_attr( $mk_click_id ); ?>" <?php checked( (string) ( $settings['gallery_click'] ?? 'lightbox' ), $mk_click_id ); ?> /> <?php echo esc_html( $mk_click_label ); ?></label>
+					<?php endforeach; ?>
+				</td>
+			</tr>
+		</table>
+
+		<h2><?php esc_html_e( 'Map', 'maapkathi' ); ?></h2>
+		<p class="description"><?php esc_html_e( 'The map shown on your Contact page. It needs no Google account and no API key. If you leave both the address and the coordinates empty, the map is simply not shown — no blank grey box appears on your site.', 'maapkathi' ); ?></p>
+		<table class="form-table">
+			<tr>
+				<th><?php esc_html_e( 'Show map', 'maapkathi' ); ?></th>
+				<td>
+					<label style="margin-right:1.5em"><input type="hidden" name="mk_map[enabled_contact]" value="0" /><input type="checkbox" name="mk_map[enabled_contact]" value="1" <?php checked( ! empty( $map['enabled_contact'] ) ); ?> /> <?php esc_html_e( 'On the Contact page', 'maapkathi' ); ?></label>
+					<label><input type="hidden" name="mk_map[enabled_home]" value="0" /><input type="checkbox" name="mk_map[enabled_home]" value="1" <?php checked( ! empty( $map['enabled_home'] ) ); ?> /> <?php esc_html_e( 'On the homepage', 'maapkathi' ); ?></label>
+				</td>
+			</tr>
+			<tr>
+				<th><?php esc_html_e( 'Provider', 'maapkathi' ); ?></th>
+				<td>
+					<select name="mk_map[provider]">
+						<?php foreach ( \Maapkathi\Core\Map\MapSettings::providers() as $mk_provider_id => $mk_provider_label ) : ?>
+							<option value="<?php echo esc_attr( $mk_provider_id ); ?>" <?php selected( (string) $map['provider'], $mk_provider_id ); ?>><?php echo esc_html( $mk_provider_label ); ?></option>
+						<?php endforeach; ?>
+					</select>
+				</td>
+			</tr>
+			<tr>
+				<th><?php esc_html_e( 'Address', 'maapkathi' ); ?></th>
+				<td><input type="text" class="large-text" name="mk_map[address]" value="<?php echo esc_attr( (string) $map['address'] ); ?>" /></td>
+			</tr>
+			<tr>
+				<th><?php esc_html_e( 'Latitude / Longitude', 'maapkathi' ); ?></th>
+				<td>
+					<input type="text" name="mk_map[lat]" value="<?php echo esc_attr( (string) $map['lat'] ); ?>" placeholder="23.7806" />
+					<input type="text" name="mk_map[lng]" value="<?php echo esc_attr( (string) $map['lng'] ); ?>" placeholder="90.4074" />
+					<p class="description"><?php esc_html_e( 'If you fill in both the address and the coordinates, the coordinates win — they point at an exact spot, whereas an address has to be looked up and can land on the wrong side of the street.', 'maapkathi' ); ?></p>
+				</td>
+			</tr>
+			<tr>
+				<th><?php esc_html_e( 'Zoom', 'maapkathi' ); ?></th>
+				<td><input type="number" min="1" max="20" name="mk_map[zoom]" value="<?php echo esc_attr( (string) $map['zoom'] ); ?>" /></td>
+			</tr>
+			<tr>
+				<th><?php esc_html_e( 'Height', 'maapkathi' ); ?></th>
+				<td>
+					<input type="number" min="120" max="1200" name="mk_map[h_desktop]" value="<?php echo esc_attr( (string) $map['h_desktop'] ); ?>" /> <?php esc_html_e( 'px on desktop', 'maapkathi' ); ?>
+					&nbsp;
+					<input type="number" min="120" max="1200" name="mk_map[h_mobile]" value="<?php echo esc_attr( (string) $map['h_mobile'] ); ?>" /> <?php esc_html_e( 'px on mobile', 'maapkathi' ); ?>
+				</td>
+			</tr>
+			<tr>
+				<th><?php esc_html_e( 'Map style', 'maapkathi' ); ?></th>
+				<td>
+					<?php
+					$mk_map_styles = array(
+						'auto'  => __( 'Follow site light/dark mode', 'maapkathi' ),
+						'light' => __( 'Always light', 'maapkathi' ),
+						'dark'  => __( 'Always dark', 'maapkathi' ),
+					);
+					foreach ( $mk_map_styles as $mk_style_id => $mk_map_style_label ) :
+						?>
+						<label style="margin-right:1.5em"><input type="radio" name="mk_map[style]" value="<?php echo esc_attr( $mk_style_id ); ?>" <?php checked( (string) $map['style'], $mk_style_id ); ?> /> <?php echo esc_html( $mk_map_style_label ); ?></label>
+					<?php endforeach; ?>
+				</td>
+			</tr>
+			<tr>
+				<th><?php esc_html_e( 'Marker label', 'maapkathi' ); ?></th>
+				<td><input type="text" class="regular-text" name="mk_map[marker]" value="<?php echo esc_attr( (string) $map['marker'] ); ?>" placeholder="<?php echo esc_attr( (string) ( $settings['studio_name'] ?? '' ) ); ?>" /></td>
+			</tr>
+			<tr>
+				<th><?php esc_html_e( 'Directions button', 'maapkathi' ); ?></th>
+				<td><label><input type="hidden" name="mk_map[show_directions]" value="0" /><input type="checkbox" name="mk_map[show_directions]" value="1" <?php checked( ! empty( $map['show_directions'] ) ); ?> /> <?php esc_html_e( 'Show an "Open in Google Maps" button', 'maapkathi' ); ?></label></td>
+			</tr>
+			<tr>
+				<th><?php esc_html_e( 'Google API key', 'maapkathi' ); ?></th>
+				<td>
+					<input type="text" class="regular-text" name="mk_map[api_key]" value="<?php echo esc_attr( (string) $map['api_key'] ); ?>" autocomplete="off" />
+					<p class="description"><?php esc_html_e( 'Only needed for the JavaScript API option. Without a valid key that option falls back to the keyless embed, so your visitors never see an error box.', 'maapkathi' ); ?></p>
+				</td>
+			</tr>
 		</table>
 
 		<h2><?php esc_html_e( 'Behaviour', 'maapkathi' ); ?></h2>

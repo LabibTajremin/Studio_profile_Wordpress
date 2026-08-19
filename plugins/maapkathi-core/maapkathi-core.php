@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 define( 'MK_PLUGIN_FILE', __FILE__ );
 define( 'MK_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'MK_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
-define( 'MK_DB_VERSION', '1.0.0' );
+define( 'MK_DB_VERSION', '1.1.0' );
 
 // Sane defaults for every §5 constant — a site that never touches
 // wp-config.php still boots on the documented defaults.

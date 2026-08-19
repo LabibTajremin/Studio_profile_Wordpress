@@ -18,8 +18,12 @@ $mk_show_title  = mk_setting( 'logo_show_title', true );
 $mk_logo_light  = mk_logo_light_url();
 $mk_logo_dark   = mk_logo_dark_url();
 $mk_studio_name = mk_setting( 'studio_name', get_bloginfo( 'name' ) );
+// FR-01: a custom header colour paints a solid, auto-contrasted bar; the
+// default accent-following header keeps its translucent wash untouched.
+$mk_header_custom = mk_header_is_custom();
+$mk_logo_mode     = mk_header_logo_mode();
 ?>
-<header class="mk-site-header" data-glass>
+<header class="mk-site-header<?php echo $mk_header_custom ? ' mk-site-header--custom' : ''; ?>" data-logo-mode="<?php echo esc_attr( $mk_logo_mode ); ?>" data-glass>
 	<div class="mk-site-header__inner">
 		<a class="mk-logo" href="<?php echo esc_url( home_url( '/' ) ); ?>" rel="home">
 			<?php if ( $mk_logo_light || $mk_logo_dark ) : ?>
