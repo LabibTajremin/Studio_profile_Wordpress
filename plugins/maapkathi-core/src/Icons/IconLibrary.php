@@ -177,7 +177,7 @@ final class IconLibrary {
 	 * markup (FR-06.4).
 	 *
 	 * @param string $id        Icon id.
-	 * @param int    $size      Rendered size in pixels.
+	 * @param int    $size      Rendered size in pixels, or 0 to let CSS size it.
 	 * @param string $css_class Optional CSS class for the svg element.
 	 * @return string SVG markup, or an empty string when the id is unknown.
 	 */
@@ -187,10 +187,15 @@ final class IconLibrary {
 			return '';
 		}
 
+		// A size of 0 means "let CSS decide": the admin-set icon size is a
+		// custom property on the section, and baked-in width/height
+		// attributes would win over it.
+		$dimensions = $size > 0 ? sprintf( ' width="%1$d" height="%1$d"', $size ) : '';
+
 		return sprintf(
-			'<svg class="%1$s" viewBox="0 0 24 24" width="%2$d" height="%2$d" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="%3$s" /></svg>',
+			'<svg class="%1$s" viewBox="0 0 24 24"%2$s fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="%3$s" /></svg>',
 			esc_attr( $css_class ),
-			$size,
+			$dimensions,
 			esc_attr( $icons[ $id ]['path'] )
 		);
 	}

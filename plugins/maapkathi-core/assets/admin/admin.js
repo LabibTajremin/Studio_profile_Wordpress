@@ -234,3 +234,46 @@
 		} );
 	}
 } )();
+
+/**
+ * Icon picker search (FR-07.2).
+ *
+ * Filters by the icon's name. Falls back to showing everything if the
+ * search box is emptied, and the picker is fully usable with this script
+ * absent — it is a filter over an already-rendered list, not the thing
+ * that renders it.
+ */
+( function () {
+	var pickers = document.querySelectorAll( '[data-mk-icon-picker]' );
+	if ( ! pickers.length ) {
+		return;
+	}
+
+	Array.prototype.forEach.call( pickers, function ( picker ) {
+		var search = picker.querySelector( '.mk-icon-picker__search' );
+		var options = picker.querySelectorAll( '.mk-icon-picker__option' );
+		if ( ! search ) {
+			return;
+		}
+
+		search.addEventListener( 'input', function () {
+			var term = search.value.trim().toLowerCase();
+
+			Array.prototype.forEach.call( options, function ( option ) {
+				if ( ! term ) {
+					option.hidden = false;
+					return;
+				}
+
+				var name = ( option.getAttribute( 'data-name' ) || '' ).toLowerCase();
+				var label = ( option.textContent || '' ).toLowerCase();
+				// A checked option always stays visible, so the current
+				// choice cannot be filtered out of sight and silently
+				// look unset.
+				var checked = option.querySelector( 'input:checked' );
+
+				option.hidden = ! checked && name.indexOf( term ) < 0 && label.indexOf( term ) < 0;
+			} );
+		} );
+	} );
+} )();

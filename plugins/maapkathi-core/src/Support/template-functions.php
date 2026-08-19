@@ -344,3 +344,32 @@ if ( ! function_exists( 'mk_contact_icon' ) ) {
 		);
 	}
 }
+
+if ( ! function_exists( 'mk_item_icon' ) ) {
+	/**
+	 * The resolved icon for one content item (FR-06, FR-07).
+	 *
+	 * @param int $post_id Post to render the icon for.
+	 * @return string Markup, already safe to echo. Empty when the item has no icon.
+	 */
+	function mk_item_icon( int $post_id ): string {
+		return \Maapkathi\Core\Icons\IconRenderer::render( $post_id );
+	}
+}
+
+if ( ! function_exists( 'mk_theme_setting' ) ) {
+	/**
+	 * One value from the Appearance settings (theme + motion registry).
+	 *
+	 * Distinct from mk_setting(), which reads the site/business settings —
+	 * these two are separate options and separate admin screens.
+	 *
+	 * @param string $key           Setting key.
+	 * @param mixed  $default_value Value to return when the key is unset.
+	 * @return mixed
+	 */
+	function mk_theme_setting( string $key, $default_value = '' ) {
+		$settings = \Maapkathi\Core\Theme\ThemeSettings::get();
+		return $settings[ $key ] ?? $default_value;
+	}
+}

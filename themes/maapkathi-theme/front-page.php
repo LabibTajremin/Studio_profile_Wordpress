@@ -157,17 +157,24 @@ $show_client_names = (bool) mk_setting( 'clients_show_name', true );
 <?php endif; ?>
 
 <?php if ( $services ) : ?>
-<section class="mk-section mk-services" data-scroll-reveal>
+<section class="mk-section mk-services mk-services--icon-<?php echo esc_attr( (string) mk_theme_setting( 'services_icon_position', 'beside' ) ); ?>" data-scroll-reveal>
 	<div class="mk-container">
 		<h2 class="mk-section__heading"><?php mk_the_text( 'home_services_heading' ); ?></h2>
 		<div class="mk-grid mk-grid--services">
 			<?php foreach ( $services as $service ) : ?>
 				<a class="mk-card mk-card--service" href="<?php echo esc_url( (string) get_permalink( $service ) ); ?>">
-					<?php $icon = mk_meta( $service->ID, 'mk_icon' ); ?>
-					<?php if ( $icon ) : ?>
-						<span class="mk-card__icon dashicons <?php echo esc_attr( $icon ); ?>" aria-hidden="true"></span>
-					<?php endif; ?>
-					<h3 class="mk-card__title"><?php echo esc_html( get_the_title( $service ) ); ?></h3>
+					<?php $icon = mk_item_icon( $service->ID ); ?>
+					<?php
+					// The icon and the title share a row so the title sits
+					// beside the icon rather than under it; the description
+					// then spans the full card width below both.
+					?>
+					<div class="mk-card__head">
+						<?php if ( $icon ) : ?>
+							<span class="mk-card__icon" aria-hidden="true"><?php echo $icon; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- built by IconRenderer, escaped at source. ?></span>
+						<?php endif; ?>
+						<h3 class="mk-card__title"><?php echo esc_html( get_the_title( $service ) ); ?></h3>
+					</div>
 					<p class="mk-card__excerpt"><?php echo esc_html( wp_trim_words( wp_strip_all_tags( $service->post_content ), 18 ) ); ?></p>
 				</a>
 			<?php endforeach; ?>
@@ -206,9 +213,9 @@ $show_client_names = (bool) mk_setting( 'clients_show_name', true );
 		<div class="mk-grid mk-grid--values">
 			<?php foreach ( $values as $value ) : ?>
 				<div class="mk-card mk-card--value">
-					<?php $icon = mk_meta( $value->ID, 'mk_icon' ); ?>
+					<?php $icon = mk_item_icon( $value->ID ); ?>
 					<?php if ( $icon ) : ?>
-						<span class="mk-card__icon dashicons <?php echo esc_attr( $icon ); ?>" aria-hidden="true"></span>
+						<span class="mk-card__icon" aria-hidden="true"><?php echo $icon; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- built by IconRenderer, escaped at source. ?></span>
 					<?php endif; ?>
 					<h3 class="mk-card__title"><?php echo esc_html( get_the_title( $value ) ); ?></h3>
 					<p><?php echo esc_html( wp_strip_all_tags( $value->post_content ) ); ?></p>

@@ -122,6 +122,11 @@ final class ThemeVarsBuilder {
 			'--footer-muted'         => $footer_light['muted'],
 			'--footer-muted-dark'    => $footer_dark['muted'],
 			'--footer-logo-max-h'    => (int) $footer['logo_max_h'] . 'px',
+			// FR-06.1/FR-07.1: the admin-set icon sizes. Emitted as lengths
+			// so a section can scale them down at a breakpoint with calc()
+			// rather than needing a second setting per breakpoint.
+			'--services-icon-size'   => (int) $settings['services_icon_size'] . 'px',
+			'--values-icon-size'     => (int) $settings['values_icon_size'] . 'px',
 			'--background'           => $tone['light']['background'],
 			'--foreground'           => $tone['light']['foreground'],
 			'--background-dark'      => $tone['dark']['background'],

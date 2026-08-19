@@ -9,6 +9,7 @@ declare( strict_types = 1 );
 
 namespace Maapkathi\Core\Fields;
 
+use Maapkathi\Core\Icons\IconLibrary;
 use Maapkathi\Core\Roles\Roles;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -75,9 +76,21 @@ final class MetaBoxes {
 			),
 			'mk_service'      => array(
 				array(
+					'key'   => 'mk_icon_id',
+					'label' => __( 'Icon', 'maapkathi' ),
+					'type'  => 'icon',
+				),
+				array(
+					'key'   => 'mk_icon_svg',
+					'label' => __( 'Or upload an SVG', 'maapkathi' ),
+					'type'  => 'media',
+					'help'  => __( 'An SVG uploaded here replaces the icon chosen above and is tinted with your accent colour. PNG and JPG cannot be recoloured, so they render in their original colours instead — use SVG wherever you can.', 'maapkathi' ),
+				),
+				array(
 					'key'   => 'mk_icon',
-					'label' => __( 'Icon (dashicon class)', 'maapkathi' ),
+					'label' => __( 'Legacy icon (dashicon class)', 'maapkathi' ),
 					'type'  => 'text',
+					'help'  => __( 'Only used when neither of the two fields above is set. Kept so icons chosen before the icon library existed keep working.', 'maapkathi' ),
 				),
 				array(
 					'key'   => 'mk_sort_order',
@@ -219,9 +232,21 @@ final class MetaBoxes {
 			),
 			'mk_value'        => array(
 				array(
+					'key'   => 'mk_icon_id',
+					'label' => __( 'Icon', 'maapkathi' ),
+					'type'  => 'icon',
+				),
+				array(
+					'key'   => 'mk_icon_svg',
+					'label' => __( 'Or upload an SVG', 'maapkathi' ),
+					'type'  => 'media',
+					'help'  => __( 'An SVG uploaded here replaces the icon chosen above and is tinted with your accent colour. PNG and JPG cannot be recoloured, so they render in their original colours instead — use SVG wherever you can.', 'maapkathi' ),
+				),
+				array(
 					'key'   => 'mk_icon',
-					'label' => __( 'Icon (dashicon class)', 'maapkathi' ),
+					'label' => __( 'Legacy icon (dashicon class)', 'maapkathi' ),
 					'type'  => 'text',
+					'help'  => __( 'Only used when neither of the two fields above is set. Kept so icons chosen before the icon library existed keep working.', 'maapkathi' ),
 				),
 				array(
 					'key'   => 'mk_sort_order',
@@ -253,9 +278,21 @@ final class MetaBoxes {
 					'type'  => 'number',
 				),
 				array(
+					'key'   => 'mk_icon_id',
+					'label' => __( 'Icon', 'maapkathi' ),
+					'type'  => 'icon',
+				),
+				array(
+					'key'   => 'mk_icon_svg',
+					'label' => __( 'Or upload an SVG', 'maapkathi' ),
+					'type'  => 'media',
+					'help'  => __( 'An SVG uploaded here replaces the icon chosen above and is tinted with your accent colour. PNG and JPG cannot be recoloured, so they render in their original colours instead — use SVG wherever you can.', 'maapkathi' ),
+				),
+				array(
 					'key'   => 'mk_icon',
-					'label' => __( 'Icon (dashicon class)', 'maapkathi' ),
+					'label' => __( 'Legacy icon (dashicon class)', 'maapkathi' ),
 					'type'  => 'text',
+					'help'  => __( 'Only used when neither of the two fields above is set. Kept so icons chosen before the icon library existed keep working.', 'maapkathi' ),
 				),
 				array(
 					'key'   => 'mk_sort_order',
@@ -286,9 +323,9 @@ final class MetaBoxes {
 					$field['key'],
 					array(
 						'type'          => match ( $field['type'] ) {
-							'number'   => 'number',
-							'checkbox' => 'boolean',
-							default    => 'string',
+							'number', 'media' => 'number',
+							'checkbox'        => 'boolean',
+							default           => 'string',
 						},
 						'single'        => true,
 						'show_in_rest'  => true,
@@ -367,9 +404,79 @@ final class MetaBoxes {
 			case 'gallery':
 				printf( '<input type="text" id="%1$s" name="%1$s" value="%2$s" class="large-text" placeholder="12,34,56" />', esc_attr( $id ), esc_attr( (string) $value ) );
 				break;
+			case 'icon':
+				$this->render_icon_picker( $id, (string) $value );
+				break;
+			case 'media':
+				$this->render_media_field( $id, absint( $value ) );
+				break;
 			default:
 				printf( '<input type="text" id="%1$s" name="%1$s" value="%2$s" class="regular-text" />', esc_attr( $id ), esc_attr( (string) $value ) );
 		}
+	}
+
+	/**
+	 * Renders the bundled icon picker (FR-07.2).
+	 *
+	 * A searchable radio grid rather than a select, so the admin picks by
+	 * looking at the icon instead of guessing from a name. The live preview
+	 * is the swatch itself — the chosen one is outlined — which is cheaper
+	 * and more honest than a separate preview pane that could fall out of
+	 * sync with the selection.
+	 *
+	 * @param string $id    Field key, used as the input name.
+	 * @param string $value Currently stored icon id.
+	 * @return void
+	 */
+	private function render_icon_picker( string $id, string $value ): void {
+		printf(
+			'<div class="mk-icon-picker" data-mk-icon-picker><input type="search" class="mk-icon-picker__search" placeholder="%s" aria-label="%s" /><div class="mk-icon-picker__grid">',
+			esc_attr__( 'Search icons…', 'maapkathi' ),
+			esc_attr__( 'Search icons', 'maapkathi' )
+		);
+
+		// An explicit "no icon" choice, so an icon can be removed again
+		// without clearing the field by hand.
+		printf(
+			'<label class="mk-icon-picker__option" data-name="none"><input type="radio" name="%1$s" value="" %2$s /><span class="mk-icon-picker__none">%3$s</span></label>',
+			esc_attr( $id ),
+			checked( '', $value, false ),
+			esc_html__( 'None', 'maapkathi' )
+		);
+
+		foreach ( IconLibrary::all() as $icon_id => $icon ) {
+			printf(
+				'<label class="mk-icon-picker__option" data-name="%1$s" title="%2$s"><input type="radio" name="%3$s" value="%1$s" %4$s />%5$s<span class="mk-icon-picker__label">%2$s</span></label>',
+				esc_attr( $icon_id ),
+				esc_attr( $icon['label'] ),
+				esc_attr( $id ),
+				checked( $icon_id, $value, false ),
+				IconLibrary::svg( $icon_id, 28 ) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- bundled inline SVG, escaped at source.
+			);
+		}
+
+		echo '</div></div>';
+	}
+
+	/**
+	 * Renders an attachment-id media field with a preview.
+	 *
+	 * @param string $id    Field key, used as the input name.
+	 * @param int    $value Currently stored attachment id.
+	 * @return void
+	 */
+	private function render_media_field( string $id, int $value ): void {
+		$src = $value ? wp_get_attachment_image_url( $value, 'thumbnail' ) : '';
+
+		printf(
+			'<div data-mk-media><input type="hidden" id="%1$s" name="%1$s" value="%2$d" /><div class="mk-media__preview">%3$s</div><button type="button" class="button mk-media__choose">%4$s</button> <button type="button" class="button-link mk-media__clear" %5$s>%6$s</button></div>',
+			esc_attr( $id ),
+			absint( $value ),
+			$src ? '<img src="' . esc_url( $src ) . '" alt="" />' : '',
+			esc_html__( 'Choose image', 'maapkathi' ),
+			$value ? '' : 'hidden',
+			esc_html__( 'Clear', 'maapkathi' )
+		);
 	}
 
 	/**
@@ -402,6 +509,10 @@ final class MetaBoxes {
 			$raw       = wp_unslash( $_POST[ $key ] );
 			$sanitized = match ( $field['type'] ) {
 				'textarea' => sanitize_textarea_field( $raw ),
+				// An icon id that is not in the library is dropped rather
+				// than stored, so the front end never has to guess.
+				'icon'     => IconLibrary::has( (string) $raw ) ? (string) $raw : '',
+				'media'    => absint( $raw ),
 				'number'   => is_numeric( $raw ) ? (float) $raw : 0,
 				'url'      => esc_url_raw( $raw ),
 				'date'     => preg_match( '/^\d{4}-\d{2}-\d{2}$/', $raw ) ? $raw : '',

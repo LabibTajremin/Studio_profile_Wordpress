@@ -35,6 +35,7 @@ final class ThemeSettingsRegistryTest extends TestCase {
 			'font_pair_id', 'font_overrides', 'heading_color_hex', 'body_color_hex',
 			'background_tone', 'header_opacity',
 			'header_follow_accent', 'header_palette_id', 'header_hex', 'header_logo_mode',
+			'services_icon_size', 'services_icon_position', 'values_icon_size',
 			'radius', 'density', 'grain', 'glass', 'hero_style',
 			'motion_preset', 'motion_level', 'scroll_reveal_style', 'hero_animation',
 			'image_hover_style', 'card_hover_style', 'text_reveal_style', 'page_transition',

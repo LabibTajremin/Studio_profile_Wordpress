@@ -201,6 +201,34 @@ $is_custom_preset = 'custom' === $settings['motion_preset'];
 				</td>
 			</tr>
 			<tr>
+				<th><?php esc_html_e( '9e. Services icon size', 'maapkathi' ); ?></th>
+				<td>
+					<input type="number" min="24" max="160" name="mk_theme_settings[services_icon_size]" value="<?php echo esc_attr( (string) $settings['services_icon_size'] ); ?>" /> px
+					<p class="description"><?php esc_html_e( 'Applies to the Services section on the homepage and the Services page. Shrinks to 60% of this on phones so the icon and title stay side by side.', 'maapkathi' ); ?></p>
+				</td>
+			</tr>
+			<tr>
+				<th><?php esc_html_e( '9f. Services icon position', 'maapkathi' ); ?></th>
+				<td>
+					<?php
+					$mk_icon_positions = array(
+						'beside' => __( 'Beside the title', 'maapkathi' ),
+						'above'  => __( 'Above the title', 'maapkathi' ),
+					);
+					foreach ( $mk_icon_positions as $mk_position_id => $mk_position_label ) :
+						?>
+						<label style="margin-right:1.5em"><input type="radio" name="mk_theme_settings[services_icon_position]" value="<?php echo esc_attr( $mk_position_id ); ?>" <?php checked( (string) $settings['services_icon_position'], $mk_position_id ); ?> /> <?php echo esc_html( $mk_position_label ); ?></label>
+					<?php endforeach; ?>
+				</td>
+			</tr>
+			<tr>
+				<th><?php esc_html_e( '9g. "What we stand for" icon size', 'maapkathi' ); ?></th>
+				<td>
+					<input type="number" min="24" max="160" name="mk_theme_settings[values_icon_size]" value="<?php echo esc_attr( (string) $settings['values_icon_size'] ); ?>" /> px
+					<p class="description"><?php esc_html_e( 'Pick each item\'s icon on its own edit screen, under Values.', 'maapkathi' ); ?></p>
+				</td>
+			</tr>
+			<tr>
 				<th><?php esc_html_e( '10. Radius', 'maapkathi' ); ?></th>
 				<td>
 					<?php foreach ( Fonts::RADIUS_SCALE as $mk_radius_id => $px ) : ?>

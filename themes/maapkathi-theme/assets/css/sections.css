@@ -373,7 +373,85 @@ html[data-hero-style="split"] .mk-hero { background: var(--background); }
 .mk-card__role { color: var(--accent-readable, var(--accent)); font-weight: 600; margin: 0 0 0.5rem; padding-inline: 1rem; }
 .mk-card--member .mk-card__bio { padding: 0 1rem 1rem; font-size: 0.92rem; opacity: 0.8; }
 .mk-card__socials { padding: 0 1rem 1rem; display: flex; gap: 0.75rem; font-size: 0.9rem; }
-.mk-card__icon { font-size: 28px; width: 28px; height: 28px; color: var(--accent-readable, var(--accent)); }
+/* Icons (FR-06, FR-07)
+   ---------------------------------------------------------------------
+   One rule sets the colour for every icon shape — bundled SVG, uploaded
+   SVG and legacy dashicon alike — because they all draw with
+   currentColor. Changing the accent therefore changes all of them, with
+   no per-icon markup and nowhere for an old colour to survive. */
+.mk-card__icon {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	flex: 0 0 auto;
+	color: var(--accent-readable, var(--accent));
+	transition: color var(--motion-duration) var(--motion-ease);
+	/* Sized per section below; this is the floor for anything that does
+	   not set one. */
+	--mk-icon-size: 28px;
+	width: var(--mk-icon-size);
+	height: var(--mk-icon-size);
+}
+.mk-card__icon > svg,
+.mk-card__icon > img {
+	width: 100%;
+	height: 100%;
+	display: block;
+	object-fit: contain;
+}
+.mk-card__icon .dashicons,
+.mk-card__icon.dashicons {
+	font-size: var(--mk-icon-size);
+	width: var(--mk-icon-size);
+	height: var(--mk-icon-size);
+}
+.mk-card:hover .mk-card__icon { color: var(--accent); }
+
+/* Services: icon beside the title, description below spanning the whole
+   card. align-items:center keeps the two optically centred on each other
+   whether the title runs to one line or two (FR-06.6). */
+.mk-card__head {
+	display: flex;
+	align-items: center;
+	gap: 0.9rem;
+	margin-bottom: 0.6rem;
+}
+.mk-card__head .mk-card__title { margin: 0; }
+.mk-services .mk-card__icon,
+.mk-service-group .mk-card__icon { --mk-icon-size: var(--services-icon-size, 84px); }
+.mk-values .mk-card__icon { --mk-icon-size: var(--values-icon-size, 56px); }
+
+/* Legacy layout, kept reachable so a site can be put back without code. */
+.mk-services--icon-above .mk-card__head,
+.mk-service-group.mk-services--icon-above .mk-card__head {
+	display: block;
+}
+.mk-services--icon-above .mk-card__head .mk-card__icon,
+.mk-service-group.mk-services--icon-above .mk-card__head .mk-card__icon {
+	margin-bottom: 0.6rem;
+}
+
+/* Cards in a row keep equal heights regardless of icon size or how long
+   the description runs (FR-06.7). */
+.mk-grid--services { align-items: stretch; }
+.mk-grid--services .mk-card--service {
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+}
+
+/* Below 480px the icon scales to 60% rather than wrapping under the
+   title, so the beside-title arrangement survives on a phone (FR-06.8). */
+@media (max-width: 479px) {
+	.mk-services .mk-card__icon,
+	.mk-service-group .mk-card__icon {
+		--mk-icon-size: calc(var(--services-icon-size, 84px) * 0.6);
+	}
+	.mk-values .mk-card__icon {
+		--mk-icon-size: calc(var(--values-icon-size, 56px) * 0.6);
+	}
+	.mk-card__head { gap: 0.65rem; }
+}
 .mk-card__media { overflow: hidden; }
 .mk-card__media img { width: 100%; height: auto; display: block; aspect-ratio: 4 / 5; object-fit: cover; }
 .mk-card--member .mk-card__media img { aspect-ratio: 3 / 4; }
