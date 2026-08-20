@@ -277,3 +277,97 @@
 		} );
 	} );
 } )();
+
+/**
+ * Repeater rows (footer social links, contact lines, custom links).
+ *
+ * Each repeater ships a <template> holding one blank row with __INDEX__
+ * where the array index goes. Adding a row clones that template, so a row
+ * created in the browser is byte-identical to one rendered from the
+ * database — there is no second copy of the markup to drift.
+ *
+ * The screen still works without this script: every repeater renders one
+ * spare blank row, so links can be added one per save.
+ */
+( function () {
+	var adders = document.querySelectorAll( '.mk-repeater__add' );
+	if ( ! adders.length ) {
+		return;
+	}
+
+	/**
+	 * The next free index for a repeater.
+	 *
+	 * Derived from the highest index already on the page rather than from
+	 * the row count: rows can be removed, and reusing an index would make
+	 * two rows collide into one on save.
+	 *
+	 * @param {HTMLElement} table The repeater table.
+	 * @return {number} An index not currently in use.
+	 */
+	var nextIndex = function ( table ) {
+		var highest = -1;
+
+		Array.prototype.forEach.call( table.querySelectorAll( '[name]' ), function ( field ) {
+			var found = field.getAttribute( 'name' ).match( /\[(\d+)\]/ );
+			if ( found ) {
+				highest = Math.max( highest, parseInt( found[ 1 ], 10 ) );
+			}
+		} );
+
+		return highest + 1;
+	};
+
+	Array.prototype.forEach.call( adders, function ( button ) {
+		var target = button.getAttribute( 'data-target' );
+		var table = document.querySelector( '[data-mk-repeater="' + target + '"]' );
+		var template = document.querySelector( '.mk-repeater__template[data-for="' + target + '"]' );
+
+		if ( ! table || ! template ) {
+			return;
+		}
+
+		var body = table.querySelector( '.mk-repeater__rows' ) || table;
+
+		button.addEventListener( 'click', function () {
+			var markup = template.innerHTML.split( '__INDEX__' ).join( String( nextIndex( table ) ) );
+			var holder = document.createElement( 'template' );
+			holder.innerHTML = markup;
+
+			var row = holder.content.firstElementChild;
+			body.appendChild( holder.content );
+
+			// Focus the new row so a keyboard user is not left hunting for
+			// where it landed.
+			var first = row && row.querySelector( 'select, input, textarea' );
+			if ( first ) {
+				first.focus();
+			}
+		} );
+	} );
+
+	// Removal is delegated, so it applies to rows added after load too.
+	document.addEventListener( 'click', function ( event ) {
+		if ( ! event.target.classList.contains( 'mk-repeater__remove' ) ) {
+			return;
+		}
+
+		var row = event.target.closest( '.mk-repeater__row' );
+		if ( ! row ) {
+			return;
+		}
+
+		var body = row.parentNode;
+		row.parentNode.removeChild( row );
+
+		// Never leave the repeater with nothing at all — an empty table
+		// offers no way back except reloading the page.
+		if ( ! body.querySelector( '.mk-repeater__row' ) ) {
+			var table = body.closest( '[data-mk-repeater]' );
+			var adder = table && document.querySelector( '.mk-repeater__add[data-target="' + table.getAttribute( 'data-mk-repeater' ) + '"]' );
+			if ( adder ) {
+				adder.click();
+			}
+		}
+	} );
+} )();
