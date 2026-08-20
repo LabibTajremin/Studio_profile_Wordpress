@@ -38,7 +38,7 @@ WP_CORE_DIR=${WP_CORE_DIR-$TMPDIR/wordpress}
 # caller can act on, rather than waiting forever.
 download() {
 	if command -v curl >/dev/null 2>&1; then
-		curl -sSL --connect-timeout 15 --max-time 300 --retry 3 --retry-delay 2 -o "$2" "$1"
+		curl -sSL --fail --connect-timeout 15 --max-time 300 --retry 3 --retry-delay 2 -o "$2" "$1"
 	elif command -v wget >/dev/null 2>&1; then
 		wget -nv --timeout=15 --tries=3 -O "$2" "$1"
 	else
@@ -125,47 +125,52 @@ install_wp() {
 # Test library (includes/ and data/ from wordpress-develop)
 # ---------------------------------------------------------------------
 
-# Fetches the test suite over plain HTTPS instead of Subversion.
+# Fetches the test suite without Subversion.
 #
 # This used to be two `svn co` calls, which meant CI had to apt-get install
 # subversion first. That step hung for seventeen hours on an Ubuntu mirror
 # that would neither answer nor fail, and because apt retries indefinitely
-# the job never finished on its own. One tarball over HTTPS needs no extra
-# package, is a single request rather than hundreds, and also carries
-# wp-tests-config-sample.php, so the separate download for that goes too.
+# the job never finished on its own.
 #
-# svn is still used if it is present and the download fails, so anyone who
-# already has it keeps a working fallback — but nothing installs it.
+# A shallow, blobless, sparse git clone gets the same two directories with
+# no extra package: git is already present anywhere this runs. Crucially
+# `--branch` takes a tag or a branch name interchangeably, so there is no
+# refs/tags-versus-refs/heads mapping to get wrong — which is exactly what
+# broke the first attempt at this, where a release archive URL 404'd and
+# tar was handed an HTML error page.
+#
+# The clone also carries wp-tests-config-sample.php, since --sparse keeps
+# the repository's root files, so the separate download for that goes too.
+#
+# svn is still used if git fails and svn happens to be present, so anyone
+# who already has it keeps a working fallback — but nothing installs it.
 fetch_test_suite() {
-	# WP_TESTS_TAG is an svn path: "tags/6.7.1", "branches/6.7" or "trunk".
-	# The git mirror needs a ref instead.
-	local ref
-	case "$WP_TESTS_TAG" in
-		tags/*)     ref="refs/tags/${WP_TESTS_TAG#tags/}" ;;
-		branches/*) ref="refs/heads/${WP_TESTS_TAG#branches/}" ;;
-		*)          ref="refs/heads/${WP_TESTS_TAG}" ;;
-	esac
+	# WP_TESTS_TAG is an svn path: "tags/7.1", "branches/7.1" or "trunk".
+	# git wants just the name.
+	local ref="${WP_TESTS_TAG#tags/}"
+	ref="${ref#branches/}"
 
-	local tarball="$TMPDIR/wp-develop.tar.gz"
 	local extracted="$TMPDIR/wp-develop"
-
 	rm -rf "$extracted"
-	mkdir -p "$extracted"
 
-	if download "https://github.com/WordPress/wordpress-develop/archive/${ref}.tar.gz" "$tarball" &&
-		tar -zxmf "$tarball" -C "$extracted" --strip-components=1; then
+	if git clone --quiet --depth 1 --branch "$ref" --filter=blob:none --sparse \
+		https://github.com/WordPress/wordpress-develop.git "$extracted" &&
+		git -C "$extracted" sparse-checkout set tests/phpunit/includes tests/phpunit/data &&
+		[ -d "$extracted/tests/phpunit/includes" ] &&
+		[ -d "$extracted/tests/phpunit/data" ]; then
 		cp -R "$extracted"/tests/phpunit/includes "$WP_TESTS_DIR"/includes
 		cp -R "$extracted"/tests/phpunit/data "$WP_TESTS_DIR"/data
 		return 0
 	fi
 
-	echo "Could not download the test suite tarball; falling back to Subversion." >&2
+	echo "Could not clone the test suite for '$ref'; falling back to Subversion." >&2
 
 	if ! command -v svn >/dev/null 2>&1; then
 		echo "Subversion is not installed either, so the test suite cannot be fetched." >&2
 		exit 1
 	fi
 
+	mkdir -p "$extracted"
 	svn co --quiet --ignore-externals \
 		https://develop.svn.wordpress.org/"${WP_TESTS_TAG}"/tests/phpunit/includes/ "$WP_TESTS_DIR"/includes
 	svn co --quiet --ignore-externals \
