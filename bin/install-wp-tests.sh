@@ -32,11 +32,15 @@ TMPDIR=$(echo "$TMPDIR" | sed -e "s/\/$//")
 WP_TESTS_DIR=${WP_TESTS_DIR-$TMPDIR/wordpress-tests-lib}
 WP_CORE_DIR=${WP_CORE_DIR-$TMPDIR/wordpress}
 
+# Every fetch is bounded. An unbounded download is what let a stalled
+# mirror hold CI open for seventeen hours: a request that neither answers
+# nor fails should end the run in minutes, with a non-zero status the
+# caller can act on, rather than waiting forever.
 download() {
 	if command -v curl >/dev/null 2>&1; then
-		curl -sSL -o "$2" "$1"
+		curl -sSL --fail --connect-timeout 15 --max-time 300 --retry 3 --retry-delay 2 -o "$2" "$1"
 	elif command -v wget >/dev/null 2>&1; then
-		wget -nv -O "$2" "$1"
+		wget -nv --timeout=15 --tries=3 -O "$2" "$1"
 	else
 		echo "Neither curl nor wget is available." >&2
 		exit 1
@@ -120,6 +124,60 @@ install_wp() {
 # ---------------------------------------------------------------------
 # Test library (includes/ and data/ from wordpress-develop)
 # ---------------------------------------------------------------------
+
+# Fetches the test suite without Subversion.
+#
+# This used to be two `svn co` calls, which meant CI had to apt-get install
+# subversion first. That step hung for seventeen hours on an Ubuntu mirror
+# that would neither answer nor fail, and because apt retries indefinitely
+# the job never finished on its own.
+#
+# A shallow, blobless, sparse git clone gets the same two directories with
+# no extra package: git is already present anywhere this runs. Crucially
+# `--branch` takes a tag or a branch name interchangeably, so there is no
+# refs/tags-versus-refs/heads mapping to get wrong — which is exactly what
+# broke the first attempt at this, where a release archive URL 404'd and
+# tar was handed an HTML error page.
+#
+# The clone also carries wp-tests-config-sample.php, since --sparse keeps
+# the repository's root files, so the separate download for that goes too.
+#
+# svn is still used if git fails and svn happens to be present, so anyone
+# who already has it keeps a working fallback — but nothing installs it.
+fetch_test_suite() {
+	# WP_TESTS_TAG is an svn path: "tags/7.1", "branches/7.1" or "trunk".
+	# git wants just the name.
+	local ref="${WP_TESTS_TAG#tags/}"
+	ref="${ref#branches/}"
+
+	local extracted="$TMPDIR/wp-develop"
+	rm -rf "$extracted"
+
+	if git clone --quiet --depth 1 --branch "$ref" --filter=blob:none --sparse \
+		https://github.com/WordPress/wordpress-develop.git "$extracted" &&
+		git -C "$extracted" sparse-checkout set tests/phpunit/includes tests/phpunit/data &&
+		[ -d "$extracted/tests/phpunit/includes" ] &&
+		[ -d "$extracted/tests/phpunit/data" ]; then
+		cp -R "$extracted"/tests/phpunit/includes "$WP_TESTS_DIR"/includes
+		cp -R "$extracted"/tests/phpunit/data "$WP_TESTS_DIR"/data
+		return 0
+	fi
+
+	echo "Could not clone the test suite for '$ref'; falling back to Subversion." >&2
+
+	if ! command -v svn >/dev/null 2>&1; then
+		echo "Subversion is not installed either, so the test suite cannot be fetched." >&2
+		exit 1
+	fi
+
+	mkdir -p "$extracted"
+	svn co --quiet --ignore-externals \
+		https://develop.svn.wordpress.org/"${WP_TESTS_TAG}"/tests/phpunit/includes/ "$WP_TESTS_DIR"/includes
+	svn co --quiet --ignore-externals \
+		https://develop.svn.wordpress.org/"${WP_TESTS_TAG}"/tests/phpunit/data/ "$WP_TESTS_DIR"/data
+	download https://develop.svn.wordpress.org/"${WP_TESTS_TAG}"/wp-tests-config-sample.php "$extracted"/wp-tests-config-sample.php
+}
+
 install_test_suite() {
 	# Portable in-place sed.
 	if [[ $(uname -s) == 'Darwin' ]]; then
@@ -131,16 +189,22 @@ install_test_suite() {
 	if [ ! -d "$WP_TESTS_DIR" ]; then
 		mkdir -p "$WP_TESTS_DIR"
 		rm -rf "$WP_TESTS_DIR"/{includes,data}
-		svn co --quiet --ignore-externals \
-			https://develop.svn.wordpress.org/"${WP_TESTS_TAG}"/tests/phpunit/includes/ "$WP_TESTS_DIR"/includes
-		svn co --quiet --ignore-externals \
-			https://develop.svn.wordpress.org/"${WP_TESTS_TAG}"/tests/phpunit/data/ "$WP_TESTS_DIR"/data
+		fetch_test_suite
 	else
 		echo "Test suite already present at $WP_TESTS_DIR — skipping checkout."
 	fi
 
 	if [ ! -f wp-tests-config.php ]; then
-		download https://develop.svn.wordpress.org/"${WP_TESTS_TAG}"/wp-tests-config-sample.php "$WP_TESTS_DIR"/wp-tests-config.php
+		# The sample normally arrives inside the tarball, but the suite
+		# directory can outlive $TMPDIR — a re-run that skipped the
+		# checkout above would otherwise find nothing to copy.
+		if [ ! -f "$TMPDIR"/wp-develop/wp-tests-config-sample.php ]; then
+			mkdir -p "$TMPDIR"/wp-develop
+			download https://develop.svn.wordpress.org/"${WP_TESTS_TAG}"/wp-tests-config-sample.php \
+				"$TMPDIR"/wp-develop/wp-tests-config-sample.php
+		fi
+
+		cp "$TMPDIR"/wp-develop/wp-tests-config-sample.php "$WP_TESTS_DIR"/wp-tests-config.php
 
 		# Remove any trailing slash so the constant is a clean path.
 		WP_CORE_DIR=${WP_CORE_DIR%/}
