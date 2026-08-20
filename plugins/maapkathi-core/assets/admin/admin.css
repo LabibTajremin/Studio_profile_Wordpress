@@ -264,3 +264,11 @@
 .mk-builder__save { display: flex; align-items: center; gap: 0.75rem; margin-top: 1rem; }
 .mk-builder__status { color: #646970; }
 .mk-builder__status--error { color: #b32d2e; font-weight: 600; }
+
+/* Repeater rows (footer social links, contact lines, custom links). */
+.mk-repeater__row td { position: relative; }
+.mk-repeater__remove {
+	margin-left: 0.75em;
+	vertical-align: middle;
+}
+.mk-repeater__row:hover .mk-repeater__remove { opacity: 1; }

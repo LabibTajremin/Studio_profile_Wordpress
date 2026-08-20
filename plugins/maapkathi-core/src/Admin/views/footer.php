@@ -133,53 +133,96 @@ $mk_col4     = (array) $footer['col4'];
 
 		<h2><?php esc_html_e( 'Social links', 'maapkathi' ); ?></h2>
 		<p class="description"><?php esc_html_e( 'Shown under the footer logo as icons only — no addresses and no platform names are visible. A row with an empty address is not shown at all.', 'maapkathi' ); ?></p>
-		<table class="form-table mk-repeater" data-mk-repeater="socials">
+		<?php
+		/**
+		 * Renders one social row.
+		 *
+		 * Shared by the saved rows and by the template the "Add" button
+		 * clones, so a row added in the browser is identical to one that
+		 * came from the database — there is no second copy of this markup
+		 * to drift out of step.
+		 *
+		 * @param string              $index Row index, or __INDEX__ in the template.
+		 * @param array<string,mixed> $row   Stored row values.
+		 * @return void
+		 */
+		$mk_render_social_row = static function ( string $index, array $row = array() ): void {
+			?>
+			<tr class="mk-repeater__row">
+				<th>
+					<select name="mk_footer[socials][<?php echo esc_attr( $index ); ?>][platform]">
+						<option value=""><?php esc_html_e( '— none —', 'maapkathi' ); ?></option>
+						<?php foreach ( FooterSettings::platforms() as $mk_slug => $mk_platform_label ) : ?>
+							<option value="<?php echo esc_attr( $mk_slug ); ?>" <?php selected( (string) ( $row['platform'] ?? '' ), $mk_slug ); ?>><?php echo esc_html( $mk_platform_label ); ?></option>
+						<?php endforeach; ?>
+					</select>
+				</th>
+				<td>
+					<input type="url" class="regular-text" name="mk_footer[socials][<?php echo esc_attr( $index ); ?>][url]" value="<?php echo esc_attr( (string) ( $row['url'] ?? '' ) ); ?>" placeholder="https://" />
+					<label><input type="hidden" name="mk_footer[socials][<?php echo esc_attr( $index ); ?>][enabled]" value="0" /><input type="checkbox" name="mk_footer[socials][<?php echo esc_attr( $index ); ?>][enabled]" value="1" <?php checked( ! isset( $row['enabled'] ) || $row['enabled'] ); ?> /> <?php esc_html_e( 'Show', 'maapkathi' ); ?></label>
+					<button type="button" class="button-link delete mk-repeater__remove"><?php esc_html_e( 'Remove', 'maapkathi' ); ?></button>
+				</td>
+			</tr>
 			<?php
-			// One blank row past the end so there is always somewhere to add
-			// the next link without a JavaScript "add row" step.
+		};
+		?>
+		<table class="form-table mk-repeater" data-mk-repeater="socials">
+			<tbody class="mk-repeater__rows">
+			<?php
+			// One blank row past the end, so the repeater is still usable
+			// with JavaScript unavailable — just one row per save.
 			$mk_social_rows = array_merge( $mk_socials, array( array() ) );
-			foreach ( $mk_social_rows as $mk_i => $mk_social ) :
-				?>
-				<tr>
-					<th>
-						<select name="mk_footer[socials][<?php echo esc_attr( (string) $mk_i ); ?>][platform]">
-							<option value=""><?php esc_html_e( '— none —', 'maapkathi' ); ?></option>
-							<?php foreach ( FooterSettings::platforms() as $mk_slug => $mk_platform_label ) : ?>
-								<option value="<?php echo esc_attr( $mk_slug ); ?>" <?php selected( (string) ( $mk_social['platform'] ?? '' ), $mk_slug ); ?>><?php echo esc_html( $mk_platform_label ); ?></option>
-							<?php endforeach; ?>
-						</select>
-					</th>
-					<td>
-						<input type="url" class="regular-text" name="mk_footer[socials][<?php echo esc_attr( (string) $mk_i ); ?>][url]" value="<?php echo esc_attr( (string) ( $mk_social['url'] ?? '' ) ); ?>" placeholder="https://" />
-						<label><input type="hidden" name="mk_footer[socials][<?php echo esc_attr( (string) $mk_i ); ?>][enabled]" value="0" /><input type="checkbox" name="mk_footer[socials][<?php echo esc_attr( (string) $mk_i ); ?>][enabled]" value="1" <?php checked( ! isset( $mk_social['enabled'] ) || $mk_social['enabled'] ); ?> /> <?php esc_html_e( 'Show', 'maapkathi' ); ?></label>
-					</td>
-				</tr>
-			<?php endforeach; ?>
+			foreach ( $mk_social_rows as $mk_i => $mk_social ) {
+				$mk_render_social_row( (string) $mk_i, (array) $mk_social );
+			}
+			?>
+			</tbody>
 		</table>
+		<template class="mk-repeater__template" data-for="socials"><?php $mk_render_social_row( '__INDEX__' ); ?></template>
+		<p><button type="button" class="button mk-repeater__add" data-target="socials"><?php esc_html_e( 'Add social link', 'maapkathi' ); ?></button></p>
 
 		<h2><?php esc_html_e( 'Contact lines', 'maapkathi' ); ?></h2>
 		<p class="description"><?php esc_html_e( 'One piece of information per line, each with its own icon. Email lines become clickable mail links and phone lines become tap-to-call links automatically.', 'maapkathi' ); ?></p>
+		<?php
+		/**
+		 * Renders one contact row. Shared with the add-row template.
+		 *
+		 * @param string              $index Row index, or __INDEX__ in the template.
+		 * @param array<string,mixed> $row   Stored row values.
+		 * @return void
+		 */
+		$mk_render_contact_row = static function ( string $index, array $row = array() ): void {
+			?>
+			<tr class="mk-repeater__row">
+				<th>
+					<select name="mk_footer[contacts][<?php echo esc_attr( $index ); ?>][type]">
+						<option value=""><?php esc_html_e( '— none —', 'maapkathi' ); ?></option>
+						<?php foreach ( FooterSettings::contact_types() as $mk_slug => $mk_type_label ) : ?>
+							<option value="<?php echo esc_attr( $mk_slug ); ?>" <?php selected( (string) ( $row['type'] ?? '' ), $mk_slug ); ?>><?php echo esc_html( $mk_type_label ); ?></option>
+						<?php endforeach; ?>
+					</select>
+				</th>
+				<td>
+					<textarea rows="2" class="large-text" name="mk_footer[contacts][<?php echo esc_attr( $index ); ?>][value]" placeholder="<?php esc_attr_e( 'Value shown in the footer', 'maapkathi' ); ?>"><?php echo esc_textarea( (string) ( $row['value'] ?? '' ) ); ?></textarea>
+					<input type="url" class="regular-text" name="mk_footer[contacts][<?php echo esc_attr( $index ); ?>][link]" value="<?php echo esc_attr( (string) ( $row['link'] ?? '' ) ); ?>" placeholder="<?php esc_attr_e( 'Optional link (leave empty for the automatic one)', 'maapkathi' ); ?>" />
+					<button type="button" class="button-link delete mk-repeater__remove"><?php esc_html_e( 'Remove', 'maapkathi' ); ?></button>
+				</td>
+			</tr>
+			<?php
+		};
+		?>
 		<table class="form-table mk-repeater" data-mk-repeater="contacts">
+			<tbody class="mk-repeater__rows">
 			<?php
 			$mk_contact_rows = array_merge( $mk_contacts, array( array() ) );
-			foreach ( $mk_contact_rows as $mk_i => $mk_contact ) :
-				?>
-				<tr>
-					<th>
-						<select name="mk_footer[contacts][<?php echo esc_attr( (string) $mk_i ); ?>][type]">
-							<option value=""><?php esc_html_e( '— none —', 'maapkathi' ); ?></option>
-							<?php foreach ( FooterSettings::contact_types() as $mk_slug => $mk_type_label ) : ?>
-								<option value="<?php echo esc_attr( $mk_slug ); ?>" <?php selected( (string) ( $mk_contact['type'] ?? '' ), $mk_slug ); ?>><?php echo esc_html( $mk_type_label ); ?></option>
-							<?php endforeach; ?>
-						</select>
-					</th>
-					<td>
-						<textarea rows="2" class="large-text" name="mk_footer[contacts][<?php echo esc_attr( (string) $mk_i ); ?>][value]" placeholder="<?php esc_attr_e( 'Value shown in the footer', 'maapkathi' ); ?>"><?php echo esc_textarea( (string) ( $mk_contact['value'] ?? '' ) ); ?></textarea>
-						<input type="url" class="regular-text" name="mk_footer[contacts][<?php echo esc_attr( (string) $mk_i ); ?>][link]" value="<?php echo esc_attr( (string) ( $mk_contact['link'] ?? '' ) ); ?>" placeholder="<?php esc_attr_e( 'Optional link (leave empty for the automatic one)', 'maapkathi' ); ?>" />
-					</td>
-				</tr>
-			<?php endforeach; ?>
+			foreach ( $mk_contact_rows as $mk_i => $mk_contact ) {
+				$mk_render_contact_row( (string) $mk_i, (array) $mk_contact );
+			}
+			?>
+			</tbody>
 		</table>
+		<template class="mk-repeater__template" data-for="contacts"><?php $mk_render_contact_row( '__INDEX__' ); ?></template>
+		<p><button type="button" class="button mk-repeater__add" data-target="contacts"><?php esc_html_e( 'Add contact line', 'maapkathi' ); ?></button></p>
 
 		<h2><?php esc_html_e( 'Links column', 'maapkathi' ); ?></h2>
 		<table class="form-table">
@@ -200,19 +243,44 @@ $mk_col4     = (array) $footer['col4'];
 					<?php esc_html_e( 'items', 'maapkathi' ); ?>
 				</td>
 			</tr>
+		</table>
+
+		<?php
+		/**
+		 * Renders one custom-link row. Shared with the add-row template.
+		 *
+		 * @param string              $index Row index, or __INDEX__ in the template.
+		 * @param array<string,mixed> $row   Stored row values.
+		 * @return void
+		 */
+		$mk_render_link_row = static function ( string $index, array $row = array() ): void {
+			?>
+			<tr class="mk-repeater__row">
+				<th><?php esc_html_e( 'Custom link', 'maapkathi' ); ?></th>
+				<td>
+					<input type="text" name="mk_footer[col3][links][<?php echo esc_attr( $index ); ?>][label]" value="<?php echo esc_attr( (string) ( $row['label'] ?? '' ) ); ?>" placeholder="<?php esc_attr_e( 'Label', 'maapkathi' ); ?>" />
+					<input type="url" class="regular-text" name="mk_footer[col3][links][<?php echo esc_attr( $index ); ?>][url]" value="<?php echo esc_attr( (string) ( $row['url'] ?? '' ) ); ?>" placeholder="https://" />
+					<button type="button" class="button-link delete mk-repeater__remove"><?php esc_html_e( 'Remove', 'maapkathi' ); ?></button>
+				</td>
+			</tr>
+			<?php
+		};
+		?>
+		<table class="form-table mk-repeater" data-mk-repeater="col3links">
+			<tbody class="mk-repeater__rows">
 			<?php
 			$mk_col3_links = array_merge( (array) $mk_col3['links'], array( array() ) );
-			foreach ( $mk_col3_links as $mk_i => $mk_link ) :
-				?>
-				<tr>
-					<th><?php echo 0 === $mk_i ? esc_html__( 'Custom links', 'maapkathi' ) : ''; ?></th>
-					<td>
-						<input type="text" name="mk_footer[col3][links][<?php echo esc_attr( (string) $mk_i ); ?>][label]" value="<?php echo esc_attr( (string) ( $mk_link['label'] ?? '' ) ); ?>" placeholder="<?php esc_attr_e( 'Label', 'maapkathi' ); ?>" />
-						<input type="url" class="regular-text" name="mk_footer[col3][links][<?php echo esc_attr( (string) $mk_i ); ?>][url]" value="<?php echo esc_attr( (string) ( $mk_link['url'] ?? '' ) ); ?>" placeholder="https://" />
-					</td>
-				</tr>
-			<?php endforeach; ?>
+			foreach ( $mk_col3_links as $mk_i => $mk_link ) {
+				$mk_render_link_row( (string) $mk_i, (array) $mk_link );
+			}
+			?>
+			</tbody>
 		</table>
+		<template class="mk-repeater__template" data-for="col3links"><?php $mk_render_link_row( '__INDEX__' ); ?></template>
+		<p>
+			<button type="button" class="button mk-repeater__add" data-target="col3links"><?php esc_html_e( 'Add custom link', 'maapkathi' ); ?></button>
+			<span class="description"><?php esc_html_e( 'Only used when the column above is set to "Custom links".', 'maapkathi' ); ?></span>
+		</p>
 
 		<h2><?php esc_html_e( 'Fourth column', 'maapkathi' ); ?></h2>
 		<table class="form-table">
