@@ -1,5 +1,35 @@
 # Build status — honest checklist
 
+## Static assets are versioned in the path, not in `?ver=`
+
+Production (Hostinger/LiteSpeed) has "remove query strings from static
+resources" switched on, which strips WordPress's `?ver=` cache-buster
+before it reaches the browser. Combined with
+`Cache-Control: max-age=604800` on the CSS, that meant no deploy was ever
+picked up: fetching `base.css` returned a 12,535-byte August copy while
+`base.css?bust=…` returned the current 21,259-byte one from the same
+server. Every visual complaint about the footer, the featured-work
+showcase and the hero height traced back to this one cause, not to the
+markup or the CSS, both of which were already correct on the server.
+
+`themes/maapkathi-theme/inc/asset-cache.php` moves the version into the
+path instead: each stylesheet and script is mirrored into
+`wp-content/uploads/maapkathi-assets/<name>.<mtime>.<ext>`, so a changed
+file gets a URL no cache layer has ever seen and an unchanged file keeps
+its URL and stays cached. Superseded copies are kept for a week rather
+than deleted immediately, because downstream-cached HTML can still point
+at the previous fingerprint. Anything that fails — an unwritable uploads
+directory, an unreadable source — falls back to the old theme URL with a
+`?ver=`, so the worst case is today's behaviour, never a missing
+stylesheet.
+
+Verified on the live Docker stack: all seven mirrored assets return 200
+with the correct MIME type and full byte counts, the footer computes as a
+four-column grid at 1440px and a single column at 390px, and appending a
+byte to `base.css` produced a new fingerprinted URL on the next request
+while the previous copy stayed in place.
+
+
 > **Latest pass (client-view sweep + production hardening).** Added a
 > versioned migration runner, an Enquiries inbox, the placeholder and
 > health endpoints, favicon/logo handling, security hardening, locally

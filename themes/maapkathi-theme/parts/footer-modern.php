@@ -54,8 +54,13 @@ $mk_col4_links = 'links' === $mk_col4['type']
 				$mk_light_src = $mk_footer_logo_light ? $mk_footer_logo_light : $mk_footer_logo_dark;
 				$mk_dark_src  = $mk_footer_logo_dark ? $mk_footer_logo_dark : $mk_footer_logo_light;
 				?>
-				<img class="mk-footer__logo-img mk-footer__logo-img--light" src="<?php echo esc_url( $mk_light_src ); ?>" alt="<?php echo esc_attr( $mk_studio_name ); ?>" loading="lazy" decoding="async" />
-				<img class="mk-footer__logo-img mk-footer__logo-img--dark" src="<?php echo esc_url( $mk_dark_src ); ?>" alt="<?php echo esc_attr( $mk_studio_name ); ?>" loading="lazy" decoding="async" />
+				<?php if ( $mk_light_src === $mk_dark_src ) : ?>
+					<?php /* One logo serves both themes: emitting the pair would download the same file twice, and show it twice anywhere the stylesheet has not arrived. */ ?>
+					<img class="mk-footer__logo-img" src="<?php echo esc_url( $mk_light_src ); ?>" alt="<?php echo esc_attr( $mk_studio_name ); ?>" loading="lazy" decoding="async" />
+				<?php else : ?>
+					<img class="mk-footer__logo-img mk-footer__logo-img--light" src="<?php echo esc_url( $mk_light_src ); ?>" alt="<?php echo esc_attr( $mk_studio_name ); ?>" loading="lazy" decoding="async" />
+					<img class="mk-footer__logo-img mk-footer__logo-img--dark" src="<?php echo esc_url( $mk_dark_src ); ?>" alt="" aria-hidden="true" loading="lazy" decoding="async" />
+				<?php endif; ?>
 			<?php else : ?>
 				<span class="mk-footer__wordmark"><?php echo esc_html( $mk_studio_name ); ?></span>
 			<?php endif; ?>
