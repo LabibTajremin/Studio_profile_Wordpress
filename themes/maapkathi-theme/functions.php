@@ -25,6 +25,7 @@ if ( ! defined( 'MK_THEME_VERSION' ) ) {
 	define( 'MK_THEME_VERSION', '0.1.0' );
 }
 
+require get_template_directory() . '/inc/asset-cache.php';
 require get_template_directory() . '/parts/nav.php';
 
 /**
@@ -63,48 +64,26 @@ add_action(
 add_action(
 	'wp_enqueue_scripts',
 	static function (): void {
-		$theme_uri = get_stylesheet_directory_uri();
-		$theme_dir = get_stylesheet_directory();
+		// Assets are versioned in the PATH rather than a ?ver= query
+		// string, because production strips query strings from static
+		// resources and so never picked up a deploy. See
+		// inc/asset-cache.php for the whole story.
+		wp_enqueue_style( 'maapkathi-tokens', mk_asset_url( '/assets/css/tokens.css' ), array(), mk_asset_version( '/assets/css/tokens.css' ) );
+		wp_enqueue_style( 'maapkathi-base', mk_asset_url( '/assets/css/base.css' ), array( 'maapkathi-tokens' ), mk_asset_version( '/assets/css/base.css' ) );
+		wp_enqueue_style( 'maapkathi-sections', mk_asset_url( '/assets/css/sections.css' ), array( 'maapkathi-base' ), mk_asset_version( '/assets/css/sections.css' ) );
+		wp_enqueue_style( 'maapkathi-motion', mk_asset_url( '/assets/css/motion.css' ), array( 'maapkathi-base' ), mk_asset_version( '/assets/css/motion.css' ) );
 
-		// File-mtime versioning busts browser caches on deploy without
-		// anyone having to remember to bump a version constant.
-		//
-		// Every branch must return a NON-EMPTY string. wp_enqueue_style()
-		// treats '' as "no version" and omits the ?ver= query entirely —
-		// and with a CDN/browser Cache-Control of a week on these files,
-		// a versionless URL is cached indefinitely and no deploy is ever
-		// picked up. That is exactly what was happening in production:
-		// every theme stylesheet was being served from
-		// /assets/css/*.css with no query string at all. filemtime() can
-		// legitimately fail (opcache/stat cache, restrictive open_basedir,
-		// a symlinked or synced deploy), so both fallbacks are guarded.
-		$ver = static function ( string $rel ) use ( $theme_dir ): string {
-			$path  = $theme_dir . $rel;
-			$stamp = file_exists( $path ) ? filemtime( $path ) : false;
-			if ( false !== $stamp ) {
-				return (string) $stamp;
-			}
-
-			$theme_version = (string) wp_get_theme()->get( 'Version' );
-			return '' !== $theme_version ? $theme_version : MK_THEME_VERSION;
-		};
-
-		wp_enqueue_style( 'maapkathi-tokens', $theme_uri . '/assets/css/tokens.css', array(), $ver( '/assets/css/tokens.css' ) );
-		wp_enqueue_style( 'maapkathi-base', $theme_uri . '/assets/css/base.css', array( 'maapkathi-tokens' ), $ver( '/assets/css/base.css' ) );
-		wp_enqueue_style( 'maapkathi-sections', $theme_uri . '/assets/css/sections.css', array( 'maapkathi-base' ), $ver( '/assets/css/sections.css' ) );
-		wp_enqueue_style( 'maapkathi-motion', $theme_uri . '/assets/css/motion.css', array( 'maapkathi-base' ), $ver( '/assets/css/motion.css' ) );
-
-		wp_enqueue_script( 'maapkathi-motion-engine', $theme_uri . '/assets/js/motion-engine.js', array(), $ver( '/assets/js/motion-engine.js' ), true );
-		wp_enqueue_script( 'maapkathi-theme-toggle', $theme_uri . '/assets/js/theme-toggle.js', array(), $ver( '/assets/js/theme-toggle.js' ), true );
+		wp_enqueue_script( 'maapkathi-motion-engine', mk_asset_url( '/assets/js/motion-engine.js' ), array(), mk_asset_version( '/assets/js/motion-engine.js' ), true );
+		wp_enqueue_script( 'maapkathi-theme-toggle', mk_asset_url( '/assets/js/theme-toggle.js' ), array(), mk_asset_version( '/assets/js/theme-toggle.js' ), true );
 
 		// Lightbox only where a gallery can actually appear.
 		if ( is_singular( array( 'mk_project', 'mk_service' ) ) || mk_theme_has_gallery_section() ) {
-			wp_enqueue_script( 'maapkathi-lightbox', $theme_uri . '/assets/js/lightbox.js', array(), $ver( '/assets/js/lightbox.js' ), true );
+			wp_enqueue_script( 'maapkathi-lightbox', mk_asset_url( '/assets/js/lightbox.js' ), array(), mk_asset_version( '/assets/js/lightbox.js' ), true );
 		}
 
 		// The gallery script only ships where a gallery section renders.
 		if ( mk_theme_has_gallery_section() ) {
-			wp_enqueue_script( 'maapkathi-gallery', $theme_uri . '/assets/js/gallery.js', array(), $ver( '/assets/js/gallery.js' ), true );
+			wp_enqueue_script( 'maapkathi-gallery', mk_asset_url( '/assets/js/gallery.js' ), array(), mk_asset_version( '/assets/js/gallery.js' ), true );
 			wp_localize_script(
 				'maapkathi-gallery',
 				'mkGallery',
@@ -119,14 +98,14 @@ add_action(
 		// The marquee script only exists to pause the band in a hidden tab,
 		// so it is pointless anywhere the band is not a marquee.
 		if ( mk_theme_has_partner_marquee() ) {
-			wp_enqueue_script( 'maapkathi-partners-marquee', $theme_uri . '/assets/js/partners-marquee.js', array(), $ver( '/assets/js/partners-marquee.js' ), true );
+			wp_enqueue_script( 'maapkathi-partners-marquee', mk_asset_url( '/assets/js/partners-marquee.js' ), array(), mk_asset_version( '/assets/js/partners-marquee.js' ), true );
 		}
 
 		// The subscribe script is only useful where the newsletter column
 		// actually renders, which is the Modern footer with column 4 set to
 		// the newsletter (GR-06: no script on a page that cannot use it).
 		if ( mk_theme_has_subscribe_form() ) {
-			wp_enqueue_script( 'maapkathi-subscribe', $theme_uri . '/assets/js/subscribe.js', array(), $ver( '/assets/js/subscribe.js' ), true );
+			wp_enqueue_script( 'maapkathi-subscribe', mk_asset_url( '/assets/js/subscribe.js' ), array(), mk_asset_version( '/assets/js/subscribe.js' ), true );
 			wp_localize_script(
 				'maapkathi-subscribe',
 				'mkSubscribe',
@@ -148,7 +127,7 @@ add_action(
 
 		$fonts_url = mk_theme_google_fonts_url();
 		if ( $fonts_url ) {
-			wp_enqueue_style( 'maapkathi-google-fonts', $fonts_url, array(), $ver( '/style.css' ) );
+			wp_enqueue_style( 'maapkathi-google-fonts', $fonts_url, array(), mk_asset_version( '/style.css' ) );
 		}
 	}
 );
