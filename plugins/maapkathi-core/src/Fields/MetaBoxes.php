@@ -164,6 +164,11 @@ final class MetaBoxes {
 			),
 			'mk_partner'      => array(
 				array(
+					'key'   => 'mk_logo',
+					'label' => __( 'Logo', 'maapkathi' ),
+					'type'  => 'media',
+				),
+				array(
 					'key'   => 'mk_website',
 					'label' => __( 'Website', 'maapkathi' ),
 					'type'  => 'url',
@@ -180,6 +185,11 @@ final class MetaBoxes {
 				),
 			),
 			'mk_client'       => array(
+				array(
+					'key'   => 'mk_logo',
+					'label' => __( 'Logo', 'maapkathi' ),
+					'type'  => 'media',
+				),
 				array(
 					'key'   => 'mk_website',
 					'label' => __( 'Website', 'maapkathi' ),

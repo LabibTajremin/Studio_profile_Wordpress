@@ -2,9 +2,11 @@
 /**
  * "Our Partners" logo band (FR-10).
  *
- * Sits directly above the footer. Renders nothing at all when no partner
- * logos are configured — no empty band, no heading floating over nothing
- * (FR-10.9).
+ * Sits directly above the footer, on the page background, which is what
+ * separates the last section from the footer when both are accent-tinted.
+ * Its logos come from partners, clients, or both, whichever the admin
+ * chose. Renders nothing at all when no logos are configured — no empty
+ * band, no heading floating over nothing (FR-10.9).
  *
  * @package maapkathi-theme
  */
@@ -15,7 +17,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-$mk_partners = mk_setting( 'section_partners_enabled', true ) ? mk_content( 'partners' ) : array();
+$mk_partners_source = (string) mk_setting( 'partners_source', 'partners' );
+$mk_partners        = mk_setting( 'section_partners_enabled', true ) ? mk_content( 'logo_wall', $mk_partners_source ) : array();
 
 if ( ! $mk_partners ) {
 	return;
@@ -49,20 +52,10 @@ if ( $mk_partners_grey ) {
  */
 $mk_render_partner = static function ( \WP_Post $partner ): void {
 	$name = get_the_title( $partner );
-	$alt  = mk_meta( $partner->ID, 'mk_alt_text' );
 	$url  = mk_meta( $partner->ID, 'mk_website' );
-	$logo = get_the_post_thumbnail(
-		$partner,
-		'medium',
-		array(
-			'class'    => 'mk-partners__logo',
-			'loading'  => 'lazy',
-			'decoding' => 'async',
-			// Alt text falls back to the partner's name, so a logo is never
-			// announced as an unnamed image.
-			'alt'      => '' !== $alt ? $alt : $name,
-		)
-	);
+	// The dedicated logo field, falling back to the featured image — the
+	// alt text and that fallback are both resolved plugin-side.
+	$logo = mk_logo_image( $partner, 'medium', array( 'class' => 'mk-partners__logo' ) );
 	?>
 	<li class="mk-partners__item">
 		<?php if ( $url ) : ?>

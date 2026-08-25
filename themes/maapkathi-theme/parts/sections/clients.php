@@ -38,14 +38,13 @@ if ( ! $mk_data ) {
 				<?php
 				$website = mk_meta( $client->ID, 'mk_website' );
 				$name    = get_the_title( $client );
-				$logo    = get_the_post_thumbnail(
-					$client,
-					'medium',
-					array(
-						'loading' => 'lazy',
-						'class'   => 'mk-clients__logo',
-					)
-				);
+				// The client's dedicated logo field only — deliberately NOT
+				// the featured image. A client's featured image is a
+				// photograph of the work, and reading it here put an
+				// interior shot in the middle of the logo wall. A client
+				// with no logo uploaded falls through to the initials mark
+				// below, which is a deliberate design, not a gap.
+				$logo = mk_logo_image( $client, 'medium', array( 'class' => 'mk-clients__logo' ), true );
 				// The name always accompanies a bare initials mark, whatever
 				// the setting — otherwise a client with no logo uploaded
 				// would render as an unidentifiable coloured square.

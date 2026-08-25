@@ -1,5 +1,47 @@
 # Build status — honest checklist
 
+## Client and partner logos are their own field
+
+A client's featured image is a photograph of the work, so reading it for
+the client wall put an interior shot in among the logos on the live site.
+Both `mk_client` and `mk_partner` now carry a dedicated `mk_logo`
+attachment field (the existing reusable `media` field type), resolved by
+`Support\Logos`.
+
+The two types deliberately differ on the fallback. Partners have always
+been logo-only records, so a partner's featured image still counts as a
+logo and existing sites render unchanged. A client's does not: the client
+wall and the logo band use the dedicated field only, and a client with no
+logo uploaded falls through to the initials mark rather than showing its
+photograph.
+
+The logo band above the footer (FR-10) also gained a source setting —
+partners, clients, or both — so a "Trusted by" band does not mean entering
+every logo twice. It sits on the page background between the last section
+and the footer, which is what stops an accent-tinted closing section and
+an accent-tinted footer reading as one oversized block.
+
+While wiring the field up, a pre-existing bug surfaced: the admin CSS/JS
+bundle was enqueued only on screens whose hook contains "maapkathi", but
+the content edit screens are WordPress's own post.php / post-new.php. Every
+media and icon picker inside a meta box has therefore been inert since it
+was added — "Choose image" did nothing, because neither `wp_enqueue_media()`
+nor the plugin's admin JS ever loaded there. `Menu::is_mk_post_screen()`
+now includes those screens.
+
+Verified on the live Docker stack: the Logo field renders on both edit
+screens, the Media Library modal actually opens from it, a value saved
+through the real admin form round-trips and shows its preview thumbnail,
+and the front page then renders that logo with the correct alt text. A
+client holding only a featured image renders the initials mark, not the
+photograph. The band's three sources return 2 / 1 / 3 logos against a
+fixture where one client's image is a photograph rather than a logo, and
+its computed background is transparent (the page background) while the
+footer's is not. Thirteen assertions covering every case in
+`tests/Integration/LogoResolutionTest.php` were also executed directly
+against the running WordPress, since PHPUnit itself still cannot run here.
+
+
 ## Static assets are versioned in the path, not in `?ver=`
 
 Production (Hostinger/LiteSpeed) has "remove query strings from static

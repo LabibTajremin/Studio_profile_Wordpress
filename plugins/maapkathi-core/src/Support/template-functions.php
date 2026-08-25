@@ -15,6 +15,7 @@ declare( strict_types = 1 );
 use Maapkathi\Core\Support\SiteText;
 use Maapkathi\Core\Support\Content;
 use Maapkathi\Core\Support\Branding;
+use Maapkathi\Core\Support\Logos;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -87,6 +88,25 @@ if ( ! function_exists( 'mk_content' ) ) {
 			return array();
 		}
 		return call_user_func_array( array( Content::class, $what ), $args );
+	}
+}
+
+if ( ! function_exists( 'mk_logo_image' ) ) {
+	/**
+	 * A client's or partner's logo as an `<img>`, or '' when it has none.
+	 *
+	 * Reads the record's dedicated logo field and falls back to its
+	 * featured image, so a wall of logos never picks up the photograph
+	 * that represents the record elsewhere.
+	 *
+	 * @param \WP_Post|int         $post           Post or post id.
+	 * @param string               $size           Registered image size.
+	 * @param array<string,string> $attr           Attributes merged over the defaults.
+	 * @param bool                 $dedicated_only Ignore the featured-image fallback.
+	 * @return string
+	 */
+	function mk_logo_image( $post, string $size = 'medium', array $attr = array(), bool $dedicated_only = false ): string {
+		return Logos::image( $post, $size, $attr, $dedicated_only );
 	}
 }
 

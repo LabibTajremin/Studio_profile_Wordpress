@@ -82,6 +82,9 @@ final class SettingsScreen {
 		$settings['partners_max_logo_h'] = max( 24, min( 160, absint( $_POST['partners_max_logo_h'] ?? 48 ) ) );
 		$settings['partners_greyscale']  = ! empty( $_POST['partners_greyscale'] );
 		$settings['partners_speed']      = max( 10, min( 120, absint( $_POST['partners_speed'] ?? 40 ) ) );
+		// FR-10: where the band's logos come from. Clients are offered so a
+		// "Trusted by" band does not mean entering every logo twice.
+		$settings['partners_source']     = in_array( $_POST['partners_source'] ?? '', array( 'partners', 'clients', 'both' ), true ) ? sanitize_text_field( wp_unslash( $_POST['partners_source'] ) ) : 'partners';
 		$settings['partners_background'] = in_array( $_POST['partners_background'] ?? '', array( 'none', 'surface', 'accent' ), true ) ? sanitize_text_field( wp_unslash( $_POST['partners_background'] ) ) : 'none';
 
 		// FR-04: Projects layout. The responsive column ladder is derived
