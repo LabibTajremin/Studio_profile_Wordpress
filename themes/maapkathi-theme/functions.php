@@ -95,6 +95,19 @@ add_action(
 			);
 		}
 
+		// The rail arrows only exist where the rail does (GR-06).
+		if ( mk_theme_has_showcase_rail() ) {
+			wp_enqueue_script( 'maapkathi-showcase', mk_asset_url( '/assets/js/showcase.js' ), array(), mk_asset_version( '/assets/js/showcase.js' ), true );
+			wp_localize_script(
+				'maapkathi-showcase',
+				'mkShowcase',
+				array(
+					'previous' => __( 'Previous projects', 'maapkathi' ),
+					'next'     => __( 'Next projects', 'maapkathi' ),
+				)
+			);
+		}
+
 		// The marquee script only exists to pause the band in a hidden tab,
 		// so it is pointless anywhere the band is not a marquee.
 		if ( mk_theme_has_partner_marquee() ) {
@@ -495,6 +508,23 @@ function mk_theme_has_gallery_section(): bool {
 	}
 
 	return 'gallery' === mk_setting( 'projects_layout', 'showcase' )
+		&& (bool) mk_setting( 'section_projects_enabled', true );
+}
+
+/**
+ * Whether the featured-work section on this request renders as the
+ * horizontal showcase rail.
+ *
+ * Gates the rail's arrow script, which is useless on any other layout.
+ *
+ * @return bool
+ */
+function mk_theme_has_showcase_rail(): bool {
+	if ( ! is_front_page() || ! function_exists( 'mk_setting' ) ) {
+		return false;
+	}
+
+	return 'showcase' === mk_setting( 'projects_layout', 'showcase' )
 		&& (bool) mk_setting( 'section_projects_enabled', true );
 }
 

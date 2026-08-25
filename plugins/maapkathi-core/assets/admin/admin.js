@@ -370,4 +370,29 @@
 			}
 		}
 	} );
+	/**
+	 * Paired range + number inputs. The number box carries the field name
+	 * and is the value that posts; the slider is a second way to set it,
+	 * so the two are kept in step in both directions.
+	 */
+	document.querySelectorAll( '[data-mk-range]' ).forEach( function ( wrap ) {
+		var slider = wrap.querySelector( '[data-mk-range-slider]' );
+		var number = wrap.querySelector( '[data-mk-range-number]' );
+		if ( ! slider || ! number ) {
+			return;
+		}
+
+		slider.addEventListener( 'input', function () {
+			number.value = slider.value;
+		} );
+
+		number.addEventListener( 'input', function () {
+			// A half-typed or out-of-range number must not drag the slider
+			// to an edge — leave it where it is until the value is usable.
+			var value = parseInt( number.value, 10 );
+			if ( ! isNaN( value ) && value >= Number( slider.min ) && value <= Number( slider.max ) ) {
+				slider.value = value;
+			}
+		} );
+	} );
 } )();
