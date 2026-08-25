@@ -95,7 +95,8 @@ final class Content {
 	 *
 	 * A published partner with no logo attached is dropped rather than
 	 * rendered: the section is a wall of logos, and an entry with nothing
-	 * to show would leave a hole in it.
+	 * to show would leave a hole in it. "Logo" means the dedicated logo
+	 * field, falling back to the featured image.
 	 *
 	 * @return \WP_Post[]
 	 */
@@ -103,9 +104,51 @@ final class Content {
 		return array_values(
 			array_filter(
 				self::items( 'mk_partner' ),
-				static fn( $partner ) => (bool) get_post_thumbnail_id( $partner )
+				static fn( $partner ) => Logos::has( $partner )
 			)
 		);
+	}
+
+	/**
+	 * Records for the logo band above the footer, from the source the
+	 * admin chose (FR-10).
+	 *
+	 * Clients are offered as a source because most studios already keep
+	 * that list and would otherwise have to enter every logo twice to get
+	 * a "Trusted by" band. Whatever the source, a record with no logo is
+	 * dropped: the band is a wall of logos, and an entry with nothing to
+	 * show would leave a hole in it.
+	 *
+	 * @param string $source One of 'partners', 'clients', 'both'.
+	 * @return \WP_Post[]
+	 */
+	public static function logo_wall( string $source = 'partners' ): array {
+		$posts = array();
+
+		if ( 'clients' !== $source ) {
+			// Partners have always been logo-only records, so their
+			// featured image counts as a logo here.
+			$posts = array_filter(
+				self::items( 'mk_partner' ),
+				static fn( $partner ) => Logos::has( $partner )
+			);
+		}
+
+		if ( 'partners' !== $source ) {
+			// Clients are not: their featured image is a photograph of the
+			// work, which is exactly what must never end up in a wall of
+			// logos. A client appears here only once a real logo is
+			// uploaded to the logo field.
+			$posts = array_merge(
+				$posts,
+				array_filter(
+					self::items( 'mk_client' ),
+					static fn( $client ) => Logos::has_dedicated( $client )
+				)
+			);
+		}
+
+		return array_values( $posts );
 	}
 
 	/**

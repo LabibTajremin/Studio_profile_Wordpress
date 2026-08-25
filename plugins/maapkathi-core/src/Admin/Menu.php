@@ -118,18 +118,43 @@ final class Menu {
 	}
 
 	/**
+	 * Whether the current screen is the add/edit screen of one of the
+	 * plugin's own content types.
+	 *
+	 * Those screens are rendered by WordPress at post.php / post-new.php,
+	 * so their hook suffix never contains "maapkathi" — but they carry the
+	 * plugin's meta boxes, and the media and icon pickers inside them need
+	 * the same bundle the plugin's own screens load.
+	 *
+	 * @param string $hook Current admin page hook suffix.
+	 * @return bool
+	 */
+	private function is_mk_post_screen( string $hook ): bool {
+		if ( 'post.php' !== $hook && 'post-new.php' !== $hook ) {
+			return false;
+		}
+
+		$screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
+
+		return $screen instanceof \WP_Screen && str_starts_with( (string) $screen->post_type, 'mk_' );
+	}
+
+	/**
 	 * Enqueues the admin CSS/JS bundle on Maapkathi screens only.
 	 *
 	 * @param string $hook Current admin page hook suffix.
 	 * @return void
 	 */
 	public function enqueue_assets( string $hook ): void {
-		if ( ! str_contains( $hook, 'maapkathi' ) ) {
+		if ( ! str_contains( $hook, 'maapkathi' ) && ! $this->is_mk_post_screen( $hook ) ) {
 			return;
 		}
 
 		// The Settings and Hero screens pick images from the Media
-		// Library, which needs core's media modal scripts loaded.
+		// Library, which needs core's media modal scripts loaded — and so
+		// do the logo and icon fields on the content edit screens, which
+		// is why those screens are included above. Without it their
+		// "Choose image" buttons are inert.
 		wp_enqueue_media();
 
 		wp_enqueue_style( 'maapkathi-admin', MK_PLUGIN_URL . 'assets/admin/admin.css', array(), MK_DB_VERSION );

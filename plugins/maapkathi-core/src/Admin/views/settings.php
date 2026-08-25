@@ -114,8 +114,24 @@ $socials = $settings['socials'] ?? array();
 		</table>
 
 		<h2><?php esc_html_e( 'Our Partners', 'maapkathi' ); ?></h2>
-		<p class="description"><?php esc_html_e( 'The partner logo band that sits directly above the footer. Add the logos themselves under Partners in the menu — this section is only about how they are displayed. With no partner logos added, the section does not appear at all.', 'maapkathi' ); ?></p>
+		<p class="description"><?php esc_html_e( 'The logo band that sits directly above the footer, separating the last section from it. Add the logos under Partners (or Clients) in the menu — this section is only about how they are displayed. With no logos added, the section does not appear at all.', 'maapkathi' ); ?></p>
 		<table class="form-table">
+			<tr>
+				<th><?php esc_html_e( 'Logos to show', 'maapkathi' ); ?></th>
+				<td>
+					<?php
+					$mk_partner_sources = array(
+						'partners' => __( 'Partners', 'maapkathi' ),
+						'clients'  => __( 'Clients', 'maapkathi' ),
+						'both'     => __( 'Partners and clients', 'maapkathi' ),
+					);
+					foreach ( $mk_partner_sources as $mk_source_id => $mk_source_label ) :
+						?>
+						<label style="margin-right:1.5em"><input type="radio" name="partners_source" value="<?php echo esc_attr( $mk_source_id ); ?>" <?php checked( (string) ( $settings['partners_source'] ?? 'partners' ), $mk_source_id ); ?> /> <?php echo esc_html( $mk_source_label ); ?></label>
+					<?php endforeach; ?>
+					<p class="description"><?php esc_html_e( 'Pick Clients to turn this into a "Trusted by" band without entering every logo twice. Whichever you pick, only records with a logo uploaded appear here — a client with no logo is skipped rather than shown as a gap.', 'maapkathi' ); ?></p>
+				</td>
+			</tr>
 			<tr>
 				<th><?php esc_html_e( 'Layout', 'maapkathi' ); ?></th>
 				<td>
