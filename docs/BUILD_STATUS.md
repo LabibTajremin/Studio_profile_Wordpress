@@ -1,5 +1,66 @@
 # Build status — honest checklist
 
+## Footer subscribe button, showcase rail, footer logo size
+
+**The subscribe button was invisible.** It painted `background: var(--accent)`
+with `color: var(--accent-foreground)`, but FR-08.2 lets the footer
+background be set to the accent — and an accent button on an accent footer
+cannot be seen. It now inverts the footer's own colours (`--footer-fg`
+background, `--footer-bg` text), which `FooterColor::resolve()` has already
+contrast-checked against each other, so it is legible on every footer
+background by construction. Hover lifts it 2px with a shadow rather than
+changing hue, so that guarantee survives the hover state.
+
+**Featured work is a horizontal rail.** The full-bleed gapless wall ran
+edge to edge with no breathing room and could only ever show what fitted
+one screen. It is now a snap-scrolling rail inside the section's gutter.
+It scrolls with touch, trackpad, scrollbar and keyboard from CSS alone;
+`assets/js/showcase.js` adds prev/next arrows on top and creates them in
+JS rather than PHP, so a failed script leaves no dead controls. "View all
+work" changed from bare underlined text to a pill with a hairline border
+and an arrow that travels on hover.
+
+**Footer logo size is a slider.** The number-only "Maximum logo height"
+field is now a paired range + number control labelled "Logo size", and its
+ceiling went from 160px to 320px so a wordmark can be made large enough to
+read.
+
+Raising that ceiling exposed a real bug: `.mk-footer__logo-img` set
+`max-height` and `width: auto` but no `max-width`, so a wide wordmark at a
+large logo height became wider than its column, stretched the footer grid
+and put a horizontal scrollbar on the whole page (GR-04). Caught at 390px
+with the size set to 200px, and fixed with `max-width: 100%`.
+
+Verified on the live stack with the footer background set to the accent —
+the exact reported condition. The button renders cream on maroon instead
+of maroon on maroon, and hover applies a −2px translate plus a shadow. The
+rail insets 16 / 31 / 168px at 390 / 768 / 1440, scrolls at every width,
+and the page's horizontal overflow is 0 at all three. The next arrow
+advances exactly one tile plus its gap (373px), the prev arrow enables
+once scrolled, and both hide when everything already fits. The logo
+slider drives the number box, saves, persists across a reload and reaches
+the front end as `--footer-logo-max-h: 200px`.
+
+## Demo data covers partners
+
+`wp maapkathi seed` now seeds six partners with generated logos, alt text
+and websites, so the logo band — and therefore the separation it puts
+between the closing section and the footer — is visible on a freshly
+seeded site instead of only after someone adds partners by hand. Partners
+are also torn down by `--fresh`, alongside every other demo type.
+
+The client seeder was corrected at the same time: it was attaching its
+generated logo as the featured image, which the client wall no longer
+reads, so seeded clients would have rendered as initials marks. It writes
+to the logo field now.
+
+Verified on the live stack: `--fresh` reseeds cleanly, all six partners
+carry a logo and alt text, all six clients carry a logo and no featured
+image, the front page renders six client logos with no initials marks, and
+the band renders six partner logos at the default source (twelve with
+"both"). Partners appear in the Maapkathi admin menu between Clients and
+Awards, and its list screen shows the six seeded records.
+
 ## Client and partner logos are their own field
 
 A client's featured image is a photograph of the work, so reading it for
