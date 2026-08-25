@@ -1,5 +1,25 @@
 # Build status — honest checklist
 
+## Demo data covers partners
+
+`wp maapkathi seed` now seeds six partners with generated logos, alt text
+and websites, so the logo band — and therefore the separation it puts
+between the closing section and the footer — is visible on a freshly
+seeded site instead of only after someone adds partners by hand. Partners
+are also torn down by `--fresh`, alongside every other demo type.
+
+The client seeder was corrected at the same time: it was attaching its
+generated logo as the featured image, which the client wall no longer
+reads, so seeded clients would have rendered as initials marks. It writes
+to the logo field now.
+
+Verified on the live stack: `--fresh` reseeds cleanly, all six partners
+carry a logo and alt text, all six clients carry a logo and no featured
+image, the front page renders six client logos with no initials marks, and
+the band renders six partner logos at the default source (twelve with
+"both"). Partners appear in the Maapkathi admin menu between Clients and
+Awards, and its list screen shows the six seeded records.
+
 ## Client and partner logos are their own field
 
 A client's featured image is a photograph of the work, so reading it for
