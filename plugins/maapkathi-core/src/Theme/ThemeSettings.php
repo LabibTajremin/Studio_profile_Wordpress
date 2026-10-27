@@ -107,7 +107,6 @@ final class ThemeSettings {
 			'background_tone'        => Backgrounds::ids(),
 			'radius'                 => array_keys( Fonts::RADIUS_SCALE ),
 			'density'                => array_keys( Fonts::DENSITY_SCALE ),
-			'hero_style'             => array( 'full-bleed', 'contained', 'split', 'minimal' ),
 			'motion_preset'          => array( 'off', 'subtle', 'refined', 'expressive', 'custom' ),
 			'motion_level'           => array( 'off', 'subtle', 'refined', 'expressive', 'custom' ),
 			'scroll_reveal_style'    => array_column( Motion::scroll_reveal_styles(), 'id' ),
@@ -216,6 +215,11 @@ final class ThemeSettings {
 		// motion_level mirrors motion_preset — legacy parity column, no
 		// independent control (§11.1 #16).
 		$out['motion_level'] = $out['motion_preset'];
+
+		// The hero is always full-bleed and always full viewport. The column is
+		// kept for schema parity with the source app but is never admin-settable,
+		// so a stale or hand-crafted POST cannot shrink the hero.
+		$out['hero_style'] = 'full-bleed';
 
 		return $out;
 	}

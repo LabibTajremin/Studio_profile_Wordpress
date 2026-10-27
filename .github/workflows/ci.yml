@@ -79,15 +79,25 @@ jobs:
           node-version: 20
       - run: npm install
       - name: Run E2E tests
+        env:
+          MK_BASE_URL: ${{ vars.MK_BASE_URL }}
         run: |
-          # No spec files exist yet under tests/E2E, and this job doesn't
-          # stand up a WordPress server for Playwright to hit — see
+          # This job does not stand up a WordPress server — see
           # docs/BUILD_STATUS.md, "no real browser/Playwright run ever
           # happened". Skip gracefully rather than failing on
           # infrastructure that hasn't been built, or faking coverage
           # with specs that assert nothing real.
+          #
+          # Set the repository variable MK_BASE_URL (Settings -> Secrets and
+          # variables -> Actions -> Variables) to a reachable site and these
+          # run for real. Without it we skip before installing a browser,
+          # so the job does not sit until its timeout.
           if ! find tests/E2E -name '*.spec.ts' -print -quit | grep -q .; then
             echo "No E2E specs found under tests/E2E — skipping."
+            exit 0
+          fi
+          if [ -z "${MK_BASE_URL}" ]; then
+            echo "MK_BASE_URL is not set — no server for Playwright to hit. Skipping."
             exit 0
           fi
           npx playwright install --with-deps chromium

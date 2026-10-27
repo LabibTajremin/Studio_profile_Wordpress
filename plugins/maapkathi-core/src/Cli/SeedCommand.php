@@ -74,6 +74,7 @@ final class SeedCommand {
 		$this->seed_team();
 		$this->seed_testimonials();
 		$this->seed_clients();
+		$this->seed_partners();
 		$this->seed_awards();
 		$this->seed_stats();
 		$this->seed_values();
@@ -170,7 +171,7 @@ final class SeedCommand {
 	 * Remove all previously seeded demo content, generated images, and the seed marker.
 	 */
 	private function tear_down(): void {
-		foreach ( array( 'mk_project', 'mk_service', 'mk_member', 'mk_testimonial', 'mk_client', 'mk_award', 'mk_faq', 'mk_value', 'mk_stat', 'mk_process_step' ) as $type ) {
+		foreach ( array( 'mk_project', 'mk_service', 'mk_member', 'mk_testimonial', 'mk_client', 'mk_partner', 'mk_award', 'mk_faq', 'mk_value', 'mk_stat', 'mk_process_step' ) as $type ) {
 			$ids = get_posts(
 				array(
 					'post_type'      => $type,
@@ -519,10 +520,46 @@ final class SeedCommand {
 					'mk_website'     => 'https://example.com/' . $slug,
 					'mk_is_featured' => $i < 3 ? 1 : 0,
 					'mk_sort_order'  => $i,
+					// The logo field, deliberately not the featured image:
+					// a client's featured image is a photograph of the
+					// work, and the client wall shows logos only.
+					'mk_logo'        => DemoAssets::logo( 'mk-demo-client-' . $slug, $name, $i ),
+				)
+			);
+		}
+	}
+
+	/**
+	 * Seed demo mk_partner posts with logos.
+	 *
+	 * These are what fill the logo band between the last homepage section
+	 * and the footer, so the separation that band provides is visible on a
+	 * freshly seeded site rather than only once someone adds partners by
+	 * hand.
+	 */
+	private function seed_partners(): void {
+		$partners = array( 'Delta Build', 'Kiln & Co', 'Ravi Timberworks', 'Meridian Glass', 'Coastal Stone', 'Lumen Lighting' );
+
+		foreach ( $partners as $i => $name ) {
+			$slug = sanitize_title( $name );
+			$id   = $this->upsert(
+				'mk_partner',
+				$slug,
+				array(
+					'post_title' => $name,
+					'menu_order' => $i,
 				)
 			);
 
-			$this->attach_cover( $id, DemoAssets::logo( 'mk-demo-client-' . $slug, $name, $i ) );
+			$this->set_meta(
+				$id,
+				array(
+					'mk_website'    => 'https://example.com/' . $slug,
+					'mk_alt_text'   => sprintf( '%s logo', $name ),
+					'mk_sort_order' => $i,
+					'mk_logo'       => DemoAssets::logo( 'mk-demo-partner-' . $slug, $name, $i + 2 ),
+				)
+			);
 		}
 	}
 

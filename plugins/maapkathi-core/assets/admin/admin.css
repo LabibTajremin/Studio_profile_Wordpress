@@ -272,3 +272,8 @@
 	vertical-align: middle;
 }
 .mk-repeater__row:hover .mk-repeater__remove { opacity: 1; }
+
+/* Paired range + number control (footer logo size). */
+.mk-range { display: flex; align-items: center; gap: 0.75em; }
+.mk-range input[type="range"] { flex: 0 1 18em; max-width: 100%; }
+.mk-range input[type="number"] { width: 5.5em; }

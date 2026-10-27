@@ -126,8 +126,30 @@ $mk_col4     = (array) $footer['col4'];
 				</td>
 			</tr>
 			<tr>
-				<th><?php esc_html_e( 'Maximum logo height', 'maapkathi' ); ?></th>
-				<td><input type="number" min="24" max="160" name="mk_footer[logo_max_h]" value="<?php echo esc_attr( (string) $footer['logo_max_h'] ); ?>" /> px</td>
+				<th><?php esc_html_e( 'Logo size', 'maapkathi' ); ?></th>
+				<td>
+					<?php // Slider and number box edit the same value — drag to judge it by eye, type to set it exactly. ?>
+					<div class="mk-range" data-mk-range>
+						<input
+							type="range"
+							min="24"
+							max="320"
+							step="4"
+							value="<?php echo esc_attr( (string) $footer['logo_max_h'] ); ?>"
+							aria-label="<?php esc_attr_e( 'Logo size', 'maapkathi' ); ?>"
+							data-mk-range-slider
+						/>
+						<input
+							type="number"
+							min="24"
+							max="320"
+							name="mk_footer[logo_max_h]"
+							value="<?php echo esc_attr( (string) $footer['logo_max_h'] ); ?>"
+							data-mk-range-number
+						/> px
+					</div>
+					<p class="description"><?php esc_html_e( 'The height the footer logo is fitted into, keeping its proportions. Wide wordmark logos usually need a larger value than square marks.', 'maapkathi' ); ?></p>
+				</td>
 			</tr>
 		</table>
 

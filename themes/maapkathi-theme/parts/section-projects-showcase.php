@@ -2,9 +2,14 @@
 /**
  * Featured work — showcase layout.
  *
- * Full-bleed, gapless tiles matching the client's reference: hovering a
- * tile washes it and lifts a caption carrying the project title and its
+ * A horizontal rail of tiles inside the section's gutter: hovering a tile
+ * washes it and lifts a caption carrying the project title and its
  * category. Required from the projects section partial, which owns $mk_data.
+ *
+ * The rail scrolls natively — touch, trackpad, scrollbar and keyboard all
+ * work with no JavaScript at all. The arrows are added by showcase.js on
+ * top of that, so nothing here renders a control that would sit dead if
+ * the script fails to load.
  *
  * @package maapkathi-theme
  */
@@ -21,7 +26,8 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @var \WP_Post[] $mk_data Projects to show.
  */
 ?>
-<ul class="mk-showcase">
+<div class="mk-showcase-rail" data-mk-showcase>
+	<ul class="mk-showcase" tabindex="0" role="list" aria-label="<?php esc_attr_e( 'Featured work', 'maapkathi' ); ?>">
 	<?php foreach ( $mk_data as $mk_showcase_project ) : ?>
 		<?php
 		$mk_showcase_title = get_the_title( $mk_showcase_project );
@@ -67,4 +73,5 @@ if ( ! defined( 'ABSPATH' ) ) {
 			</a>
 		</li>
 	<?php endforeach; ?>
-</ul>
+	</ul>
+</div>

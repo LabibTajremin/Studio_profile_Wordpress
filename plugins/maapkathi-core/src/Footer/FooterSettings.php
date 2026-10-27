@@ -135,13 +135,15 @@ final class FooterSettings {
 		$defaults = self::defaults();
 		$out      = array();
 
-		$out['style']         = in_array( $input['style'] ?? '', array( 'classic', 'modern' ), true ) ? $input['style'] : $defaults['style'];
-		$out['bg_mode']       = in_array( $input['bg_mode'] ?? '', array( 'dark', 'accent', 'custom', 'surface' ), true ) ? $input['bg_mode'] : $defaults['bg_mode'];
-		$out['bg_hex']        = HexColor::normalize( $input['bg_hex'] ?? null );
-		$out['logo_light']    = absint( $input['logo_light'] ?? 0 );
-		$out['logo_dark']     = absint( $input['logo_dark'] ?? 0 );
-		$out['logo_mode']     = in_array( $input['logo_mode'] ?? '', array( 'auto', 'light', 'dark' ), true ) ? $input['logo_mode'] : $defaults['logo_mode'];
-		$out['logo_max_h']    = max( 24, min( 160, absint( $input['logo_max_h'] ?? $defaults['logo_max_h'] ) ) );
+		$out['style']      = in_array( $input['style'] ?? '', array( 'classic', 'modern' ), true ) ? $input['style'] : $defaults['style'];
+		$out['bg_mode']    = in_array( $input['bg_mode'] ?? '', array( 'dark', 'accent', 'custom', 'surface' ), true ) ? $input['bg_mode'] : $defaults['bg_mode'];
+		$out['bg_hex']     = HexColor::normalize( $input['bg_hex'] ?? null );
+		$out['logo_light'] = absint( $input['logo_light'] ?? 0 );
+		$out['logo_dark']  = absint( $input['logo_dark'] ?? 0 );
+		$out['logo_mode']  = in_array( $input['logo_mode'] ?? '', array( 'auto', 'light', 'dark' ), true ) ? $input['logo_mode'] : $defaults['logo_mode'];
+		// Upper bound raised from 160 so a wordmark-shaped logo can be made
+		// large enough to read; the floor stops it vanishing entirely.
+		$out['logo_max_h']    = max( 24, min( 320, absint( $input['logo_max_h'] ?? $defaults['logo_max_h'] ) ) );
 		$out['show_divider']  = ! empty( $input['show_divider'] );
 		$out['centre_mobile'] = ! empty( $input['centre_mobile'] );
 		$out['socials']       = self::sanitize_socials( $input['socials'] ?? array() );
