@@ -192,7 +192,6 @@ final class ThemeVarsBuilder {
 	public static function data_attrs_for( array $settings ): array {
 		return array(
 			'data-mode'                => $settings['mode'],
-			'data-hero-style'          => $settings['hero_style'],
 			'data-hero-animation'      => $settings['hero_animation'],
 			'data-loader-style'        => $settings['loader_style'],
 			'data-page-transition'     => $settings['page_transition'],

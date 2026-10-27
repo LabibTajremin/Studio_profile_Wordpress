@@ -271,15 +271,18 @@ Found by walking the site as a client would, against the live stack:
   `/blog/`, `/contact/`) return 200 with well-formed, fully-closed HTML and
   zero PHP log entries.
 - **The theme engine is live-confirmed working end to end**, not just
-  unit-tested: saved 19 of the 30 Appearance/Motion controls through the
-  real admin form (accent, pattern, radius, density, hero style, motion
-  preset, all 6 motion selects, cursor/loader style, parallax/speed/
-  stagger sliders, motion-on-mobile) and confirmed the **public homepage's
-  rendered `<html>` reflected every change immediately** (`--accent:
-  #0f5a5e`, `--radius: 9999px`, `data-hero-style="contained"`,
-  `data-cursor-style="ring"`, `data-loader-style="bar"`) with no hard
-  refresh — proving the transient cache-bust-on-save (§11.3) genuinely
-  works.
+  unit-tested: saved 18 of the 29 Appearance/Motion controls through the
+  real admin form (accent, pattern, radius, density, motion preset, all 6
+  motion selects, cursor/loader style, parallax/speed/stagger sliders,
+  motion-on-mobile) and confirmed the **public homepage's rendered
+  `<html>` reflected every change immediately** (`--accent: #0f5a5e`,
+  `--radius: 9999px`, `data-cursor-style="ring"`,
+  `data-loader-style="bar"`) with no hard refresh — proving the transient
+  cache-bust-on-save (§11.3) genuinely works.
+- **Hero style is no longer a control.** It shipped as a 4-way select and
+  production was left on `minimal`, which rendered the hero at 43–50% of
+  the viewport. The variants and the `data-hero-style` attribute are gone;
+  the hero is now `min-height: 100svh` unconditionally (§11.5).
 - **Hero screen save** round-tripped through the real form (slide
   duration, media kind, headline, image URL) and persisted correctly into
   `mk_site_settings`.
