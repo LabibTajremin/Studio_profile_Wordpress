@@ -255,11 +255,9 @@ $is_custom_preset = 'custom' === $settings['motion_preset'];
 			<tr>
 				<th><?php esc_html_e( '14. Hero style', 'maapkathi' ); ?></th>
 				<td>
-					<select name="mk_theme_settings[hero_style]">
-						<?php foreach ( array( 'full-bleed', 'contained', 'split', 'minimal' ) as $mk_hero_style_id ) : ?>
-							<option value="<?php echo esc_attr( $mk_hero_style_id ); ?>" <?php selected( $settings['hero_style'], $mk_hero_style_id ); ?>><?php echo esc_html( ucwords( str_replace( '-', ' ', $mk_hero_style_id ) ) ); ?></option>
-						<?php endforeach; ?>
-					</select>
+					<p class="description">
+						<?php esc_html_e( 'The hero always fills the full page. Whatever image, GIF or video you upload is scaled to cover it, so this is not adjustable.', 'maapkathi' ); ?>
+					</p>
 				</td>
 			</tr>
 		</table>

@@ -48,6 +48,29 @@ final class ThemeSettingsRegistryTest extends TestCase {
 		$this->assertSame( $this->expected_keys(), ThemeSettings::keys() );
 	}
 
+	/**
+	 * The hero is full-page by product decision. It is stored for schema parity
+	 * but must never be settable — if someone re-adds a size control, this fails.
+	 */
+	public function test_hero_style_is_forced_and_not_adjustable(): void {
+		$this->assertArrayNotHasKey(
+			'hero_style',
+			ThemeSettings::allowed_values(),
+			'hero_style must not be an admin-selectable setting.'
+		);
+
+		foreach ( array( 'minimal', 'contained', 'split', 'nonsense', '' ) as $attempt ) {
+			$out = ThemeSettings::sanitize(
+				array_merge( ThemeSettings::defaults(), array( 'hero_style' => $attempt ) )
+			);
+			$this->assertSame(
+				'full-bleed',
+				$out['hero_style'],
+				sprintf( 'Posting hero_style="%s" must still yield full-bleed.', $attempt )
+			);
+		}
+	}
+
 	public function test_2_background_tones_never_plain_white(): void {
 		$this->assertSame( array( 'warm', 'cool' ), Backgrounds::ids() );
 		$this->assertSame( 'warm', Backgrounds::DEFAULT_TONE );

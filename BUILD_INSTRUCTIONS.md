@@ -204,7 +204,7 @@ Every one of these exists in the source app and must exist here.
 | 11 | Hero | Carousel slide manager (add/edit/reorder/toggle). Each slide takes **an image, a GIF, an uploaded MP4, or a video link** (§6.3), with the length warning and per-slide hold toggle. Global slide-duration setting lives here. |
 | 12 | Approvals | Pending revisions queue — approve/reject with note. |
 | 13 | Users | Invite editor, toggle active, change role. |
-| 14 | Appearance | Two tabs. **Theme** — the 14 appearance settings (mode, accent, custom hex, pattern, opacity, font pair, per-area overrides, heading/body colour, radius, density, grain, glass, hero style). **Motion** — the 16 motion controls. **All 31 `theme_settings` columns exposed and working — see §11, this is a hard requirement.** |
+| 14 | Appearance | Two tabs. **Theme** — 13 controls (mode, accent, custom hex, pattern, opacity, font pair, per-area overrides, heading/body colour, radius, density, grain, glass). **Motion** — the 16 motion controls. 29 controls covering 31 stored columns; `motion_level` mirrors `motion_preset` and **`hero_style` is forced to full-bleed (§11.5)**. |
 | 15 | **Site Text** | All 29 editable copy strings, grouped by page/section. |
 | 16 | Settings | Studio name, tagline, contact, socials, SEO, logos, favicon, blog toggle, vision/mission, verification toggle, admin-shield toggle. |
 | 17 | Account | Own profile, change password. |
@@ -696,7 +696,7 @@ All 31 columns of `theme_settings`. **Option IDs below are copied verbatim from 
 
 Three settings marked **🆕** are stored in the source schema but have **no registry and no renderer anywhere in the source app**. Their option lists are defined *by this document* and you must build both the control and the rendering.
 
-#### Appearance group — 14 settings · admin screen *Appearance → Theme*
+#### Appearance group — 14 settings, **13 controls** · admin screen *Appearance → Theme*
 
 | # | Setting | Default | Admin control | Exact values | Renders as |
 |---|---|---|---|---|---|
@@ -713,7 +713,7 @@ Three settings marked **🆕** are stored in the source schema but have **no reg
 | 11 | `density` | `comfortable` | Segmented radio, 3 buttons | `compact` (0.85) · `comfortable` (1) · `spacious` (1.2) | `--density` |
 | 12 | `grain` | `false` | Toggle | bool | body grain overlay layer |
 | 13 | `glass` | `true` | Toggle | bool | header/card `backdrop-filter` |
-| 14 | 🆕 `hero_style` | `full-bleed` | Select | `full-bleed` · `contained` · `split` · `minimal` | hero section layout class |
+| 14 | `hero_style` | `full-bleed` | **NO CONTROL — forced** | always `full-bleed` | hero is always the full viewport (`min-height: 100svh`); see §11.5 |
 
 > ⚠️ **#10 `radius`:** the values are `sharp / subtle / soft / pill` — **not** `none / soft / round`. `RADIUS_SCALE` in `fonts.ts` is keyed on those exact four strings; anything else silently falls back to `subtle`.
 
@@ -742,7 +742,12 @@ Three settings marked **🆕** are stored in the source schema but have **no reg
 > ⚠️ **#15 includes `off` and `custom`** — the source type is `'off' \| 'subtle' \| 'refined' \| 'expressive' \| 'custom'`. There is no `none`.
 > ⚠️ **#28 clamps to 50–150**, not 50–200. `resolveMotionVars()` does `Math.min(150, Math.max(50, motionSpeed))` — a slider that goes to 200 would let the admin drag into a dead zone where nothing changes. Cap the control at 150.
 
-`motion_level` (#16) is the only setting with no control — a legacy duplicate of `motion_preset`. Write `motion_preset`'s value into it on every save so the data shape matches the source exactly. **That leaves 30 visible controls covering 31 columns.**
+Two of the 31 have no control:
+
+- **`motion_level` (#16)** — a legacy duplicate of `motion_preset`. Write `motion_preset`'s value into it on every save so the data shape matches the source exactly.
+- **`hero_style` (#14)** — **forced to `full-bleed`**; see §11.5.
+
+**That leaves 29 visible controls covering 31 columns.**
 
 ### 11.2 Making the tuning actually work
 
@@ -803,6 +808,47 @@ These are the rules that separate a control that *saves a value* from a control 
 - Unknown stored values must fall back to the default *and* log a notice — never render an empty var. (`RADIUS_SCALE[x] ?? RADIUS_SCALE.subtle` is the source's pattern.)
 - **A test must assert no hardcoded animation durations exist in the theme CSS** — the source app has exactly this test (`tests/unit/theme/no-hardcoded-motion.test.ts`). Port it.
 
+### 11.5 The hero is always full-page — not an admin choice
+
+**Product decision, settled.** The hero fills the viewport on every page that has
+one, at every breakpoint, whatever media the admin uploads. There is no size,
+crop, or layout control for it.
+
+Why this is called out: the build originally shipped `hero_style` with four
+variants (`full-bleed`, `contained`, `split`, `minimal`). Production was set to
+`minimal`, which caps the hero at `clamp(320px, 46vh, 520px)` — measured at
+**43–50% of the viewport** across desktop, tablet and mobile. That is the
+regression this section exists to prevent recurring.
+
+**Rules:**
+
+- `.mk-hero { min-height: 100svh; }` — `svh` (small viewport height) so the hero
+  does not jump when mobile browser chrome collapses, with a `100vh` fallback
+  under `@supports not (min-height: 100svh)`.
+- Use `min-height`, **never a fixed `height`** — a fixed height clips the hero
+  copy on short screens (e.g. 667×375 landscape).
+- No `html[data-hero-style="…"]` selectors exist. The attribute is not emitted.
+- `hero_style` stays in the registry and the database for schema parity, but
+  `ThemeSettings::sanitize()` hard-writes `'full-bleed'`, and it is absent from
+  `allowed_values()`. A stale row or hand-crafted POST cannot shrink the hero.
+- `.mk-hero__media` keeps `position:absolute; inset:0; width:100%; height:100%;
+  object-fit:cover`, so any aspect ratio fills the frame rather than letterboxing.
+- The homepage header is `position: fixed`, so `100svh` yields a true
+  full-viewport hero with the bar floating over it. If the header is ever changed
+  to in-flow on the homepage, this section must be revisited.
+
+**Required assertions:**
+
+- [ ] Hero bounding height ≥ viewport height at 1920×1200, 1920×1080, 1440×900,
+      768×1024, 375×667, 360×640 and 667×375
+- [ ] Hero copy does not overflow the hero box at any of those sizes
+- [ ] No horizontal page scroll at any of those sizes
+- [ ] Setting `data-hero-style` to `minimal`/`contained`/`split` on `<html>` at
+      runtime changes nothing
+- [ ] `sanitize()` returns `full-bleed` for every posted value, valid or not
+- [ ] `hero_style` is **not** a key of `allowed_values()`
+- [ ] Square, 9:16 and 32:9 images all cover the hero with no gap
+
 ### 11.4 Required proof (gate for Phases 6 and 7)
 
 Neither phase may be marked complete without all of the following:
@@ -812,8 +858,8 @@ Neither phase may be marked complete without all of the following:
 - [ ] **A test asserting every option ID in every select matches the source registry exactly** — 12 scroll-reveal, 8 hero, 8 image-hover, 6 card-hover, 6 text-reveal, 6 page-transition, 24 accents, 22 patterns, 8 font pairs, 4 radius, 3 density, 5 motion presets. Counts and IDs both.
 - [ ] **A test proving invalid input is rejected**: POST an unknown ID and an out-of-range slider value to each handler; assert the stored value is unchanged and an error is surfaced.
 - [ ] **A test proving the `stagger_ms` gating works** — disabled and inert when the preset is not `custom`, enabled and effective when it is.
-- [ ] A Playwright test that, for each of the 30 visible controls: loads the admin screen, changes the control, saves, reloads the public homepage, and asserts the corresponding `data-*` attribute or CSS custom property on `<html>` changed. A control that saves but does not alter the rendered output is a **failing test**, not a passing one.
-- [ ] A screenshot-diff or computed-style check for the visual settings that do not map to a single CSS var (`hero_style`, `hero_animation`, `loader_style`, `page_transition`, `cursor_style`, `scroll_progress`, `grain`, `glass`) confirming the DOM actually changes.
+- [ ] A Playwright test that, for each of the 29 visible controls: loads the admin screen, changes the control, saves, reloads the public homepage, and asserts the corresponding `data-*` attribute or CSS custom property on `<html>` changed. A control that saves but does not alter the rendered output is a **failing test**, not a passing one.
+- [ ] A screenshot-diff or computed-style check for the visual settings that do not map to a single CSS var (`hero_animation`, `loader_style`, `page_transition`, `cursor_style`, `scroll_progress`, `grain`, `glass`) confirming the DOM actually changes. Plus the §11.5 hero-height assertions.
 - [ ] **A cache-invalidation test** — save, then request the public page with no hard refresh, and assert the new value is already live.
 - [ ] Manual sign-off note in the phase commit listing all 31 settings and the observed effect of each.
 

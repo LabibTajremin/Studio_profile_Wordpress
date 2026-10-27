@@ -29,9 +29,11 @@
 
 - Adding a project/service/team member/testimonial: use the matching
   screen under the Maapkathi menu.
-- Changing colours, fonts, motion, or hero style: Appearance → Theme /
-  Motion. Every control updates the live site immediately on save — no
-  developer needed.
+- Changing colours, fonts, or motion: Appearance → Theme / Motion. Every
+  control updates the live site immediately on save — no developer needed.
+- The hero always fills the whole screen, and whatever image, GIF or video
+  you upload is scaled to cover it. There is deliberately no size or crop
+  setting — you cannot accidentally make the hero small.
 - Reading contact form submissions: the Approvals/Content/Settings area
   inbox (see the relevant admin screen once built out).
 
