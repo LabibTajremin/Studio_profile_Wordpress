@@ -1,5 +1,18 @@
 # Build status — honest checklist
 
+## Our Partners band disappeared after saving Settings (fixed)
+
+The Settings screen saved `section_partners_enabled` but its form had no
+checkbox for it, so every Settings save stored `false` and the logo band
+above the footer vanished. The Settings form now has an "Our Partners"
+checkbox under Homepage sections, and DB migration 1.1.1 turns the band
+back on once for sites that were already affected. (No admin could have
+turned it off on purpose before, so this repair is safe.)
+
+Verified on a live Docker stack with real browser form saves: the old code
+hid the band after one Settings save (1 → 0), the new code keeps it
+(1 → 1), and the migration repaired a site stored as off.
+
 ## Demo content button (no command line needed)
 
 The Maapkathi Dashboard has a **Demo content** card with a **Load demo
