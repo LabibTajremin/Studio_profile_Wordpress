@@ -1,5 +1,20 @@
 # Build status — honest checklist
 
+## Demo content button (no command line needed)
+
+The Maapkathi Dashboard has a **Demo content** card with a **Load demo
+content** button (or **Reset demo content** once loaded), so non-technical
+users don't need `wp maapkathi seed`. It runs the same seeder
+(`SeedCommand::run()`, now independent of WP-CLI) through an
+`admin-post.php` handler in `Admin/DemoContent.php`, gated on
+`mk_manage_settings` + a nonce. Reset asks for confirmation first.
+
+Verified on a live Docker stack with a real Chromium click: load → 6
+projects, 6 services, 3 FAQs, 53 images; reset took ~48s and gave the same
+counts; public homepage 200; empty debug.log; `wp maapkathi seed` and
+`--fresh` still work. Not verified on Hostinger, where PHP time limits are
+lower — if the button times out there, use WP-CLI.
+
 ## Footer subscribe button, showcase rail, footer logo size
 
 **The subscribe button was invisible.** It painted `background: var(--accent)`

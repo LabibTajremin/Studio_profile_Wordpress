@@ -32,6 +32,7 @@ use Maapkathi\Core\Setup\SetupWizard;
 use Maapkathi\Core\Users\EmailVerification;
 use Maapkathi\Core\Mail\Mailer;
 use Maapkathi\Core\Admin\AdminSkin;
+use Maapkathi\Core\Admin\DemoContent;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -112,6 +113,7 @@ final class Plugin {
 			( new Menu() )->register_hooks();
 			( new SetupWizard() )->register_hooks();
 			( new AdminSkin() )->register_hooks();
+			( new DemoContent() )->register_hooks();
 			( new SectionBuilderScreen() )->register_hooks();
 		}
 
