@@ -7,7 +7,8 @@ unstyled/wrong theme.
 
 ## Registries (ported verbatim from the source app)
 
-- `Theme\Accents` — 24 accent colours + custom hex override.
+- `Theme\Accents` — 27 accent colours (24 from the source app + Night Slate,
+  Deep Midnight, Onyx) + custom hex override.
 - `Theme\Patterns` — 22 CSS/SVG background patterns.
 - `Theme\Fonts` — 8 font pairings + the radius/density scales.
 - `Theme\Motion` — the reveal/hover/transition style registries and
