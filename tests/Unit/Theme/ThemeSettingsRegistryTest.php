@@ -80,8 +80,8 @@ final class ThemeSettingsRegistryTest extends TestCase {
 		}
 	}
 
-	public function test_24_accents(): void {
-		$this->assertCount( 24, Accents::ids() );
+	public function test_27_accents(): void {
+		$this->assertCount( 27, Accents::ids() );
 		$this->assertContains( 'oxblood', Accents::ids() );
 		$this->assertSame( 'oxblood', Accents::default_id() );
 	}

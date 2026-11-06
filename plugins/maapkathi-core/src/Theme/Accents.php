@@ -14,9 +14,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Accent registry (24), ported verbatim from
- * src/presentation/theme/accents.ts in the source app. IDs, names, and hex
- * values must match exactly — do not retype or invent.
+ * Accent registry (27). The first 24 are ported verbatim from
+ * src/presentation/theme/accents.ts in the source app — their IDs, names,
+ * and hex values must match exactly, do not retype or invent. The last 3
+ * (Night Slate, Deep Midnight, Onyx) are studio additions.
  */
 final class Accents {
 
@@ -24,7 +25,7 @@ final class Accents {
 	public const CREAM = '#faf6f1';
 
 	/**
-	 * All 24 registered accents.
+	 * All 27 registered accents.
 	 *
 	 * @return array<int, array{id:string,name:string,light:string,dark:string}>
 	 */
@@ -173,6 +174,25 @@ final class Accents {
 				'name'  => 'Warm Graphite',
 				'light' => '#44403c',
 				'dark'  => '#605a54',
+			),
+			// Studio additions (not in the source app's registry).
+			array(
+				'id'    => 'night-slate',
+				'name'  => 'Night Slate',
+				'light' => '#14181f',
+				'dark'  => '#2c3444',
+			),
+			array(
+				'id'    => 'deep-midnight',
+				'name'  => 'Deep Midnight',
+				'light' => '#121d3d',
+				'dark'  => '#26396e',
+			),
+			array(
+				'id'    => 'onyx',
+				'name'  => 'Onyx',
+				'light' => '#111111',
+				'dark'  => '#3a3a3a',
 			),
 		);
 	}
