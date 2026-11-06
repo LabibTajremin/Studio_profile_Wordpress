@@ -95,6 +95,7 @@ $socials = $settings['socials'] ?? array();
 				'section_testimonials_enabled' => __( 'Testimonials', 'maapkathi' ),
 				'section_awards_enabled'       => __( 'Awards', 'maapkathi' ),
 				'section_faq_enabled'          => __( 'FAQ', 'maapkathi' ),
+				'section_partners_enabled'     => __( 'Our Partners (logo band above the footer)', 'maapkathi' ),
 			);
 			foreach ( $mk_sections as $mk_key => $mk_label ) :
 				?>

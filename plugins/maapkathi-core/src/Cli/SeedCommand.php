@@ -51,18 +51,67 @@ final class SeedCommand {
 	 * @param array<string,string> $assoc_args Flags.
 	 */
 	public function __invoke( array $args = array(), array $assoc_args = array() ): void {
-		$fresh = isset( $assoc_args['fresh'] );
+		$result = $this->run( isset( $assoc_args['fresh'] ) );
+
+		foreach ( $this->messages as $message ) {
+			'warning' === $message['level'] ? \WP_CLI::warning( $message['text'] ) : \WP_CLI::log( $message['text'] );
+		}
+
+		if ( 'seeded' === $result ) {
+			\WP_CLI::success( 'Demo content seeded. Visit the site to see it.' );
+		}
+	}
+
+	/**
+	 * Messages collected during run(), so the same seeder can report back
+	 * to both WP-CLI and the wp-admin "Demo content" button.
+	 *
+	 * @var array<int,array{level:string,text:string}>
+	 */
+	private array $messages = array();
+
+	/**
+	 * Returns the messages collected by the last run().
+	 *
+	 * @return array<int,array{level:string,text:string}>
+	 */
+	public function messages(): array {
+		return $this->messages;
+	}
+
+	/**
+	 * Records a message for whoever called run().
+	 *
+	 * @param string $level 'log' or 'warning'.
+	 * @param string $text  Message text.
+	 * @return void
+	 */
+	private function note( string $level, string $text ): void {
+		$this->messages[] = array(
+			'level' => $level,
+			'text'  => $text,
+		);
+	}
+
+	/**
+	 * Seeds demo content. Usable from WP-CLI and from wp-admin.
+	 *
+	 * @param bool $fresh Remove previously seeded demo content first.
+	 * @return string 'seeded' or 'already_seeded'.
+	 */
+	public function run( bool $fresh = false ): string {
+		$this->messages = array();
 
 		if ( $fresh ) {
 			$this->tear_down();
-			\WP_CLI::log( 'Existing demo content removed.' );
+			$this->note( 'log', 'Existing demo content removed.' );
 		} elseif ( get_option( 'mk_seed_installed' ) ) {
-			\WP_CLI::log( 'Demo content already seeded — nothing to do (use --fresh to rebuild).' );
-			return;
+			$this->note( 'log', 'Demo content already seeded — nothing to do (use --fresh to rebuild).' );
+			return 'already_seeded';
 		}
 
 		if ( ! DemoAssets::available() ) {
-			\WP_CLI::warning( 'PHP GD is unavailable, so demo images cannot be generated. Content will be seeded without imagery.' );
+			$this->note( 'warning', 'PHP GD is unavailable, so demo images cannot be generated. Content will be seeded without imagery.' );
 		}
 
 		$this->seed_site_settings();
@@ -86,7 +135,7 @@ final class SeedCommand {
 		update_option( 'mk_seed_installed', time() );
 		flush_rewrite_rules();
 
-		\WP_CLI::success( 'Demo content seeded. Visit the site to see it.' );
+		return 'seeded';
 	}
 
 	// ---------------------------------------------------------------
@@ -131,7 +180,7 @@ final class SeedCommand {
 		);
 
 		if ( is_wp_error( $id ) ) {
-			\WP_CLI::warning( sprintf( 'Could not create %s "%s": %s', $post_type, $slug, $id->get_error_message() ) );
+			$this->note( 'warning', sprintf( 'Could not create %s "%s": %s', $post_type, $slug, $id->get_error_message() ) );
 			return 0;
 		}
 

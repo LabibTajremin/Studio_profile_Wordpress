@@ -1,5 +1,33 @@
 # Build status — honest checklist
 
+## Our Partners band disappeared after saving Settings (fixed)
+
+The Settings screen saved `section_partners_enabled` but its form had no
+checkbox for it, so every Settings save stored `false` and the logo band
+above the footer vanished. The Settings form now has an "Our Partners"
+checkbox under Homepage sections, and DB migration 1.1.1 turns the band
+back on once for sites that were already affected. (No admin could have
+turned it off on purpose before, so this repair is safe.)
+
+Verified on a live Docker stack with real browser form saves: the old code
+hid the band after one Settings save (1 → 0), the new code keeps it
+(1 → 1), and the migration repaired a site stored as off.
+
+## Demo content button (no command line needed)
+
+The Maapkathi Dashboard has a **Demo content** card with a **Load demo
+content** button (or **Reset demo content** once loaded), so non-technical
+users don't need `wp maapkathi seed`. It runs the same seeder
+(`SeedCommand::run()`, now independent of WP-CLI) through an
+`admin-post.php` handler in `Admin/DemoContent.php`, gated on
+`mk_manage_settings` + a nonce. Reset asks for confirmation first.
+
+Verified on a live Docker stack with a real Chromium click: load → 6
+projects, 6 services, 3 FAQs, 53 images; reset took ~48s and gave the same
+counts; public homepage 200; empty debug.log; `wp maapkathi seed` and
+`--fresh` still work. Not verified on Hostinger, where PHP time limits are
+lower — if the button times out there, use WP-CLI.
+
 ## Footer subscribe button, showcase rail, footer logo size
 
 **The subscribe button was invisible.** It painted `background: var(--accent)`

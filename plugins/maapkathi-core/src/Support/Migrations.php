@@ -63,6 +63,7 @@ final class Migrations {
 		return array(
 			'1.0.0' => array( self::class, 'migrate_1_0_0' ),
 			'1.1.0' => array( self::class, 'migrate_1_1_0' ),
+			'1.1.1' => array( self::class, 'migrate_1_1_1' ),
 		);
 	}
 
@@ -160,6 +161,23 @@ final class Migrations {
 		dbDelta( $inquiries );
 		dbDelta( $audit_log );
 		dbDelta( $revisions );
+	}
+
+	/**
+	 * Turns the Our Partners band back on.
+	 *
+	 * The Settings form saved `section_partners_enabled` but never rendered
+	 * a checkbox for it, so every Settings save silently stored false and
+	 * hid the band. No admin could have switched it off on purpose, so any
+	 * stored false is the bug's doing and is reset here once.
+	 */
+	private static function migrate_1_1_1(): void {
+		$settings = get_option( 'mk_site_settings', false );
+
+		if ( is_array( $settings ) && isset( $settings['section_partners_enabled'] ) && ! $settings['section_partners_enabled'] ) {
+			$settings['section_partners_enabled'] = true;
+			update_option( 'mk_site_settings', $settings );
+		}
 	}
 
 	/**

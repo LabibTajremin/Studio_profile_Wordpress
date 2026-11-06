@@ -236,7 +236,11 @@ final class Menu {
 		if ( $pending_count > 0 ) {
 			echo '<p><a class="button" href="' . esc_url( admin_url( 'admin.php?page=maapkathi-approvals' ) ) . '">' . esc_html__( 'Review', 'maapkathi' ) . '</a></p>';
 		}
-		echo '</div></div>';
+		echo '</div>';
+
+		DemoContent::render_card();
+
+		echo '</div>';
 	}
 
 	/**
