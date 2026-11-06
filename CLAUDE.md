@@ -12,7 +12,7 @@ anything is done or broken.**
   Fields, Storage, Video, Roles, Approval, Theme, Admin, Inquiries, Seo,
   Rest, Cli, Support). Plugin owns all data; theme only renders.
 - `themes/maapkathi-theme/` — presentation only, no DB writes.
-- `docs/` — ARCHITECTURE, CONFIGURATION, DEPLOYMENT, TESTING, THEMING,
+- `docs/` — DEVELOPER_GUIDE (where to edit what), ARCHITECTURE, CONFIGURATION, DEPLOYMENT, TESTING, THEMING,
   CLIENT_HANDOVER, BUILD_STATUS (living doc, keep updated).
 
 ## Key deliberate deviations from BUILD_INSTRUCTIONS.md (don't "fix" these back)
