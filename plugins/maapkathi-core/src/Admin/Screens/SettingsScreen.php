@@ -125,7 +125,6 @@ final class SettingsScreen {
 
 		update_option( 'mk_site_settings', $settings );
 
-		// phpcs:disable WordPress.Security.NonceVerification.Missing -- verified by the caller.
 		// Homepage section order. Posted as type => number alongside the
 		// on/off switches, so both live in one place and one save.
 		if ( isset( $_POST['mk_section_order'] ) && is_array( $_POST['mk_section_order'] ) ) {
@@ -153,7 +152,6 @@ final class SettingsScreen {
 			}
 		}
 		update_option( ThemeSettings::OPTION, ThemeSettings::sanitize( $mk_theme ) );
-		// phpcs:enable WordPress.Security.NonceVerification.Missing
 
 		$seo = array(
 			'default_title'       => sanitize_text_field( wp_unslash( $_POST['seo_default_title'] ?? '' ) ),

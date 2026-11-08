@@ -358,7 +358,6 @@ final class Menu {
 			$sanitized = ThemeSettings::sanitize( $raw );
 			update_option( ThemeSettings::OPTION, $sanitized );
 
-
 			if ( $field_errors ) {
 				echo '<div class="notice notice-error"><p>' . esc_html__( 'Saved, but one field was rejected — see the error below.', 'maapkathi' ) . '</p></div>';
 			} else {
@@ -370,5 +369,4 @@ final class Menu {
 
 		require MK_PLUGIN_DIR . 'src/Admin/views/appearance.php';
 	}
-
 }
