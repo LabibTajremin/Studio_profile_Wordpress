@@ -145,6 +145,11 @@ final class ThemeVarsBuilder {
 			'--density'              => Fonts::DENSITY_SCALE[ $settings['density'] ] ?? Fonts::DENSITY_SCALE['comfortable'],
 			'--grain-opacity'        => $settings['grain'] ? '0.06' : '0',
 			'--glass-blur'           => $settings['glass'] ? '12px' : '0px',
+			// Logo wordmark. Defaults resolve to the heading font so a site
+			// that never touches these looks exactly as it did.
+			'--logo-font'            => LogoFonts::resolve_stack( $settings ),
+			'--logo-font-size'       => (int) $settings['logo_font_size'] . 'px',
+			'--logo-font-weight'     => (string) (int) $settings['logo_font_weight'],
 		);
 
 		$motion_vars = Motion::resolve_vars(

@@ -557,3 +557,61 @@ if ( ! function_exists( 'mk_section_layout' ) ) {
 		return \Maapkathi\Core\Sections\SectionLayout::get();
 	}
 }
+
+if ( ! function_exists( 'mk_page_is_builder_built' ) ) {
+	/**
+	 * Whether a page's content was laid out by a page builder.
+	 *
+	 * Builder content arrives already sectioned and full-bleed, so the
+	 * theme must not wrap it in its own padded container. Detected from
+	 * Elementor's own per-post flag rather than by sniffing the HTML.
+	 *
+	 * @param int|null $post_id Post to test; the current post when omitted.
+	 * @return bool
+	 */
+	function mk_page_is_builder_built( ?int $post_id = null ): bool {
+		$post_id = $post_id ? $post_id : (int) get_the_ID();
+		if ( $post_id <= 0 ) {
+			return false;
+		}
+
+		if ( did_action( 'elementor/loaded' ) && class_exists( '\\Elementor\\Plugin' ) ) {
+			$documents = \Elementor\Plugin::$instance->documents ?? null;
+
+			if ( $documents && method_exists( $documents, 'get' ) ) {
+				$document = $documents->get( $post_id );
+
+				if ( $document && method_exists( $document, 'is_built_with_elementor' ) ) {
+					return (bool) $document->is_built_with_elementor();
+				}
+			}
+		}
+
+		return false;
+	}
+}
+
+if ( ! function_exists( 'mk_front_page_builder_id' ) ) {
+	/**
+	 * The id of a builder-built page standing in for the homepage.
+	 *
+	 * Returns 0 unless the site has a static front page set under
+	 * Settings → Reading *and* that page was built with Elementor. The
+	 * theme's own section layout stays in charge in every other case, so
+	 * installing Elementor never changes an existing homepage by itself.
+	 *
+	 * @return int Page id, or 0 when the theme should render its sections.
+	 */
+	function mk_front_page_builder_id(): int {
+		if ( 'page' !== get_option( 'show_on_front' ) ) {
+			return 0;
+		}
+
+		$page_id = (int) get_option( 'page_on_front' );
+		if ( $page_id <= 0 ) {
+			return 0;
+		}
+
+		return mk_page_is_builder_built( $page_id ) ? $page_id : 0;
+	}
+}

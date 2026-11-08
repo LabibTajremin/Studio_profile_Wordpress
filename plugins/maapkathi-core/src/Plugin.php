@@ -109,6 +109,10 @@ final class Plugin {
 		( new Subscribers() )->register_hooks();
 		( new GalleryController() )->register_hooks();
 
+		// Elementor: publishes the theme's sections as widgets. Self-guards
+		// when Elementor is absent, so this is safe on a plain install.
+		\Maapkathi\Core\Elementor\Support::boot();
+
 		if ( is_admin() ) {
 			( new Menu() )->register_hooks();
 			( new SetupWizard() )->register_hooks();

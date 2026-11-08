@@ -190,7 +190,14 @@ body.home .mk-site-header--custom .mk-menu-toggle {
 }
 .mk-logo { display: flex; align-items: center; gap: 0.5em; text-decoration: none; color: inherit; }
 .mk-logo__img, .mk-logo__mark { height: 36px; width: auto; display: block; }
-.mk-logo__title { font-family: var(--font-headings); font-weight: 600; }
+.mk-logo__title {
+	/* All three fall back to the previous hardcoded values, so a site that
+	   has never saved a logo font renders byte-identically. */
+	font-family: var(--logo-font, var(--font-headings));
+	font-size: var(--logo-font-size, 18px);
+	font-weight: var(--logo-font-weight, 600);
+	line-height: 1.1;
+}
 /* Light/dark logo swap happens in CSS, not JS, so there is no flash of the
    wrong logo while scripts load (§3.5). */
 .mk-logo__img--dark { display: none; }

@@ -14,6 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 use Maapkathi\Core\Theme\ThemeVarsBuilder;
 use Maapkathi\Core\Theme\ThemeSettings;
 use Maapkathi\Core\Theme\Fonts;
+use Maapkathi\Core\Theme\LogoFonts;
 use Maapkathi\Core\Support\Branding;
 
 /**
@@ -141,6 +142,14 @@ add_action(
 		$fonts_url = mk_theme_google_fonts_url();
 		if ( $fonts_url ) {
 			wp_enqueue_style( 'maapkathi-google-fonts', $fonts_url, array(), mk_asset_version( '/style.css' ) );
+		}
+
+		// A custom wordmark face served from somewhere other than Google.
+		// The URL is host-allowlisted at save time (ThemeSettings), so by
+		// the time it reaches here it is one we are willing to load.
+		$logo_font_url = mk_theme_logo_font_url();
+		if ( $logo_font_url ) {
+			wp_enqueue_style( 'maapkathi-logo-font', $logo_font_url, array(), null );
 		}
 	}
 );
@@ -292,17 +301,48 @@ function mk_theme_google_fonts_url(): string {
 		}
 	}
 
+	// No early return on an empty pairing: a custom wordmark face may still
+	// need requesting even when the pair itself resolves to nothing.
 	$names = array_unique( array_filter( $names ) );
-	if ( ! $names ) {
-		return '';
-	}
 
 	$parts = array();
 	foreach ( $names as $name ) {
 		$parts[] = 'family=' . rawurlencode( $name ) . ':wght@400;500;600;700';
 	}
 
+	// The wordmark face, when it is not already one of the pairing's two.
+	// Its weight is requested explicitly: the admin can pick 100 or 900,
+	// and asking only for 400-700 would silently render a synthesised face.
+	$logo_family = LogoFonts::google_family( $settings );
+	if ( '' !== $logo_family && ! in_array( $logo_family, $names, true ) ) {
+		$weight    = (int) $settings['logo_font_weight'];
+		$weights   = array_unique( array( 400, 600, 700, $weight ) );
+		sort( $weights );
+		$parts[] = 'family=' . rawurlencode( $logo_family ) . ':wght@' . implode( ';', $weights );
+	}
+
+	if ( ! $parts ) {
+		return '';
+	}
+
 	return 'https://fonts.googleapis.com/css2?' . implode( '&', $parts ) . '&display=swap';
+}
+
+/**
+ * The admin's own webfont stylesheet for the logo wordmark, if any.
+ */
+function mk_theme_logo_font_url(): string {
+	if ( ! mk_theme_plugin_active() ) {
+		return '';
+	}
+
+	$settings = ThemeSettings::get();
+
+	if ( LogoFonts::CUSTOM !== ( $settings['logo_font_id'] ?? '' ) ) {
+		return '';
+	}
+
+	return (string) ( $settings['logo_font_url'] ?? '' );
 }
 
 /**

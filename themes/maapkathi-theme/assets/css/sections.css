@@ -1140,3 +1140,43 @@
 	.mk-showcase__item:hover .mk-showcase__image { transform: none; }
 	.mk-showcase__caption { transform: none; }
 }
+
+/* ---------- Page-builder compatibility ---------- */
+
+/*
+ * A builder-built page supplies its own section rhythm, so the theme must
+ * not add a second container around it. The wrapper exists only so these
+ * rules have something to hang off.
+ */
+.mk-builder-page {
+	width: 100%;
+}
+
+/*
+ * Theme sections placed as Elementor widgets.
+ *
+ * Elementor wraps every widget in .elementor-widget-container. Our sections
+ * carry their own vertical rhythm and full-bleed backgrounds, so that
+ * wrapper must contribute nothing of its own — otherwise a section gains
+ * double padding and its background stops reaching the page edges.
+ */
+.elementor-widget-container > .mk-section {
+	margin-block: 0;
+}
+
+/*
+ * Let the admin resize a section by resizing its Elementor container: the
+ * section fills whatever width it is given instead of forcing its own.
+ */
+[class*="elementor-widget-mk-"] .mk-section {
+	width: 100%;
+	max-width: 100%;
+}
+
+/*
+ * In the editor an empty section would collapse to nothing and become
+ * impossible to select. A minimum height keeps a grab target.
+ */
+.elementor-editor-active [class*="elementor-widget-mk-"] .mk-section:empty {
+	min-height: 80px;
+}
