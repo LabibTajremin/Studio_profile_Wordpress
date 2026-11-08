@@ -90,7 +90,6 @@ $mk_logo_mode     = mk_header_logo_mode();
 		</div>
 	</div>
 
-
 	<?php if ( $mk_show_shield ) : ?>
 		<p class="mk-admin-shield-note">
 			<?php esc_html_e( 'Studio team:', 'maapkathi' ); ?>

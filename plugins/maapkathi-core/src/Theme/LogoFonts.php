@@ -54,8 +54,8 @@ final class LogoFonts {
 				'google' => '',
 			),
 
-			// ── Installed on the visitor's device: nothing to download, so
-			//    these render instantly and cost nothing. ─────────────────
+			// Already installed on the visitor's device: nothing to
+			// download, so these render instantly and cost nothing.
 			array(
 				'id'     => 'system-sans',
 				'name'   => 'System sans',
@@ -129,7 +129,7 @@ final class LogoFonts {
 				'google' => '',
 			),
 
-			// ── Google Fonts, sans. Only the chosen one is ever requested. ──
+			// Google Fonts, sans. Only the chosen face is ever requested.
 			array(
 				'id'     => 'montserrat',
 				'name'   => 'Montserrat',
@@ -251,7 +251,7 @@ final class LogoFonts {
 				'google' => 'Outfit',
 			),
 
-			// ── Google Fonts, serif and display. ────────────────────────────
+			// Google Fonts, serif and display.
 			array(
 				'id'     => 'merriweather',
 				'name'   => 'Merriweather',
