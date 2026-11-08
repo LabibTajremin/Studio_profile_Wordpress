@@ -15,7 +15,6 @@ use Maapkathi\Core\Theme\Fonts;
 use Maapkathi\Core\Theme\LogoFonts;
 use Maapkathi\Core\Theme\Motion;
 use Maapkathi\Core\Sections\SectionRegistry;
-use Maapkathi\Core\Sections\SectionLayout;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -33,7 +32,6 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 
 $is_custom_preset = 'custom' === $settings['motion_preset'];
-$layout           = isset( $layout ) && is_array( $layout ) ? $layout : SectionLayout::get();
 ?>
 <div class="wrap mk-admin">
 	<h1><?php esc_html_e( 'Appearance', 'maapkathi' ); ?></h1>

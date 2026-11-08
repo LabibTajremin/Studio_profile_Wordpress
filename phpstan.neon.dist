@@ -5,6 +5,14 @@ parameters:
         - themes/maapkathi-theme
     excludePaths:
         - '*/vendor/*'
+        # SectionWidget extends Elementor\Widget_Base, which is not on disk
+        # here (Elementor is an optional plugin, not a dependency of this
+        # one). "extends unknown class" is one of the few errors PHPStan
+        # refuses to let ignoreErrors suppress - it says so itself and points
+        # at excludePaths - so the thin widget subclasses are excluded
+        # outright. Support.php, which only references Elementor classes
+        # rather than extending one, stays analysed.
+        - plugins/maapkathi-core/src/Elementor/Widgets
     bootstrapFiles:
         - phpstan-bootstrap.php
         - vendor/szepeviktor/phpstan-wordpress/bootstrap.php
@@ -36,13 +44,6 @@ parameters:
         # rather than leaving a stale ignore behind.
         -
             message: '#(has invalid type|on an unknown class|extends unknown class) Elementor#'
-            paths:
-                - plugins/maapkathi-core/src/Elementor
-        # Inherited Elementor\Widget_Base methods (start_controls_section,
-        # add_control, get_settings_for_display, ...) are unresolvable for
-        # the same reason: the parent class is not on disk here.
-        -
-            message: '#^Call to an undefined method Maapkathi\\Core\\Elementor\\Widgets\\SectionWidget::#'
             paths:
                 - plugins/maapkathi-core/src/Elementor
         -
