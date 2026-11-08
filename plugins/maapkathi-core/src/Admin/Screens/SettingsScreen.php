@@ -11,6 +11,8 @@ namespace Maapkathi\Core\Admin\Screens;
 
 use Maapkathi\Core\Map\MapSettings;
 use Maapkathi\Core\Roles\Roles;
+use Maapkathi\Core\Sections\SectionLayout;
+use Maapkathi\Core\Theme\ThemeSettings;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -122,6 +124,36 @@ final class SettingsScreen {
 		);
 
 		update_option( 'mk_site_settings', $settings );
+
+		// phpcs:disable WordPress.Security.NonceVerification.Missing -- verified by the caller.
+		// Homepage section order. Posted as type => number alongside the
+		// on/off switches, so both live in one place and one save.
+		if ( isset( $_POST['mk_section_order'] ) && is_array( $_POST['mk_section_order'] ) ) {
+			$mk_orders = array_map( 'absint', wp_unslash( $_POST['mk_section_order'] ) );
+			$mk_clean  = array();
+
+			foreach ( $mk_orders as $mk_type => $mk_value ) {
+				$mk_type = sanitize_key( (string) $mk_type );
+				if ( '' !== $mk_type && $mk_value > 0 ) {
+					$mk_clean[ $mk_type ] = $mk_value;
+				}
+			}
+
+			if ( $mk_clean ) {
+				SectionLayout::apply_ordinals( $mk_clean );
+			}
+		}
+
+		// Logo wordmark typography. Stored with the rest of the theme
+		// settings, but edited here because it belongs beside the logo.
+		$mk_theme = ThemeSettings::get();
+		foreach ( array( 'logo_font_id', 'logo_font_custom', 'logo_font_url', 'logo_font_size', 'logo_font_weight' ) as $mk_field ) {
+			if ( isset( $_POST[ $mk_field ] ) ) {
+				$mk_theme[ $mk_field ] = wp_unslash( $_POST[ $mk_field ] );
+			}
+		}
+		update_option( ThemeSettings::OPTION, ThemeSettings::sanitize( $mk_theme ) );
+		// phpcs:enable WordPress.Security.NonceVerification.Missing
 
 		$seo = array(
 			'default_title'       => sanitize_text_field( wp_unslash( $_POST['seo_default_title'] ?? '' ) ),

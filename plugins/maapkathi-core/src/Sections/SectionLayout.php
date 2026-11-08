@@ -96,6 +96,76 @@ final class SectionLayout {
 	}
 
 	/**
+	 * The current render position of each section type, 1-based.
+	 *
+	 * Used by the Settings screen to show an order number beside each
+	 * section's on/off switch. Keyed by type rather than by instance id,
+	 * because that screen lists types.
+	 *
+	 * @return array<string,int> type => position
+	 */
+	public static function ordinals(): array {
+		$out      = array();
+		$position = 0;
+
+		foreach ( self::get() as $row ) {
+			if ( isset( $out[ $row['type'] ] ) ) {
+				continue;
+			}
+
+			$out[ $row['type'] ] = ++$position;
+		}
+
+		return $out;
+	}
+
+	/**
+	 * Re-sorts the stored layout from a map of type => order number.
+	 *
+	 * Types missing from the map keep their current place, so a screen that
+	 * lists only some sections cannot drop the others. Equal numbers keep
+	 * their existing relative order rather than shuffling on every save,
+	 * and the hero is pinned first because it renders above the content
+	 * region regardless.
+	 *
+	 * @param array<string,int> $orders type => order number.
+	 * @return void
+	 */
+	public static function apply_ordinals( array $orders ): void {
+		$layout   = self::get();
+		$current  = self::ordinals();
+		$rows     = array();
+		$position = 0;
+
+		foreach ( $layout as $row ) {
+			$type = $row['type'];
+
+			if ( 'hero' === $type ) {
+				$ordinal = 0;
+			} elseif ( isset( $orders[ $type ] ) ) {
+				$ordinal = max( 1, min( 999, (int) $orders[ $type ] ) );
+			} else {
+				$ordinal = $current[ $type ] ?? 999;
+			}
+
+			$rows[] = array(
+				'row'      => $row,
+				'_ordinal' => $ordinal,
+				'_seq'     => $position++,
+			);
+		}
+
+		usort(
+			$rows,
+			static function ( array $a, array $b ): int {
+				return array( $a['_ordinal'], $a['_seq'] ) <=> array( $b['_ordinal'], $b['_seq'] );
+			}
+		);
+
+		update_option( self::OPTION, self::sanitize( array_column( $rows, 'row' ) ) );
+	}
+
+	/**
 	 * Validates a posted layout.
 	 *
 	 * @param array<int|string,mixed> $input Raw layout rows.

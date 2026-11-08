@@ -1,11 +1,11 @@
 <?php
 /**
- * Reordering the homepage by ordinal from the Appearance screen.
+ * Reordering the homepage by ordinal from the Settings screen.
  *
- * The screen posts a number per section rather than a sorted list, so the
- * behaviour worth pinning is the sort: that a smaller number moves a
- * section up, that ties do not shuffle, and that nothing is lost on the way
- * through.
+ * The screen posts a number per section type beside that section's on/off
+ * switch, rather than a sorted list, so the behaviour worth pinning is the
+ * sort: that a smaller number moves a section up, that ties do not shuffle,
+ * and that nothing is lost on the way through.
  *
  * @package maapkathi-core
  */
@@ -20,7 +20,8 @@ use PHPUnit\Framework\TestCase;
 final class SectionOrdinalTest extends TestCase {
 
 	/**
-	 * Mirrors Menu::save_section_order(), which is private and reads $_POST.
+	 * Mirrors SectionLayout::apply_ordinals() at instance level. The shipped
+	 * method is exercised directly by the type-level tests further down.
 	 *
 	 * @param array<string,string> $types    id => type.
 	 * @param array<string,int>    $orders   id => ordinal.
@@ -98,6 +99,37 @@ final class SectionOrdinalTest extends TestCase {
 				static fn( string $id ): bool => 'hero' !== $types[ $id ]
 			)
 		);
+	}
+
+	/**
+	 * The Settings screen posts section_<type>_enabled for the switch and
+	 * mk_section_order[<type>] for the number, so the two must agree on the
+	 * type name or the order silently applies to nothing.
+	 *
+	 * @dataProvider settings_keys
+	 */
+	public function test_settings_keys_map_to_section_types( string $option_key, string $type ): void {
+		$this->assertSame( $type, preg_replace( '/^section_|_enabled$/', '', $option_key ) );
+	}
+
+	/**
+	 * @return array<int,array{0:string,1:string}>
+	 */
+	public static function settings_keys(): array {
+		return array(
+			array( 'section_clients_enabled', 'clients' ),
+			array( 'section_categories_enabled', 'categories' ),
+			array( 'section_projects_enabled', 'projects' ),
+			array( 'section_faq_enabled', 'faq' ),
+			array( 'section_partners_enabled', 'partners' ),
+		);
+	}
+
+	public function test_ordinals_are_one_based_and_gapless(): void {
+		$ordinals = SectionLayout::ordinals();
+
+		$this->assertSame( 1, $ordinals['hero'] ?? 0, 'The hero renders first.' );
+		$this->assertSame( range( 1, count( $ordinals ) ), array_values( $ordinals ) );
 	}
 
 	public function test_saving_without_changing_a_number_changes_nothing(): void {

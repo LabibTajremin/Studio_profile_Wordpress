@@ -29,6 +29,7 @@ $socials = $settings['socials'] ?? array();
 		?>
 		<div class="notice notice-success"><p><?php echo esc_html( $notice ); ?></p></div><?php endif; ?>
 
+	<?php $mk_theme = \Maapkathi\Core\Theme\ThemeSettings::get(); ?>
 	<form method="post">
 		<?php wp_nonce_field( 'mk_save_settings', 'mk_settings_nonce' ); ?>
 
@@ -70,6 +71,78 @@ $socials = $settings['socials'] ?? array();
 			<?php endforeach; ?>
 		</table>
 
+		<h2><?php esc_html_e( 'Logo text', 'maapkathi' ); ?></h2>
+		<p class="description" style="margin:0 0 .5em">
+			<?php esc_html_e( 'How the studio name beside your logo is set. These do nothing unless "Show title next to logo" is on, above.', 'maapkathi' ); ?>
+		</p>
+		<table class="form-table">
+			<tr>
+				<th><?php esc_html_e( 'Font', 'maapkathi' ); ?></th>
+				<td>
+					<select name="logo_font_id" id="mk-logo-font-id">
+						<?php foreach ( \Maapkathi\Core\Theme\LogoFonts::all() as $mk_logo_font ) : ?>
+							<option value="<?php echo esc_attr( $mk_logo_font['id'] ); ?>" <?php selected( (string) $mk_theme['logo_font_id'], $mk_logo_font['id'] ); ?>>
+								<?php echo esc_html( $mk_logo_font['name'] ); ?>
+							</option>
+						<?php endforeach; ?>
+					</select>
+					<p class="description"><?php esc_html_e( 'Changes only the wordmark. Headings and body text keep the pairing set under Appearance.', 'maapkathi' ); ?></p>
+
+					<div id="mk-logo-font-custom" style="margin-top:1em;<?php echo \Maapkathi\Core\Theme\LogoFonts::CUSTOM === $mk_theme['logo_font_id'] ? '' : 'display:none;'; ?>">
+						<p>
+							<label><strong><?php esc_html_e( 'Custom font name', 'maapkathi' ); ?></strong><br />
+								<input type="text" class="regular-text" name="logo_font_custom"
+									value="<?php echo esc_attr( (string) $mk_theme['logo_font_custom'] ); ?>"
+									placeholder="<?php esc_attr_e( 'e.g. Bodoni Moda', 'maapkathi' ); ?>" /></label>
+						</p>
+						<p class="description"><?php esc_html_e( 'Spell it exactly as Google Fonts does and it is loaded for you — no link needed.', 'maapkathi' ); ?></p>
+						<p style="margin-top:1em">
+							<label><strong><?php esc_html_e( 'Or a stylesheet link', 'maapkathi' ); ?></strong><br />
+								<input type="url" class="large-text code" name="logo_font_url"
+									value="<?php echo esc_attr( (string) $mk_theme['logo_font_url'] ); ?>"
+									placeholder="https://…/font.css" /></label>
+						</p>
+						<p class="description"><?php esc_html_e( 'For a font you host or license yourself. Only https links from Google Fonts, Bunny Fonts, Adobe Typekit, jsDelivr, rsms.me or your own site are kept — a stylesheet can restyle the whole page. Still fill in the name above so the theme knows what to ask for.', 'maapkathi' ); ?></p>
+					</div>
+				</td>
+			</tr>
+			<tr>
+				<th><?php esc_html_e( 'Size', 'maapkathi' ); ?></th>
+				<td>
+					<input type="range" min="10" max="48" step="1"
+						value="<?php echo esc_attr( (string) $mk_theme['logo_font_size'] ); ?>"
+						oninput="document.getElementById('mk-logo-font-size').value=this.value" />
+					<input type="number" min="10" max="48" step="1" id="mk-logo-font-size" name="logo_font_size"
+						value="<?php echo esc_attr( (string) $mk_theme['logo_font_size'] ); ?>" style="width:5em" /> px
+					<p class="description"><?php esc_html_e( 'Default is 18px. Past about 32px the header grows to fit, so check it on a phone.', 'maapkathi' ); ?></p>
+				</td>
+			</tr>
+			<tr>
+				<th><?php esc_html_e( 'Weight', 'maapkathi' ); ?></th>
+				<td>
+					<select name="logo_font_weight">
+						<?php
+						$mk_weights = array(
+							100 => __( '100 — Thin', 'maapkathi' ),
+							200 => __( '200 — Extra light', 'maapkathi' ),
+							300 => __( '300 — Light', 'maapkathi' ),
+							400 => __( '400 — Regular', 'maapkathi' ),
+							500 => __( '500 — Medium', 'maapkathi' ),
+							600 => __( '600 — Semi bold (default)', 'maapkathi' ),
+							700 => __( '700 — Bold', 'maapkathi' ),
+							800 => __( '800 — Extra bold', 'maapkathi' ),
+							900 => __( '900 — Black', 'maapkathi' ),
+						);
+						foreach ( $mk_weights as $mk_w => $mk_w_label ) :
+							?>
+							<option value="<?php echo esc_attr( (string) $mk_w ); ?>" <?php selected( (int) $mk_theme['logo_font_weight'], $mk_w ); ?>><?php echo esc_html( $mk_w_label ); ?></option>
+						<?php endforeach; ?>
+					</select>
+					<p class="description"><?php esc_html_e( 'Not every face has every weight; a missing one gets faked by the browser and usually looks worse.', 'maapkathi' ); ?></p>
+				</td>
+			</tr>
+		</table>
+
 		<h2><?php esc_html_e( 'Contact', 'maapkathi' ); ?></h2>
 		<table class="form-table">
 			<tr><th><?php esc_html_e( 'Email', 'maapkathi' ); ?></th><td><input type="email" name="contact_email" value="<?php echo esc_attr( $settings['contact_email'] ?? '' ); ?>" class="regular-text" /></td></tr>
@@ -97,11 +170,36 @@ $socials = $settings['socials'] ?? array();
 				'section_faq_enabled'          => __( 'FAQ', 'maapkathi' ),
 				'section_partners_enabled'     => __( 'Our Partners (logo band above the footer)', 'maapkathi' ),
 			);
+			// Order numbers come from the stored homepage layout, so this
+			// screen and the Section Builder always agree.
+			$mk_order = \Maapkathi\Core\Sections\SectionLayout::ordinals();
+			?>
+			<tr>
+				<td colspan="2" style="padding-left:0">
+					<p class="description" style="margin:0 0 .5em">
+						<?php esc_html_e( 'Order decides which section comes first on the homepage — lower numbers are higher up. To move a section up, give it a smaller number than the one above it. Numbers do not have to be consecutive, and the hero is always first.', 'maapkathi' ); ?>
+					</p>
+				</td>
+			</tr>
+			<?php
 			foreach ( $mk_sections as $mk_key => $mk_label ) :
+				$mk_type = preg_replace( '/^section_|_enabled$/', '', $mk_key );
 				?>
 				<tr>
 					<th><?php echo esc_html( $mk_label ); ?></th>
-					<td><label><input type="checkbox" name="<?php echo esc_attr( $mk_key ); ?>" value="1" <?php checked( ! isset( $settings[ $mk_key ] ) || $settings[ $mk_key ] ); ?> /> <?php esc_html_e( 'On', 'maapkathi' ); ?></label></td>
+					<td>
+						<label style="margin-right:1.5em">
+							<input type="hidden" name="<?php echo esc_attr( $mk_key ); ?>" value="0" />
+							<input type="checkbox" name="<?php echo esc_attr( $mk_key ); ?>" value="1" <?php checked( ! isset( $settings[ $mk_key ] ) || $settings[ $mk_key ] ); ?> />
+							<?php esc_html_e( 'On', 'maapkathi' ); ?>
+						</label>
+						<label>
+							<?php esc_html_e( 'Order', 'maapkathi' ); ?>
+							<input type="number" min="1" max="999" step="1" style="width:5em"
+								name="mk_section_order[<?php echo esc_attr( (string) $mk_type ); ?>]"
+								value="<?php echo esc_attr( (string) ( $mk_order[ $mk_type ] ?? '' ) ); ?>" />
+						</label>
+					</td>
 				</tr>
 			<?php endforeach; ?>
 			<tr>
@@ -340,3 +438,13 @@ $socials = $settings['socials'] ?? array();
 		<?php submit_button( __( 'Save settings', 'maapkathi' ) ); ?>
 	</form>
 </div>
+<script>
+( function () {
+	var sel = document.getElementById( 'mk-logo-font-id' );
+	var box = document.getElementById( 'mk-logo-font-custom' );
+	if ( ! sel || ! box ) { return; }
+	function sync() { box.style.display = 'custom' === sel.value ? '' : 'none'; }
+	sel.addEventListener( 'change', sync );
+	sync();
+}() );
+</script>

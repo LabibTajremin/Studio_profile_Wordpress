@@ -14,7 +14,6 @@ use Maapkathi\Core\Theme\Patterns;
 use Maapkathi\Core\Theme\Fonts;
 use Maapkathi\Core\Theme\LogoFonts;
 use Maapkathi\Core\Theme\Motion;
-use Maapkathi\Core\Sections\SectionRegistry;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -28,7 +27,6 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @var array<string,mixed> $settings
  * @var array<string,string> $field_errors Per-field validation errors from the last save.
- * @var array<int,array{id:string,type:string,enabled:bool}> $layout Homepage section layout.
  */
 
 $is_custom_preset = 'custom' === $settings['motion_preset'];
@@ -204,86 +202,6 @@ $is_custom_preset = 'custom' === $settings['motion_preset'];
 				</td>
 			</tr>
 			<tr>
-				<th><?php esc_html_e( 'Logo font', 'maapkathi' ); ?></th>
-				<td>
-					<select name="mk_theme_settings[logo_font_id]" id="mk-logo-font-id">
-						<?php foreach ( LogoFonts::all() as $mk_logo_font ) : ?>
-							<option value="<?php echo esc_attr( $mk_logo_font['id'] ); ?>" <?php selected( (string) $settings['logo_font_id'], $mk_logo_font['id'] ); ?>>
-								<?php echo esc_html( $mk_logo_font['name'] ); ?>
-							</option>
-						<?php endforeach; ?>
-					</select>
-					<p class="description">
-						<?php esc_html_e( 'The typeface for the studio name beside your logo. This changes only the wordmark — headings and body text keep the pairing set below.', 'maapkathi' ); ?>
-					</p>
-
-					<div id="mk-logo-font-custom" style="margin-top:1em;<?php echo LogoFonts::CUSTOM === $settings['logo_font_id'] ? '' : 'display:none;'; ?>">
-						<p>
-							<label for="mk-logo-font-family"><strong><?php esc_html_e( 'Custom font name', 'maapkathi' ); ?></strong></label><br />
-							<input type="text" class="regular-text" id="mk-logo-font-family"
-								name="mk_theme_settings[logo_font_custom]"
-								value="<?php echo esc_attr( (string) $settings['logo_font_custom'] ); ?>"
-								placeholder="<?php esc_attr_e( 'e.g. Bodoni Moda', 'maapkathi' ); ?>" />
-						</p>
-						<p class="description">
-							<?php esc_html_e( 'Type the family name exactly as Google Fonts spells it and it will be loaded for you — no link needed. Leave the box below empty in that case.', 'maapkathi' ); ?>
-						</p>
-						<p style="margin-top:1em">
-							<label for="mk-logo-font-url"><strong><?php esc_html_e( 'Or a stylesheet link', 'maapkathi' ); ?></strong></label><br />
-							<input type="url" class="large-text code" id="mk-logo-font-url"
-								name="mk_theme_settings[logo_font_url]"
-								value="<?php echo esc_attr( (string) $settings['logo_font_url'] ); ?>"
-								placeholder="https://…/font.css" />
-						</p>
-						<p class="description">
-							<?php esc_html_e( 'For a font you host yourself or buy elsewhere. A stylesheet can restyle the whole page, so only https links from Google Fonts, Bunny Fonts, Adobe Typekit, jsDelivr, rsms.me or your own site are accepted — anything else is discarded on save. Upload the file to your Media Library to use your own.', 'maapkathi' ); ?>
-						</p>
-						<p class="description">
-							<?php esc_html_e( 'With a link supplied, still type the family name above so the theme knows what to ask for in CSS.', 'maapkathi' ); ?>
-						</p>
-					</div>
-				</td>
-			</tr>
-			<tr>
-				<th><?php esc_html_e( 'Logo font size', 'maapkathi' ); ?></th>
-				<td>
-					<input type="range" min="10" max="48" step="1"
-						value="<?php echo esc_attr( (string) $settings['logo_font_size'] ); ?>"
-						oninput="document.getElementById('mk-logo-font-size').value=this.value" />
-					<input type="number" min="10" max="48" step="1" id="mk-logo-font-size"
-						name="mk_theme_settings[logo_font_size]"
-						value="<?php echo esc_attr( (string) $settings['logo_font_size'] ); ?>"
-						style="width:5em" /> px
-					<p class="description"><?php esc_html_e( 'How large the studio name is in the header. The default is 18px. Above about 32px the header grows to fit, so check the result on a phone.', 'maapkathi' ); ?></p>
-				</td>
-			</tr>
-			<tr>
-				<th><?php esc_html_e( 'Logo font weight', 'maapkathi' ); ?></th>
-				<td>
-					<select name="mk_theme_settings[logo_font_weight]">
-						<?php
-						$mk_weight_names = array(
-							100 => __( '100 — Thin', 'maapkathi' ),
-							200 => __( '200 — Extra light', 'maapkathi' ),
-							300 => __( '300 — Light', 'maapkathi' ),
-							400 => __( '400 — Regular', 'maapkathi' ),
-							500 => __( '500 — Medium', 'maapkathi' ),
-							600 => __( '600 — Semi bold (default)', 'maapkathi' ),
-							700 => __( '700 — Bold', 'maapkathi' ),
-							800 => __( '800 — Extra bold', 'maapkathi' ),
-							900 => __( '900 — Black', 'maapkathi' ),
-						);
-						foreach ( $mk_weight_names as $mk_weight => $mk_weight_label ) :
-							?>
-							<option value="<?php echo esc_attr( (string) $mk_weight ); ?>" <?php selected( (int) $settings['logo_font_weight'], $mk_weight ); ?>>
-								<?php echo esc_html( $mk_weight_label ); ?>
-							</option>
-						<?php endforeach; ?>
-					</select>
-					<p class="description"><?php esc_html_e( 'Not every face has every weight. If one is missing the browser fakes it, which usually looks worse than picking a weight the font really has.', 'maapkathi' ); ?></p>
-				</td>
-			</tr>
-			<tr>
 				<th><?php esc_html_e( '9e. Services icon size', 'maapkathi' ); ?></th>
 				<td>
 					<input type="number" min="24" max="160" name="mk_theme_settings[services_icon_size]" value="<?php echo esc_attr( (string) $settings['services_icon_size'] ); ?>" /> px
@@ -438,101 +356,6 @@ $is_custom_preset = 'custom' === $settings['motion_preset'];
 			</tr>
 		</table>
 
-		<h2><?php esc_html_e( 'Homepage sections', 'maapkathi' ); ?></h2>
-		<p class="mk-admin-intro">
-			<?php esc_html_e( 'The order your homepage sections appear in, and which ones are switched on. Lower numbers come first. To move a section up, give it a smaller number than the one above it — the list is re-sorted when you save.', 'maapkathi' ); ?>
-		</p>
-		<p class="description" style="margin-bottom:1em">
-			<?php esc_html_e( 'Numbers do not have to be consecutive, and ties keep their current relative order. The hero always renders first, above everything here.', 'maapkathi' ); ?>
-		</p>
-
-		<table class="widefat striped" style="max-width:720px">
-			<thead>
-				<tr>
-					<th scope="col" style="width:7em"><?php esc_html_e( 'Order', 'maapkathi' ); ?></th>
-					<th scope="col"><?php esc_html_e( 'Section', 'maapkathi' ); ?></th>
-					<th scope="col" style="width:9em"><?php esc_html_e( 'Shown', 'maapkathi' ); ?></th>
-				</tr>
-			</thead>
-			<tbody>
-				<?php
-				$mk_registry = SectionRegistry::all();
-				$mk_ordinal  = 0;
-				foreach ( $layout as $mk_row ) :
-					++$mk_ordinal;
-					$mk_type    = (string) $mk_row['type'];
-					$mk_id      = (string) $mk_row['id'];
-					$mk_label   = isset( $mk_registry[ $mk_type ]['label'] )
-						? (string) $mk_registry[ $mk_type ]['label']
-						: $mk_type;
-					$mk_is_hero = ( 'hero' === $mk_type );
-					?>
-					<tr>
-						<td>
-							<label class="screen-reader-text" for="mk-order-<?php echo esc_attr( $mk_id ); ?>">
-								<?php
-								/* translators: %s: section name. */
-								printf( esc_html__( 'Order for %s', 'maapkathi' ), esc_html( $mk_label ) );
-								?>
-							</label>
-							<input type="number" min="1" max="999" step="1"
-								id="mk-order-<?php echo esc_attr( $mk_id ); ?>"
-								name="mk_section_order[<?php echo esc_attr( $mk_id ); ?>]"
-								value="<?php echo esc_attr( (string) $mk_ordinal ); ?>"
-								style="width:5em"
-								<?php disabled( $mk_is_hero ); ?> />
-						</td>
-						<td>
-							<strong><?php echo esc_html( $mk_label ); ?></strong>
-							<?php if ( $mk_is_hero ) : ?>
-								<span class="description"> — <?php esc_html_e( 'always first', 'maapkathi' ); ?></span>
-							<?php endif; ?>
-							<?php if ( $mk_id !== $mk_type ) : ?>
-								<br /><span class="description"><?php echo esc_html( $mk_id ); ?></span>
-							<?php endif; ?>
-							<input type="hidden" name="mk_section_type[<?php echo esc_attr( $mk_id ); ?>]" value="<?php echo esc_attr( $mk_type ); ?>" />
-						</td>
-						<td>
-							<label>
-								<input type="hidden" name="mk_section_enabled[<?php echo esc_attr( $mk_id ); ?>]" value="0" />
-								<input type="checkbox" name="mk_section_enabled[<?php echo esc_attr( $mk_id ); ?>]" value="1" <?php checked( ! empty( $mk_row['enabled'] ) ); ?> />
-								<?php esc_html_e( 'On', 'maapkathi' ); ?>
-							</label>
-						</td>
-					</tr>
-				<?php endforeach; ?>
-			</tbody>
-		</table>
-		<p class="description" style="margin-top:0.75em">
-			<?php
-			echo wp_kses(
-				sprintf(
-					/* translators: %s: link to the Section Builder screen. */
-					esc_html__( 'Adding, duplicating or deleting a section lives on the %s screen. Both screens edit the same layout, so a change here shows up there.', 'maapkathi' ),
-					'<a href="' . esc_url( admin_url( 'admin.php?page=maapkathi-section-builder' ) ) . '">' . esc_html__( 'Section Builder', 'maapkathi' ) . '</a>'
-				),
-				array( 'a' => array( 'href' => array() ) )
-			);
-			?>
-		</p>
-
 		<?php submit_button( __( 'Save appearance settings', 'maapkathi' ) ); ?>
 	</form>
 </div>
-<script>
-// Show the custom-font fields only when "Custom font…" is chosen. Progressive
-// enhancement: without JS the fields are visible whenever custom is already
-// saved, and the select still posts correctly either way.
-( function () {
-	var select = document.getElementById( 'mk-logo-font-id' );
-	var panel  = document.getElementById( 'mk-logo-font-custom' );
-	if ( ! select || ! panel ) {
-		return;
-	}
-	function sync() {
-		panel.style.display = 'custom' === select.value ? '' : 'none';
-	}
-	select.addEventListener( 'change', sync );
-	sync();
-}() );
-</script>
