@@ -1,0 +1,588 @@
+<div class="wrap mk-admin">
+	<h1>Settings</h1>
+	<p class="mk-admin-intro">Your studio's core information: name, logo, favicon, contact details, social links, SEO defaults, and which homepage sections are shown.</p>
+	
+		<form method="post">
+		<input type="hidden" name="nonce">
+		<h2>Studio</h2>
+		<table class="form-table">
+			<tr><th>Studio name</th><td><input type="text" name="studio_name" value="" class="regular-text" /></td></tr>
+			<tr><th>Tagline</th><td><input type="text" name="tagline" value="" class="regular-text" /></td></tr>
+			<tr><th>Show title next to logo</th><td><label><input type="checkbox" name="logo_show_title" value="1"  checked /> On</label></td></tr>
+		</table>
+
+		<h2>Branding</h2>
+		<table class="form-table">
+							<tr>
+					<th>Logo (light mode)</th>
+					<td>
+						<div data-mk-media>
+							<input type="hidden" name="logo_light" value="0" />
+							<div class="mk-media__preview">
+															</div>
+							<button type="button" class="button mk-media__choose">Choose image</button>
+							<button type="button" class="button-link mk-media__clear" hidden>Clear</button>
+							<p class="description">Shown on light backgrounds. Recommended: SVG-crisp PNG, around 400×130.</p>
+						</div>
+					</td>
+				</tr>
+							<tr>
+					<th>Logo (dark mode)</th>
+					<td>
+						<div data-mk-media>
+							<input type="hidden" name="logo_dark" value="0" />
+							<div class="mk-media__preview">
+															</div>
+							<button type="button" class="button mk-media__choose">Choose image</button>
+							<button type="button" class="button-link mk-media__clear" hidden>Clear</button>
+							<p class="description">Shown on dark backgrounds. Falls back to the light logo when unset.</p>
+						</div>
+					</td>
+				</tr>
+							<tr>
+					<th>Favicon</th>
+					<td>
+						<div data-mk-media>
+							<input type="hidden" name="favicon" value="0" />
+							<div class="mk-media__preview">
+															</div>
+							<button type="button" class="button mk-media__choose">Choose image</button>
+							<button type="button" class="button-link mk-media__clear" hidden>Clear</button>
+							<p class="description">Browser tab icon, square. Falls back to the light logo, then the dark logo, then the built-in mark.</p>
+						</div>
+					</td>
+				</tr>
+					</table>
+
+		<h2>Logo text</h2>
+		<p class="description" style="margin:0 0 .5em">
+			How the studio name beside your logo is set. These do nothing unless "Show title next to logo" is on, above.		</p>
+		<table class="form-table">
+			<tr>
+				<th>Font</th>
+				<td>
+					<select name="logo_font_id" id="mk-logo-font-id">
+													<option value="inherit"  selected>
+								Same as headings (default)							</option>
+													<option value="system-sans" >
+								System sans							</option>
+													<option value="system-serif" >
+								System serif							</option>
+													<option value="arial" >
+								Arial							</option>
+													<option value="helvetica" >
+								Helvetica							</option>
+													<option value="times-new-roman" >
+								Times New Roman							</option>
+													<option value="georgia" >
+								Georgia							</option>
+													<option value="garamond" >
+								Garamond							</option>
+													<option value="palatino" >
+								Palatino							</option>
+													<option value="verdana" >
+								Verdana							</option>
+													<option value="tahoma" >
+								Tahoma							</option>
+													<option value="trebuchet-ms" >
+								Trebuchet MS							</option>
+													<option value="courier-new" >
+								Courier New							</option>
+													<option value="montserrat" >
+								Montserrat							</option>
+													<option value="roboto" >
+								Roboto							</option>
+													<option value="open-sans" >
+								Open Sans							</option>
+													<option value="lato" >
+								Lato							</option>
+													<option value="poppins" >
+								Poppins							</option>
+													<option value="raleway" >
+								Raleway							</option>
+													<option value="oswald" >
+								Oswald							</option>
+													<option value="nunito" >
+								Nunito							</option>
+													<option value="rubik" >
+								Rubik							</option>
+													<option value="josefin-sans" >
+								Josefin Sans							</option>
+													<option value="quicksand" >
+								Quicksand							</option>
+													<option value="bebas-neue" >
+								Bebas Neue							</option>
+													<option value="bricolage-grotesque" >
+								Bricolage Grotesque							</option>
+													<option value="manrope" >
+								Manrope							</option>
+													<option value="inter" >
+								Inter							</option>
+													<option value="geist" >
+								Geist							</option>
+													<option value="dm-sans" >
+								DM Sans							</option>
+													<option value="work-sans" >
+								Work Sans							</option>
+													<option value="space-grotesk" >
+								Space Grotesk							</option>
+													<option value="outfit" >
+								Outfit							</option>
+													<option value="merriweather" >
+								Merriweather							</option>
+													<option value="lora" >
+								Lora							</option>
+													<option value="pt-serif" >
+								PT Serif							</option>
+													<option value="noto-serif" >
+								Noto Serif							</option>
+													<option value="eb-garamond" >
+								EB Garamond							</option>
+													<option value="bodoni-moda" >
+								Bodoni Moda							</option>
+													<option value="cinzel" >
+								Cinzel							</option>
+													<option value="abril-fatface" >
+								Abril Fatface							</option>
+													<option value="fraunces" >
+								Fraunces							</option>
+													<option value="playfair-display" >
+								Playfair Display							</option>
+													<option value="cormorant-garamond" >
+								Cormorant Garamond							</option>
+													<option value="dm-serif-display" >
+								DM Serif Display							</option>
+													<option value="instrument-serif" >
+								Instrument Serif							</option>
+													<option value="libre-caslon-display" >
+								Libre Caslon Display							</option>
+													<option value="spectral" >
+								Spectral							</option>
+													<option value="custom" >
+								Custom font…							</option>
+											</select>
+					<p class="description">Changes only the wordmark. Headings and body text keep the pairing set under Appearance.</p>
+
+					<div id="mk-logo-font-custom" style="margin-top:1em;display:none;">
+						<p>
+							<label><strong>Custom font name</strong><br />
+								<input type="text" class="regular-text" name="logo_font_custom"
+									value=""
+									placeholder="e.g. Bodoni Moda" /></label>
+						</p>
+						<p class="description">Spell it exactly as Google Fonts does and it is loaded for you — no link needed.</p>
+						<p style="margin-top:1em">
+							<label><strong>Or a stylesheet link</strong><br />
+								<input type="url" class="large-text code" name="logo_font_url"
+									value=""
+									placeholder="https://…/font.css" /></label>
+						</p>
+						<p class="description">For a font you host or license yourself. Only https links from Google Fonts, Bunny Fonts, Adobe Typekit, jsDelivr, rsms.me or your own site are kept — a stylesheet can restyle the whole page. Still fill in the name above so the theme knows what to ask for.</p>
+					</div>
+				</td>
+			</tr>
+			<tr>
+				<th>Size</th>
+				<td>
+					<input type="range" min="10" max="48" step="1"
+						value="18"
+						oninput="document.getElementById('mk-logo-font-size').value=this.value" />
+					<input type="number" min="10" max="48" step="1" id="mk-logo-font-size" name="logo_font_size"
+						value="18" style="width:5em" /> px
+					<p class="description">Default is 18px. Past about 32px the header grows to fit, so check it on a phone.</p>
+				</td>
+			</tr>
+			<tr>
+				<th>Weight</th>
+				<td>
+					<select name="logo_font_weight">
+													<option value="100" >100 — Thin</option>
+													<option value="200" >200 — Extra light</option>
+													<option value="300" >300 — Light</option>
+													<option value="400" >400 — Regular</option>
+													<option value="500" >500 — Medium</option>
+													<option value="600"  selected>600 — Semi bold (default)</option>
+													<option value="700" >700 — Bold</option>
+													<option value="800" >800 — Extra bold</option>
+													<option value="900" >900 — Black</option>
+											</select>
+					<p class="description">Not every face has every weight; a missing one gets faked by the browser and usually looks worse.</p>
+				</td>
+			</tr>
+		</table>
+
+		<h2>Contact</h2>
+		<table class="form-table">
+			<tr><th>Email</th><td><input type="email" name="contact_email" value="" class="regular-text" /></td></tr>
+			<tr><th>Phone</th><td><input type="text" name="contact_phone" value="" /></td></tr>
+			<tr><th>WhatsApp</th><td><input type="text" name="whatsapp" value="" /></td></tr>
+			<tr><th>Address</th><td><textarea name="address" rows="2" class="large-text"></textarea></td></tr>
+							<tr><th>Facebook</th><td><input type="url" name="social_facebook" value="" class="regular-text" /></td></tr>
+							<tr><th>Instagram</th><td><input type="url" name="social_instagram" value="" class="regular-text" /></td></tr>
+							<tr><th>Linkedin</th><td><input type="url" name="social_linkedin" value="" class="regular-text" /></td></tr>
+							<tr><th>Twitter</th><td><input type="url" name="social_twitter" value="" class="regular-text" /></td></tr>
+							<tr><th>Pinterest</th><td><input type="url" name="social_pinterest" value="" class="regular-text" /></td></tr>
+					</table>
+
+		<h2>Homepage sections</h2>
+		<table class="form-table">
+						<tr>
+				<td colspan="2" style="padding-left:0">
+					<p class="description" style="margin:0 0 .5em">
+						Order decides which section comes first on the homepage — lower numbers are higher up. To move a section up, give it a smaller number than the one above it. Numbers do not have to be consecutive, and the hero is always first.					</p>
+				</td>
+			</tr>
+							<tr>
+					<th>Trusted by (client logos)</th>
+					<td>
+						<label style="margin-right:1.5em">
+							<input type="hidden" name="section_clients_enabled" value="0" />
+							<input type="checkbox" name="section_clients_enabled" value="1"  checked />
+							On						</label>
+						<label>
+							Order							<input type="number" min="1" max="999" step="1" style="width:5em"
+								name="mk_section_order[clients]"
+								value="3" />
+						</label>
+					</td>
+				</tr>
+							<tr>
+					<th>Portfolio categories</th>
+					<td>
+						<label style="margin-right:1.5em">
+							<input type="hidden" name="section_categories_enabled" value="0" />
+							<input type="checkbox" name="section_categories_enabled" value="1"  checked />
+							On						</label>
+						<label>
+							Order							<input type="number" min="1" max="999" step="1" style="width:5em"
+								name="mk_section_order[categories]"
+								value="4" />
+						</label>
+					</td>
+				</tr>
+							<tr>
+					<th>Featured work</th>
+					<td>
+						<label style="margin-right:1.5em">
+							<input type="hidden" name="section_projects_enabled" value="0" />
+							<input type="checkbox" name="section_projects_enabled" value="1"  checked />
+							On						</label>
+						<label>
+							Order							<input type="number" min="1" max="999" step="1" style="width:5em"
+								name="mk_section_order[projects]"
+								value="5" />
+						</label>
+					</td>
+				</tr>
+							<tr>
+					<th>Services</th>
+					<td>
+						<label style="margin-right:1.5em">
+							<input type="hidden" name="section_services_enabled" value="0" />
+							<input type="checkbox" name="section_services_enabled" value="1"  checked />
+							On						</label>
+						<label>
+							Order							<input type="number" min="1" max="999" step="1" style="width:5em"
+								name="mk_section_order[services]"
+								value="6" />
+						</label>
+					</td>
+				</tr>
+							<tr>
+					<th>Stats band</th>
+					<td>
+						<label style="margin-right:1.5em">
+							<input type="hidden" name="section_stats_enabled" value="0" />
+							<input type="checkbox" name="section_stats_enabled" value="1"  checked />
+							On						</label>
+						<label>
+							Order							<input type="number" min="1" max="999" step="1" style="width:5em"
+								name="mk_section_order[stats]"
+								value="7" />
+						</label>
+					</td>
+				</tr>
+							<tr>
+					<th>Values</th>
+					<td>
+						<label style="margin-right:1.5em">
+							<input type="hidden" name="section_values_enabled" value="0" />
+							<input type="checkbox" name="section_values_enabled" value="1"  checked />
+							On						</label>
+						<label>
+							Order							<input type="number" min="1" max="999" step="1" style="width:5em"
+								name="mk_section_order[values]"
+								value="8" />
+						</label>
+					</td>
+				</tr>
+							<tr>
+					<th>Team</th>
+					<td>
+						<label style="margin-right:1.5em">
+							<input type="hidden" name="section_team_enabled" value="0" />
+							<input type="checkbox" name="section_team_enabled" value="1"  checked />
+							On						</label>
+						<label>
+							Order							<input type="number" min="1" max="999" step="1" style="width:5em"
+								name="mk_section_order[team]"
+								value="9" />
+						</label>
+					</td>
+				</tr>
+							<tr>
+					<th>Testimonials</th>
+					<td>
+						<label style="margin-right:1.5em">
+							<input type="hidden" name="section_testimonials_enabled" value="0" />
+							<input type="checkbox" name="section_testimonials_enabled" value="1"  checked />
+							On						</label>
+						<label>
+							Order							<input type="number" min="1" max="999" step="1" style="width:5em"
+								name="mk_section_order[testimonials]"
+								value="10" />
+						</label>
+					</td>
+				</tr>
+							<tr>
+					<th>Awards</th>
+					<td>
+						<label style="margin-right:1.5em">
+							<input type="hidden" name="section_awards_enabled" value="0" />
+							<input type="checkbox" name="section_awards_enabled" value="1"  checked />
+							On						</label>
+						<label>
+							Order							<input type="number" min="1" max="999" step="1" style="width:5em"
+								name="mk_section_order[awards]"
+								value="11" />
+						</label>
+					</td>
+				</tr>
+							<tr>
+					<th>FAQ</th>
+					<td>
+						<label style="margin-right:1.5em">
+							<input type="hidden" name="section_faq_enabled" value="0" />
+							<input type="checkbox" name="section_faq_enabled" value="1"  checked />
+							On						</label>
+						<label>
+							Order							<input type="number" min="1" max="999" step="1" style="width:5em"
+								name="mk_section_order[faq]"
+								value="12" />
+						</label>
+					</td>
+				</tr>
+							<tr>
+					<th>Our Partners (logo band above the footer)</th>
+					<td>
+						<label style="margin-right:1.5em">
+							<input type="hidden" name="section_partners_enabled" value="0" />
+							<input type="checkbox" name="section_partners_enabled" value="1"  checked />
+							On						</label>
+						<label>
+							Order							<input type="number" min="1" max="999" step="1" style="width:5em"
+								name="mk_section_order[partners]"
+								value="13" />
+						</label>
+					</td>
+				</tr>
+						<tr>
+				<th>Show client names</th>
+				<td>
+					<label><input type="hidden" name="clients_show_name" value="0" /><input type="checkbox" name="clients_show_name" value="1"  checked /> On</label>
+					<p class="description">Show each client's name next to their logo in the "Trusted by" row. Turn this off for a logos-only wall. Clients with no logo uploaded always show their name, so the row never becomes a line of blank tiles.</p>
+				</td>
+			</tr>
+			<tr><td colspan="2"><p class="description">A section with no content underneath already hides itself — these switches are for hiding a section on purpose even when it has content.</p></td></tr>
+		</table>
+
+		<h2>Our Partners</h2>
+		<p class="description">The logo band that sits directly above the footer, separating the last section from it. Add the logos under Partners (or Clients) in the menu — this section is only about how they are displayed. With no logos added, the section does not appear at all.</p>
+		<table class="form-table">
+			<tr>
+				<th>Logos to show</th>
+				<td>
+											<label style="margin-right:1.5em"><input type="radio" name="partners_source" value="partners"  checked /> Partners</label>
+											<label style="margin-right:1.5em"><input type="radio" name="partners_source" value="clients"  /> Clients</label>
+											<label style="margin-right:1.5em"><input type="radio" name="partners_source" value="both"  /> Partners and clients</label>
+										<p class="description">Pick Clients to turn this into a "Trusted by" band without entering every logo twice. Whichever you pick, only records with a logo uploaded appear here — a client with no logo is skipped rather than shown as a gap.</p>
+				</td>
+			</tr>
+			<tr>
+				<th>Layout</th>
+				<td>
+											<label style="margin-right:1.5em"><input type="radio" name="partners_layout" value="grid"  checked /> Static grid</label>
+											<label style="margin-right:1.5em"><input type="radio" name="partners_layout" value="marquee"  /> Auto-scrolling band</label>
+										<p class="description">The scrolling band pauses when someone hovers over it, when the tab is hidden, and entirely for visitors who have asked their device to reduce motion.</p>
+				</td>
+			</tr>
+			<tr>
+				<th>Logos per row</th>
+				<td><input type="number" min="2" max="6" name="partners_per_row" value="5" /></td>
+			</tr>
+			<tr>
+				<th>Maximum logo height</th>
+				<td>
+					<input type="number" min="24" max="160" name="partners_max_logo_h" value="48" /> px
+					<p class="description">Every logo is fitted inside this height with its proportions kept, so logos of different shapes and sizes still look consistent.</p>
+				</td>
+			</tr>
+			<tr>
+				<th>Scroll speed</th>
+				<td>
+					<input type="number" min="10" max="120" name="partners_speed" value="40" />
+					seconds per full loop				</td>
+			</tr>
+			<tr>
+				<th>Grey out until hovered</th>
+				<td><label><input type="hidden" name="partners_greyscale" value="0" /><input type="checkbox" name="partners_greyscale" value="1"  checked /> On</label></td>
+			</tr>
+			<tr>
+				<th>Section background</th>
+				<td>
+											<label style="margin-right:1.5em"><input type="radio" name="partners_background" value="none"  checked /> None</label>
+											<label style="margin-right:1.5em"><input type="radio" name="partners_background" value="surface"  /> Subtle surface</label>
+											<label style="margin-right:1.5em"><input type="radio" name="partners_background" value="accent"  /> Accent tint</label>
+									</td>
+			</tr>
+		</table>
+
+		<h2>Featured work layout</h2>
+		<table class="form-table">
+			<tr>
+				<th>Layout style</th>
+				<td>
+											<label style="margin-right:1.5em"><input type="radio" name="projects_layout" value="showcase"  checked /> Showcase — full-width photo wall (default)</label>
+											<label style="margin-right:1.5em"><input type="radio" name="projects_layout" value="grid"  /> Classic — cards with titles and text</label>
+											<label style="margin-right:1.5em"><input type="radio" name="projects_layout" value="gallery"  /> Gallery — photos at their own shape</label>
+										<p class="description">Showcase runs your photographs edge to edge with no gaps; hovering one dims it and slides up its title and category. Classic is the older card layout with a title and a line of text under each photo. Gallery keeps every photo at its own shape and packs them together, so wide, tall and square shots can sit in one wall without any of them being cropped.</p>
+				</td>
+			</tr>
+			<tr>
+				<th>Most columns</th>
+				<td>
+					<input type="number" min="2" max="5" name="gallery_max_columns" value="4" />
+					<p class="description">On the widest screens. Narrower screens step down from here automatically, to a single column on small phones.</p>
+				</td>
+			</tr>
+			<tr>
+				<th>Gap between photos</th>
+				<td><input type="number" min="0" max="48" name="gallery_gutter" value="16" /> px</td>
+			</tr>
+			<tr>
+				<th>Photos shown at first</th>
+				<td>
+					<input type="number" min="1" max="60" name="gallery_per_load" value="12" />
+					<p class="description">A "Load more" button appears when there are more than this. Loading more adds to what is already on screen without moving it.</p>
+				</td>
+			</tr>
+			<tr>
+				<th>Clicking a photo</th>
+				<td>
+											<label style="margin-right:1.5em"><input type="radio" name="gallery_click" value="lightbox"  checked /> Opens it full size</label>
+											<label style="margin-right:1.5em"><input type="radio" name="gallery_click" value="link"  /> Goes to the project page</label>
+									</td>
+			</tr>
+		</table>
+
+		<h2>Map</h2>
+		<p class="description">The map shown on your Contact page. It needs no Google account and no API key. If you leave both the address and the coordinates empty, the map is simply not shown — no blank grey box appears on your site.</p>
+		<table class="form-table">
+			<tr>
+				<th>Show map</th>
+				<td>
+					<label style="margin-right:1.5em"><input type="hidden" name="mk_map[enabled_contact]" value="0" /><input type="checkbox" name="mk_map[enabled_contact]" value="1"  checked /> On the Contact page</label>
+					<label><input type="hidden" name="mk_map[enabled_home]" value="0" /><input type="checkbox" name="mk_map[enabled_home]" value="1"  /> On the homepage</label>
+				</td>
+			</tr>
+			<tr>
+				<th>Provider</th>
+				<td>
+					<select name="mk_map[provider]">
+													<option value="google-embed"  selected>Google Maps (no API key needed)</option>
+													<option value="osm" >OpenStreetMap (no API key needed)</option>
+													<option value="google-js" >Google Maps JavaScript API (needs a key)</option>
+											</select>
+				</td>
+			</tr>
+			<tr>
+				<th>Address</th>
+				<td><input type="text" class="large-text" name="mk_map[address]" value="" /></td>
+			</tr>
+			<tr>
+				<th>Latitude / Longitude</th>
+				<td>
+					<input type="text" name="mk_map[lat]" value="" placeholder="23.7806" />
+					<input type="text" name="mk_map[lng]" value="" placeholder="90.4074" />
+					<p class="description">If you fill in both the address and the coordinates, the coordinates win — they point at an exact spot, whereas an address has to be looked up and can land on the wrong side of the street.</p>
+				</td>
+			</tr>
+			<tr>
+				<th>Zoom</th>
+				<td><input type="number" min="1" max="20" name="mk_map[zoom]" value="15" /></td>
+			</tr>
+			<tr>
+				<th>Height</th>
+				<td>
+					<input type="number" min="120" max="1200" name="mk_map[h_desktop]" value="420" /> px on desktop					&nbsp;
+					<input type="number" min="120" max="1200" name="mk_map[h_mobile]" value="280" /> px on mobile				</td>
+			</tr>
+			<tr>
+				<th>Map style</th>
+				<td>
+											<label style="margin-right:1.5em"><input type="radio" name="mk_map[style]" value="auto"  checked /> Follow site light/dark mode</label>
+											<label style="margin-right:1.5em"><input type="radio" name="mk_map[style]" value="light"  /> Always light</label>
+											<label style="margin-right:1.5em"><input type="radio" name="mk_map[style]" value="dark"  /> Always dark</label>
+									</td>
+			</tr>
+			<tr>
+				<th>Marker label</th>
+				<td><input type="text" class="regular-text" name="mk_map[marker]" value="" placeholder="" /></td>
+			</tr>
+			<tr>
+				<th>Directions button</th>
+				<td><label><input type="hidden" name="mk_map[show_directions]" value="0" /><input type="checkbox" name="mk_map[show_directions]" value="1"  checked /> Show an "Open in Google Maps" button</label></td>
+			</tr>
+			<tr>
+				<th>Google API key</th>
+				<td>
+					<input type="text" class="regular-text" name="mk_map[api_key]" value="" autocomplete="off" />
+					<p class="description">Only needed for the JavaScript API option. Without a valid key that option falls back to the keyless embed, so your visitors never see an error box.</p>
+				</td>
+			</tr>
+		</table>
+
+		<h2>Behaviour</h2>
+		<table class="form-table">
+			<tr><th>Blog enabled</th><td><label><input type="checkbox" name="blog_enabled" value="1"  /> On</label></td></tr>
+			<tr><th>Vision & Mission section</th><td><label><input type="checkbox" name="vision_mission_enabled" value="1"  /> On</label></td></tr>
+			<tr><th>Vision text</th><td><textarea name="vision_text" rows="2" class="large-text"></textarea></td></tr>
+			<tr><th>Mission text</th><td><textarea name="mission_text" rows="2" class="large-text"></textarea></td></tr>
+			<tr><th>Editor verification required</th><td><label><input type="checkbox" name="editor_verification_required" value="1"  checked /> On</label></td></tr>
+			<tr><th>Admin login shield</th><td><label><input type="checkbox" name="show_admin_shield" value="1"  /> On</label></td></tr>
+		</table>
+
+		<h2>SEO defaults</h2>
+		<table class="form-table">
+			<tr><th>Default title</th><td><input type="text" name="seo_default_title" value="" class="regular-text" /></td></tr>
+			<tr><th>Default description</th><td><textarea name="seo_default_description" rows="2" class="large-text"></textarea></td></tr>
+			<tr><th>Default OG image URL</th><td><input type="url" name="seo_og_image" value="" class="regular-text" /></td></tr>
+			<tr><th>Google Analytics ID</th><td><input type="text" name="seo_ga_id" value="" /></td></tr>
+			<tr><th>Google Tag Manager ID</th><td><input type="text" name="seo_gtm_id" value="" /></td></tr>
+			<tr><th>Meta Pixel ID</th><td><input type="text" name="seo_meta_pixel_id" value="" /></td></tr>
+		</table>
+
+		<p class="description">Logo, favicon, and video uploads are managed from the WordPress Media Library and referenced here in a future iteration of this screen.</p>
+
+		<button>Save settings</button>	</form>
+</div>
+<script>
+( function () {
+	var sel = document.getElementById( 'mk-logo-font-id' );
+	var box = document.getElementById( 'mk-logo-font-custom' );
+	if ( ! sel || ! box ) { return; }
+	function sync() { box.style.display = 'custom' === sel.value ? '' : 'none'; }
+	sel.addEventListener( 'change', sync );
+	sync();
+}() );
+</script>
