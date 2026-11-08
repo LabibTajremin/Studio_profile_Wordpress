@@ -90,16 +90,6 @@ $mk_logo_mode     = mk_header_logo_mode();
 		</div>
 	</div>
 
-	<div id="mk-mobile-menu" class="mk-mobile-menu" hidden>
-		<button type="button" class="mk-mobile-menu__close" aria-label="<?php esc_attr_e( 'Close menu', 'maapkathi' ); ?>">&times;</button>
-		<ul>
-			<?php foreach ( mk_nav_items() as $mk_i => $mk_item ) : ?>
-				<li style="--mk-stagger-index: <?php echo esc_attr( (string) $mk_i ); ?>">
-					<a href="<?php echo esc_url( $mk_item['href'] ); ?>"><?php echo esc_html( $mk_item['label'] ); ?></a>
-				</li>
-			<?php endforeach; ?>
-		</ul>
-	</div>
 
 	<?php if ( $mk_show_shield ) : ?>
 		<p class="mk-admin-shield-note">
@@ -111,3 +101,26 @@ $mk_logo_mode     = mk_header_logo_mode();
 		</p>
 	<?php endif; ?>
 </header>
+
+<?php
+/*
+ * The mobile menu deliberately lives OUTSIDE <header>.
+ *
+ * It is a position:fixed full-screen overlay, and the header carries
+ * backdrop-filter for its glass effect. A backdrop-filter (like transform
+ * or filter) makes an element the containing block for fixed-position
+ * descendants, so while this markup sat inside the header the overlay was
+ * clamped to the header's own 65px box and the nav links rendered above
+ * the top of the screen, off-viewport.
+ */
+?>
+<div id="mk-mobile-menu" class="mk-mobile-menu" hidden>
+	<button type="button" class="mk-mobile-menu__close" aria-label="<?php esc_attr_e( 'Close menu', 'maapkathi' ); ?>">&times;</button>
+	<ul>
+		<?php foreach ( mk_nav_items() as $mk_i => $mk_item ) : ?>
+			<li style="--mk-stagger-index: <?php echo esc_attr( (string) $mk_i ); ?>">
+				<a href="<?php echo esc_url( $mk_item['href'] ); ?>"><?php echo esc_html( $mk_item['label'] ); ?></a>
+			</li>
+		<?php endforeach; ?>
+	</ul>
+</div>
