@@ -462,9 +462,9 @@ $layout           = isset( $layout ) && is_array( $layout ) ? $layout : SectionL
 				$mk_ordinal  = 0;
 				foreach ( $layout as $mk_row ) :
 					++$mk_ordinal;
-					$mk_type  = (string) $mk_row['type'];
-					$mk_id    = (string) $mk_row['id'];
-					$mk_label = isset( $mk_registry[ $mk_type ]['label'] )
+					$mk_type    = (string) $mk_row['type'];
+					$mk_id      = (string) $mk_row['id'];
+					$mk_label   = isset( $mk_registry[ $mk_type ]['label'] )
 						? (string) $mk_registry[ $mk_type ]['label']
 						: $mk_type;
 					$mk_is_hero = ( 'hero' === $mk_type );

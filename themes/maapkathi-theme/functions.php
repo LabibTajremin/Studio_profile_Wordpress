@@ -149,7 +149,7 @@ add_action(
 		// the time it reaches here it is one we are willing to load.
 		$logo_font_url = mk_theme_logo_font_url();
 		if ( $logo_font_url ) {
-			wp_enqueue_style( 'maapkathi-logo-font', $logo_font_url, array(), null );
+			wp_enqueue_style( 'maapkathi-logo-font', $logo_font_url, array(), mk_asset_version( '/style.css' ) );
 		}
 	}
 );
@@ -315,8 +315,8 @@ function mk_theme_google_fonts_url(): string {
 	// and asking only for 400-700 would silently render a synthesised face.
 	$logo_family = LogoFonts::google_family( $settings );
 	if ( '' !== $logo_family && ! in_array( $logo_family, $names, true ) ) {
-		$weight    = (int) $settings['logo_font_weight'];
-		$weights   = array_unique( array( 400, 600, 700, $weight ) );
+		$weight  = (int) $settings['logo_font_weight'];
+		$weights = array_unique( array( 400, 600, 700, $weight ) );
 		sort( $weights );
 		$parts[] = 'family=' . rawurlencode( $logo_family ) . ':wght@' . implode( ';', $weights );
 	}

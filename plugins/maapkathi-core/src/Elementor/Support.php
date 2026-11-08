@@ -207,16 +207,18 @@ final class Support {
 	 * @return void
 	 */
 	public static function enqueue_editor_styles(): void {
-		if ( ! function_exists( 'mk_asset_url' ) ) {
+		if ( ! function_exists( 'mk_asset_url' ) || ! function_exists( 'mk_asset_version' ) ) {
 			return;
 		}
 
 		foreach ( array( 'tokens', 'base', 'sections', 'motion' ) as $handle ) {
+			$relative = '/assets/css/' . $handle . '.css';
+
 			wp_enqueue_style(
 				'maapkathi-' . $handle,
-				mk_asset_url( '/assets/css/' . $handle . '.css' ),
+				mk_asset_url( $relative ),
 				array(),
-				null
+				mk_asset_version( $relative )
 			);
 		}
 	}

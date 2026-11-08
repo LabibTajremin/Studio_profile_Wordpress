@@ -22,6 +22,11 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 final class ServicesWidget extends SectionWidget {
 
+	/**
+	 * The section partial this widget renders.
+	 *
+	 * @return string
+	 */
 	protected function section_type(): string {
 		return 'services';
 	}
