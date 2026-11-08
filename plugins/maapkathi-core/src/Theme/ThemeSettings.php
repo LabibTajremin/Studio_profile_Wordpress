@@ -49,6 +49,15 @@ final class ThemeSettings {
 			'header_palette_id'      => '',
 			'header_hex'             => null,
 			'header_logo_mode'       => 'auto',
+			// Logo wordmark typography. The wordmark is a brand asset, so it
+			// gets its own face, size and weight rather than inheriting the
+			// heading pairing. 'inherit' keeps the previous behaviour, which
+			// is what an existing site must look like after this update.
+			'logo_font_id'           => LogoFonts::INHERIT,
+			'logo_font_custom'       => '',
+			'logo_font_url'          => '',
+			'logo_font_size'         => 18,
+			'logo_font_weight'       => 600,
 			// FR-06/07 icon sizing. The old rendered size was 28px, so
 			// "200% bigger" (3x) is 84 and "100% bigger" (2x) is 56. Both
 			// are exposed as numbers because that phrasing is genuinely
@@ -119,6 +128,7 @@ final class ThemeSettings {
 			'loader_style'           => array( 'none', 'bar', 'logo-fade' ),
 			'motion_on_mobile'       => array( 'full', 'reduced', 'off' ),
 			'header_logo_mode'       => array( 'auto', 'light', 'dark' ),
+			'logo_font_id'           => LogoFonts::ids(),
 			'services_icon_position' => array( 'beside', 'above' ),
 		);
 	}
@@ -197,6 +207,13 @@ final class ThemeSettings {
 				'pattern_opacity' => max( 0, min( 100, absint( $value ) ) ),
 				'header_opacity'  => max( 0, min( 100, absint( $value ) ) ),
 				'services_icon_size', 'values_icon_size' => max( 24, min( 160, absint( $value ) ) ),
+				// The wordmark sits in a fixed-height bar, so the range is
+				// bounded at both ends: below 10px it is unreadable, above
+				// 48px it breaks the header's own layout.
+				'logo_font_size'    => max( 10, min( 48, absint( $value ) ) ),
+				'logo_font_weight'  => self::sanitize_font_weight( $value ),
+				'logo_font_custom'  => self::sanitize_font_family( $value ),
+				'logo_font_url'     => self::sanitize_font_url( $value ),
 				'parallax_intensity' => max( 0, min( 100, absint( $value ) ) ),
 				'motion_speed'       => max( 50, min( 150, absint( $value ) ) ),
 				'stagger_ms'         => max( 0, min( 300, absint( $value ) ) ),
@@ -222,6 +239,99 @@ final class ThemeSettings {
 		$out['hero_style'] = 'full-bleed';
 
 		return $out;
+	}
+
+	/**
+	 * Clamps a CSS font-weight to the nine standard steps.
+	 *
+	 * @param mixed $value Raw posted weight.
+	 * @return int
+	 */
+	private static function sanitize_font_weight( $value ): int {
+		$weight = absint( $value );
+		$steps  = array( 100, 200, 300, 400, 500, 600, 700, 800, 900 );
+
+		return in_array( $weight, $steps, true ) ? $weight : 600;
+	}
+
+	/**
+	 * Normalises a custom font family name.
+	 *
+	 * The value is interpolated into a CSS font-family declaration and into
+	 * a Google Fonts query, so it is reduced to the characters a real family
+	 * name uses. That keeps a quote or a semicolon from closing the
+	 * declaration and injecting arbitrary CSS.
+	 *
+	 * @param mixed $value Raw posted family name.
+	 * @return string
+	 */
+	private static function sanitize_font_family( $value ): string {
+		if ( ! is_string( $value ) ) {
+			return '';
+		}
+
+		$family = (string) preg_replace( '/[^A-Za-z0-9 _-]/', '', trim( $value ) );
+		$family = (string) preg_replace( '/\s+/', ' ', $family );
+
+		return substr( trim( $family ), 0, 80 );
+	}
+
+	/**
+	 * Validates a custom webfont stylesheet URL.
+	 *
+	 * This URL is enqueued into <head>, so a stylesheet from anywhere can
+	 * restyle the whole page. Only https is accepted, and only a host that
+	 * actually serves fonts: an admin pasting the wrong link gets an empty
+	 * value rather than a third-party stylesheet over their site. Hosting
+	 * the file in the media library covers the self-hosted case.
+	 *
+	 * @param mixed $value Raw posted URL.
+	 * @return string Empty string when the URL is unusable.
+	 */
+	private static function sanitize_font_url( $value ): string {
+		if ( ! is_string( $value ) || '' === trim( $value ) ) {
+			return '';
+		}
+
+		$raw = trim( $value );
+
+		// Checked before esc_url_raw() rather than relying on it: that
+		// function leaves a protocol-relative "//host/path" intact, because
+		// no scheme is present for it to reject. Requiring the scheme here
+		// makes "https only" mean exactly that.
+		if ( 0 !== stripos( $raw, 'https://' ) ) {
+			return '';
+		}
+
+		$url = esc_url_raw( $raw, array( 'https' ) );
+		if ( '' === $url ) {
+			return '';
+		}
+
+		$host = strtolower( (string) wp_parse_url( $url, PHP_URL_HOST ) );
+		if ( '' === $host ) {
+			return '';
+		}
+
+		$allowed = array(
+			'fonts.googleapis.com',
+			'fonts.gstatic.com',
+			'use.typekit.net',
+			'p.typekit.net',
+			'use.fontawesome.com',
+			'fonts.bunny.net',
+			'cdn.jsdelivr.net',
+			'rsms.me',
+		);
+
+		// The site's own uploads are always allowed, which is how a licensed
+		// font file gets used without trusting an outside host.
+		$own = strtolower( (string) wp_parse_url( home_url(), PHP_URL_HOST ) );
+		if ( '' !== $own ) {
+			$allowed[] = $own;
+		}
+
+		return in_array( $host, $allowed, true ) ? $url : '';
 	}
 
 	/**

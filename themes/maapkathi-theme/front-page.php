@@ -22,6 +22,43 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 get_header();
 
+/*
+ * If the site has a static front page under Settings → Reading and that page
+ * was built with Elementor, the builder owns the homepage and the section
+ * layout below steps aside. front-page.php outranks page.php in WordPress's
+ * template hierarchy, so without this the builder's page would never render.
+ *
+ * Both conditions must hold, so installing Elementor cannot change an
+ * existing homepage on its own.
+ */
+$mk_builder_front = function_exists( 'mk_front_page_builder_id' ) ? mk_front_page_builder_id() : 0;
+
+if ( $mk_builder_front > 0 ) {
+	$mk_front_query = new WP_Query(
+		array(
+			'page_id'             => $mk_builder_front,
+			'post_type'           => 'page',
+			'posts_per_page'      => 1,
+			'ignore_sticky_posts' => true,
+		)
+	);
+
+	if ( $mk_front_query->have_posts() ) {
+		while ( $mk_front_query->have_posts() ) {
+			$mk_front_query->the_post();
+			echo '<div class="mk-builder-page">';
+			the_content();
+			echo '</div>';
+		}
+		wp_reset_postdata();
+
+		get_footer();
+		return;
+	}
+
+	wp_reset_postdata();
+}
+
 get_template_part( 'parts/hero' );
 
 foreach ( mk_section_layout() as $mk_section_row ) {

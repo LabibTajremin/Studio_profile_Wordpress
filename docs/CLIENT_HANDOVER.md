@@ -31,6 +31,22 @@
   screen under the Maapkathi menu.
 - Changing colours, fonts, or motion: Appearance → Theme / Motion. Every
   control updates the live site immediately on save — no developer needed.
+- The studio name beside your logo has its own font, size and weight under
+  Appearance → Theme → "Logo font". Pick one of the listed faces, or choose
+  "Custom font…" and type a Google Fonts family name to have it loaded for
+  you. A stylesheet link is accepted too, but only from Google Fonts, Bunny
+  Fonts, Adobe Typekit, jsDelivr, rsms.me or your own site — anything else
+  is dropped when you save, because a stylesheet can restyle the whole page.
+- Reordering the homepage: Appearance → "Homepage sections". Each section
+  has a number and an on/off switch side by side. Lower numbers come first,
+  so to move a section up give it a smaller number than the one above it.
+  The hero is always first. Adding, duplicating or deleting sections is
+  still on the Section Builder screen; both screens edit the same layout.
+- Building pages with Elementor: the theme's sections appear in Elementor's
+  widget panel under "Maapkathi Sections", so you can drag them onto a
+  page, reorder them, drop in two copies, or resize them in a column. Their
+  words and items are still edited on the Maapkathi screens, so one change
+  updates every place the section appears.
 - The hero always fills the whole screen, and whatever image, GIF or video
   you upload is scaled to cover it. There is deliberately no size or crop
   setting — you cannot accidentally make the hero small.

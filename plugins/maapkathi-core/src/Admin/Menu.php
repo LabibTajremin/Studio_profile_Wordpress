@@ -12,6 +12,7 @@ namespace Maapkathi\Core\Admin;
 use Maapkathi\Core\Roles\Roles;
 use Maapkathi\Core\Theme\HexColor;
 use Maapkathi\Core\Theme\ThemeSettings;
+use Maapkathi\Core\Sections\SectionLayout;
 use Maapkathi\Core\Storage\Adapters\LocalStorageAdapter;
 use Maapkathi\Core\Admin\Screens\HeroScreen;
 use Maapkathi\Core\Admin\Screens\ApprovalsScreen;
@@ -358,6 +359,8 @@ final class Menu {
 			$sanitized = ThemeSettings::sanitize( $raw );
 			update_option( ThemeSettings::OPTION, $sanitized );
 
+			$this->save_section_order();
+
 			if ( $field_errors ) {
 				echo '<div class="notice notice-error"><p>' . esc_html__( 'Saved, but one field was rejected — see the error below.', 'maapkathi' ) . '</p></div>';
 			} else {
@@ -366,7 +369,81 @@ final class Menu {
 		}
 
 		$settings = ThemeSettings::get();
+		$layout   = SectionLayout::get();
 
 		require MK_PLUGIN_DIR . 'src/Admin/views/appearance.php';
+	}
+
+	/**
+	 * Applies the ordinals and on/off switches posted by the Appearance
+	 * screen's homepage-sections table.
+	 *
+	 * The table posts an ordinal per instance rather than a sorted list, so
+	 * the work here is to turn those numbers back into the ordered layout
+	 * the theme renders. The nonce is already verified by the caller.
+	 *
+	 * Nothing is written when the table is absent from the request, so a
+	 * save posted by an older cached copy of the screen cannot wipe the
+	 * layout.
+	 *
+	 * @return void
+	 */
+	private function save_section_order(): void {
+		// phpcs:disable WordPress.Security.NonceVerification.Missing -- verified in render_appearance().
+		if ( ! isset( $_POST['mk_section_type'] ) || ! is_array( $_POST['mk_section_type'] ) ) {
+			return;
+		}
+
+		$types    = array_map( 'sanitize_text_field', wp_unslash( $_POST['mk_section_type'] ) );
+		$orders   = isset( $_POST['mk_section_order'] ) && is_array( $_POST['mk_section_order'] )
+			? array_map( 'absint', wp_unslash( $_POST['mk_section_order'] ) )
+			: array();
+		$switches = isset( $_POST['mk_section_enabled'] ) && is_array( $_POST['mk_section_enabled'] )
+			? array_map( 'absint', wp_unslash( $_POST['mk_section_enabled'] ) )
+			: array();
+		// phpcs:enable WordPress.Security.NonceVerification.Missing
+
+		$rows     = array();
+		$position = 0;
+
+		foreach ( $types as $id => $type ) {
+			$id = (string) $id;
+
+			// The hero's ordinal field is disabled in the markup, so it never
+			// posts one. It renders above the loop regardless, and sorting it
+			// to the front keeps the stored layout honest about that.
+			$ordinal = ( 'hero' === $type )
+				? 0
+				: ( isset( $orders[ $id ] ) ? max( 1, min( 999, absint( $orders[ $id ] ) ) ) : 999 );
+
+			$rows[] = array(
+				'id'       => $id,
+				'type'     => (string) $type,
+				'enabled'  => ! empty( $switches[ $id ] ),
+				'_ordinal' => $ordinal,
+				// Tie-break on the order the rows arrived in, so two sections
+				// sharing a number keep their current relative order instead
+				// of shuffling on every save.
+				'_seq'     => $position++,
+			);
+		}
+
+		usort(
+			$rows,
+			static function ( array $a, array $b ): int {
+				return array( $a['_ordinal'], $a['_seq'] ) <=> array( $b['_ordinal'], $b['_seq'] );
+			}
+		);
+
+		$layout = array();
+		foreach ( $rows as $row ) {
+			$layout[] = array(
+				'id'      => $row['id'],
+				'type'    => $row['type'],
+				'enabled' => $row['enabled'],
+			);
+		}
+
+		update_option( SectionLayout::OPTION, SectionLayout::sanitize( $layout ) );
 	}
 }
