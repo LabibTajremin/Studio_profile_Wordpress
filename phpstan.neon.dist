@@ -23,6 +23,28 @@ parameters:
     # "the ignore is stale". reportUnmatched is set per entry rather than
     # globally, so any ignore added later is still checked for drift.
     ignoreErrors:
+        # The Elementor integration is written against classes that exist
+        # only when Elementor is installed. Elementor is an optional plugin
+        # an admin may or may not have, not a dependency of this one, and
+        # the integration checks for it at runtime before touching any of
+        # those symbols (Support::is_available(), which also pins a minimum
+        # version). Requiring the whole plugin as a dev dependency purely to
+        # satisfy the analyser would be a large download for no added
+        # safety, so the unknown-symbol family is ignored for this
+        # directory and nowhere else. These are reported if they stop
+        # matching, so adding Elementor as a dependency later surfaces them
+        # rather than leaving a stale ignore behind.
+        -
+            message: '#(has invalid type|on an unknown class|extends unknown class) Elementor#'
+            paths:
+                - plugins/maapkathi-core/src/Elementor
+        # Inherited Elementor\Widget_Base methods (start_controls_section,
+        # add_control, get_settings_for_display, ...) are unresolvable for
+        # the same reason: the parent class is not on disk here.
+        -
+            message: '#^Call to an undefined method Maapkathi\\Core\\Elementor\\Widgets\\SectionWidget::#'
+            paths:
+                - plugins/maapkathi-core/src/Elementor
         -
             message: '#^Result of \|\| is always true\.$#'
             reportUnmatched: false
